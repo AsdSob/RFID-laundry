@@ -1,0 +1,120 @@
+﻿<UserControl x:Class="PALMS.Settings.View.Users.UserEditView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:noteSearchLinen="clr-namespace:PALMS.Settings.ViewModel.Users;assembly=PALMS.Settings.ViewModel"
+             xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
+             xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:behaviors="clr-namespace:PALMS.Settings.View.Behaviors"
+             xmlns:behaviors1="clr-namespace:PALMS.View.Common.Behaviors;assembly=PALMS.View.Common"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:utils="clr-namespace:PALMS.ViewModels.Common;assembly=PALMS.ViewModels.Common"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="600"
+             d:DataContext="{d:DesignInstance noteSearchLinen:UserEditViewModel}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions >
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <dxr:RibbonControl Grid.Row="0"
+                           Grid.ColumnSpan="3"
+                           ShowApplicationButton="False"
+                           ToolbarShowMode="Hide"
+                           RibbonHeaderVisibility="Collapsed">
+            <dxr:RibbonDefaultPageCategory>
+                <dxr:RibbonPage Caption="Home">
+                    <dxr:RibbonPageGroup Caption="Edit" ShowCaptionButton="False">
+
+                        <dxb:BarButtonItem Content="Add"
+                                           Hint="Add new user"
+                                           Command="{Binding AddCommand}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/add_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/add_64.png"
+                                           RibbonStyle="Large" />                        
+                        
+                        <dxb:BarButtonItem Content="Save"
+                                           Hint="Save Changes"
+                                           Command="{Binding SaveCommand}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/save_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/save_64.png"
+                                           IsEnabled="{Binding ElementName=ValidationContainer, Path=(dxe:ValidationService.HasValidationError), Converter={StaticResource BooleanNegationConverter}}"
+                                           RibbonStyle="Large" />
+
+                        <dxb:BarButtonItem Content="Delete"
+                                           Hint="Delete user"
+                                           Command="{Binding DeleteCommand}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/delete_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/delete_64.png"
+                                           RibbonStyle="Large" />
+
+                    </dxr:RibbonPageGroup>
+                </dxr:RibbonPage>
+            </dxr:RibbonDefaultPageCategory>
+        </dxr:RibbonControl>
+
+<Grid Grid.Row="1" Grid.Column="0">
+        <dxg:GridControl x:Name="ItemsGridControl"
+                         dxe:ValidationService.IsValidationContainer="True"
+                         ItemsSource="{Binding Users}"
+                         SelectedItem="{Binding SelectedUser}"
+                         ShowBorder="True">
+
+            <i:Interaction.Behaviors>
+                <behaviors:DictionaryEditBehavior/>
+                <behaviors1:GridViewNewItemSelectionBehavior />
+                <behaviors1:GridViewValidationBehavior IsValid="{Binding IsValid, Mode=OneWayToSource}"/>
+            </i:Interaction.Behaviors>
+
+
+            <dxg:GridControl.View>
+                <dxg:TableView EnableImmediatePosting="True"
+                               ShowSearchPanelFindButton="True"
+                               ShowSearchPanelMode="Always" 
+                               AutoWidth="True"/>
+            </dxg:GridControl.View>
+
+                <dxg:GridControl.Columns>
+                <dxg:GridColumn FieldName="Id" Width="30" HorizontalHeaderContentAlignment="Center" AllowEditing="False" >
+                    <dxg:GridColumn.EditSettings>
+                        <dxe:TextEditSettings MaxLength="{x:Static utils:ValidationExtension.DefaultMaxLength}" HorizontalContentAlignment="Center"/>
+                    </dxg:GridColumn.EditSettings>
+                </dxg:GridColumn>
+
+                <dxg:GridColumn FieldName="Name">
+                    <dxg:GridColumn.EditSettings>
+                        <dxe:TextEditSettings MaxLength="{x:Static utils:ValidationExtension.DefaultMaxLength}"/>
+                    </dxg:GridColumn.EditSettings>
+                </dxg:GridColumn>
+
+                <dxg:GridColumn FieldName="Password">
+                    <dxg:GridColumn.EditSettings>
+                        <dxe:TextEditSettings MaxLength="{x:Static utils:ValidationExtension.DefaultMaxLength}"/>
+                    </dxg:GridColumn.EditSettings>
+                </dxg:GridColumn>
+
+                <dxg:GridColumn FieldName="UserRoleId" 
+                                Header="Role" 
+                                ShowGroupedColumn="True" 
+                                >
+                    <dxg:GridColumn.EditSettings>
+                        <dxe:ComboBoxEditSettings ItemsSource="{Binding ElementName=ItemsGridControl, Path=DataContext.UserRoles}" 
+                                                  IsTextEditable="False"
+                                                  DisplayMember="Name" 
+                                                  ValueMember="Id"/>
+                    </dxg:GridColumn.EditSettings>
+                </dxg:GridColumn>
+
+            </dxg:GridControl.Columns>
+
+        </dxg:GridControl>
+</Grid>
+    </Grid>
+</UserControl>

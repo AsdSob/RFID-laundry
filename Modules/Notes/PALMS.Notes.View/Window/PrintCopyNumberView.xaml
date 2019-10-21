@@ -1,0 +1,92 @@
+﻿<controls:CustomWindow x:Class="PALMS.Notes.View.Window.PrintCopyNumberView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:PALMS.View.Common.Controls;assembly=PALMS.View.Common"
+             xmlns:viewModel="clr-namespace:PALMS.Notes.ViewModel.Window;assembly=PALMS.Notes.ViewModel"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
+             xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             d:DataContext="{d:DesignInstance viewModel:PrintCopyNumberViewModel}"
+             mc:Ignorable="d" 
+             Height="150" Width="400">
+
+    <controls:CustomWindow.Resources>
+        <Style TargetType="Button">
+            <Setter Property="FontSize" Value="25"/>
+            <Setter Property="Margin" Value="3"/>
+            <Setter Property="FontWeight" Value="UltraLight"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="LightBlue"/>
+        </Style>
+    </controls:CustomWindow.Resources>
+
+    <!--<dxmvvm:Interaction.Behaviors>
+        <dxmvvm:KeyToCommand Keyboard.KeyDown="1" Command="{Binding PrintCopyCommand}" CommandParameter="1" MarkRoutedEventsAsHandled="True"/>
+        <dxmvvm:KeyToCommand Keyboard.KeyUp="2" Command="{Binding PrintCopyCommand}" CommandParameter="2"/>
+        --><!--<dxmvvm:KeyToCommand KeyGesture="Ctrl+n" Command="{Binding AddNoteCommand}"/>--><!--
+
+    </dxmvvm:Interaction.Behaviors>-->
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+
+        <!--<dxr:RibbonControl Grid.Row="0"
+                           Grid.Column="0"
+                           Grid.ColumnSpan="3"
+                           ShowApplicationButton="False"
+                           ToolbarShowMode="Hide"
+                           RibbonHeaderVisibility="Collapsed">
+            <dxr:RibbonDefaultPageCategory>
+                <dxr:RibbonPage>
+                    <dxr:RibbonPageGroup ShowCaptionButton="False">
+                        <dxb:BarButtonItem Content="1"
+                                           Hint="1 Copy"
+                                           Command="{Binding PrintCopyCommand}"
+                                           CommandParameter="1"
+                                           IsEnabled="{Binding ElementName=ValidationContainer, Path=(dxe:ValidationService.HasValidationError)}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/print_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/print_64.png"
+                                           RibbonStyle="Large"/>
+
+                        <dxb:BarButtonItem Content="2"
+                                           Hint="2 Copy"
+                                           Command="{Binding PrintCopyCommand}"
+                                           CommandParameter="2"
+                                           IsEnabled="{Binding ElementName=ValidationContainer, Path=(dxe:ValidationService.HasValidationError)}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/print_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/print_64.png"
+                                           RibbonStyle="Large"/>
+
+                        <dxb:BarButtonItem Content="3"
+                                           Hint="3 Copy"
+                                           Command="{Binding PrintCopyCommand}"
+                                           CommandParameter="3"
+                                           IsEnabled="{Binding ElementName=ValidationContainer, Path=(dxe:ValidationService.HasValidationError)}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/print_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/print_64.png"
+                                           RibbonStyle="Large"/>
+
+
+                    </dxr:RibbonPageGroup>
+                </dxr:RibbonPage>
+            </dxr:RibbonDefaultPageCategory>
+        </dxr:RibbonControl>-->
+
+        <Button Grid.Column="0" Grid.Row="1" Content="1" CommandParameter="1" Command="{Binding PrintCopyCommand}" />
+        <Button Grid.Column="1" Grid.Row="1" Content="2" CommandParameter="2" Command="{Binding PrintCopyCommand}" />
+        <Button Grid.Column="2" Grid.Row="1" Content="3" CommandParameter="3" Command="{Binding PrintCopyCommand}" />
+
+    </Grid>
+</controls:CustomWindow>

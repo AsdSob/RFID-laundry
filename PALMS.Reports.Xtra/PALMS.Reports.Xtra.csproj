@@ -1,0 +1,395 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5A0B4B29-5F8F-4BAF-9942-3A7A73519369}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PALMS.Reports.Xtra</RootNamespace>
+    <AssemblyName>PALMS.Reports.Xtra</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DevExpress.Charts.v17.2.Core, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Charts.v17.2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.CodeParser.v17.2, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.CodeParser.v17.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Data.v17.2, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Data.v17.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.DataAccess.v17.2, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.DataAccess.v17.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Mvvm.v17.2, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Mvvm.v17.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Office.v17.2.Core, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Office.v17.2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Pdf.v17.2.Core, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Pdf.v17.2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.PivotGrid.v17.2.Core, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.PivotGrid.v17.2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Printing.v17.2.Core, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Printing.v17.2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.RichEdit.v17.2.Core, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.RichEdit.v17.2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.RichEdit.v17.2.Export, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.RichEdit.v17.2.Export.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Sparkline.v17.2.Core, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Sparkline.v17.2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Utils.v17.2, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Utils.v17.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Utils.v17.2.UI, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Utils.v17.2.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Controls.v17.2, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Xpf.Controls.v17.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Core.v17.2, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Xpf.Core.v17.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.DataAccess.v17.2, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Xpf.DataAccess.v17.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.DocumentViewer.v17.2.Core, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Xpf.DocumentViewer.v17.2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Grid.v17.2, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Xpf.Grid.v17.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Grid.v17.2.Core, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Xpf.Grid.v17.2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Grid.v17.2.Extensions, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Xpf.Grid.v17.2.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.LayoutControl.v17.2, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Xpf.LayoutControl.v17.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Printing.v17.2, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Xpf.Printing.v17.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.PropertyGrid.v17.2, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Xpf.PropertyGrid.v17.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Ribbon.v17.2, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Xpf.Ribbon.v17.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Themes.MetropolisDark.v17.2, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Xpf.Themes.MetropolisDark.v17.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Themes.MetropolisLight.v17.2, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Xpf.Themes.MetropolisLight.v17.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Themes.Office2016Colorful.v17.2, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Xpf.Themes.Office2016Colorful.v17.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Themes.Office2016ColorfulSE.v17.2, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Xpf.Themes.Office2016ColorfulSE.v17.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Themes.Office2016DarkGraySE.v17.2, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Xpf.Themes.Office2016DarkGraySE.v17.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Themes.Office2016White.v17.2, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Xpf.Themes.Office2016White.v17.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpo.v17.2, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.Xpo.v17.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.XtraCharts.v17.2, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.XtraCharts.v17.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.XtraGauges.v17.2.Core, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.XtraGauges.v17.2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.XtraPrinting.v17.2, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.XtraPrinting.v17.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.XtraReports.v17.2, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.XtraReports.v17.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.XtraReports.v17.2.Extensions, Version=17.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\DevExpress\DevExpress.XtraReports.v17.2.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UIAutomationProvider" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="IXtraReport.cs" />
+    <Compile Include="ReportFactory.cs" />
+    <Compile Include="ReportsService.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Reports\ClientsXtraReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\ClientsXtraReport.Designer.cs">
+      <DependentUpon>ClientsXtraReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\InvoiceXtraReports\AnnexTotalXtraReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\InvoiceXtraReports\AnnexTotalXtraReport.Designer.cs">
+      <DependentUpon>AnnexTotalXtraReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\InvoiceXtraReports\CoverPageXtraReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\InvoiceXtraReports\CoverPageXtraReport.Designer.cs">
+      <DependentUpon>CoverPageXtraReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\LabelXtraReports\LabelNameOnlyXtraReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\LabelXtraReports\LabelNameOnlyXtraReport.Designer.cs">
+      <DependentUpon>LabelNameOnlyXtraReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\LabelXtraReports\LabelLogoXtraReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\LabelXtraReports\LabelLogoXtraReport.Designer.cs">
+      <DependentUpon>LabelLogoXtraReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\LinensInvoiceXtraReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\LinensInvoiceXtraReport.Designer.cs">
+      <DependentUpon>LinensInvoiceXtraReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\ClientLinensXtraReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\ClientLinensXtraReport.Designer.cs">
+      <DependentUpon>ClientLinensXtraReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\NoteXtraReports\NoteByLinenXtraReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\NoteXtraReports\NoteByLinenXtraReport.Designer.cs">
+      <DependentUpon>NoteByLinenXtraReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\NoteXtraReports\NoteByNoteItemXtraReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\NoteXtraReports\NoteByNoteItemXtraReport.Designer.cs">
+      <DependentUpon>NoteByNoteItemXtraReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\NoteXtraReports\NoteByNoteXtraReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\NoteXtraReports\NoteByNoteXtraReport.Designer.cs">
+      <DependentUpon>NoteByNoteXtraReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\NoteXtraReports\NoteByTotalXtraReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\NoteXtraReports\NoteByTotalXtraReport.Designer.cs">
+      <DependentUpon>NoteByTotalXtraReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\NoteXtraReports\NoteXtraReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\NoteXtraReports\NoteXtraReport.Designer.cs">
+      <DependentUpon>NoteXtraReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\ReportTypes\ClientLinenPriceXtraReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\ReportTypes\ClientLinenPriceXtraReport.Designer.cs">
+      <DependentUpon>ClientLinenPriceXtraReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\ReportTypes\LaundryKgXtraReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\ReportTypes\LaundryKgXtraReport.Designer.cs">
+      <DependentUpon>LaundryKgXtraReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\ReportTypes\LinenReportXtraReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\ReportTypes\LinenReportXtraReport.Designer.cs">
+      <DependentUpon>LinenReportXtraReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\ReportTypes\NoteByStatusXtraReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\ReportTypes\NoteByStatusXtraReport.Designer.cs">
+      <DependentUpon>NoteByStatusXtraReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\XtraReportBase.cs">
+      <SubType>Component</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Modules\Reports\PALMS.Reports.ViewModel\PALMS.Reports.ViewModel.csproj">
+      <Project>{C4D401F6-0B3F-4B30-B0BA-3CBC04FA21D8}</Project>
+      <Name>PALMS.Reports.ViewModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PALMS.Reports.Common\PALMS.Reports.Common.csproj">
+      <Project>{8fb22f7c-8012-484f-ad91-1da067dd09bc}</Project>
+      <Name>PALMS.Reports.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PALMS.Reports.Model\PALMS.Reports.Model.csproj">
+      <Project>{29460014-7c56-4df6-bbf4-89f35b220c8b}</Project>
+      <Name>PALMS.Reports.Model</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\licenses.licx" />
+    <EmbeddedResource Include="Reports\ClientsXtraReport.resx">
+      <DependentUpon>ClientsXtraReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\InvoiceXtraReports\CoverPageXtraReport.resx">
+      <DependentUpon>CoverPageXtraReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\LabelXtraReports\LabelNameOnlyXtraReport.resx">
+      <DependentUpon>LabelNameOnlyXtraReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\LabelXtraReports\LabelLogoXtraReport.resx">
+      <DependentUpon>LabelLogoXtraReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\LinensInvoiceXtraReport.resx">
+      <DependentUpon>LinensInvoiceXtraReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\ClientLinensXtraReport.resx">
+      <DependentUpon>ClientLinensXtraReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\NoteXtraReports\NoteByNoteItemXtraReport.resx">
+      <DependentUpon>NoteByNoteItemXtraReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\NoteXtraReports\NoteByLinenXtraReport.resx">
+      <DependentUpon>NoteByLinenXtraReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\NoteXtraReports\NoteByNoteXtraReport.resx">
+      <DependentUpon>NoteByNoteXtraReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\NoteXtraReports\NoteByTotalXtraReport.resx">
+      <DependentUpon>NoteByTotalXtraReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\NoteXtraReports\NoteXtraReport.resx">
+      <DependentUpon>NoteXtraReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\ReportTypes\ClientLinenPriceXtraReport.resx">
+      <DependentUpon>ClientLinenPriceXtraReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\ReportTypes\LaundryKgXtraReport.resx">
+      <DependentUpon>LaundryKgXtraReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\ReportTypes\LinenReportXtraReport.resx">
+      <DependentUpon>LinenReportXtraReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\ReportTypes\NoteByStatusXtraReport.resx">
+      <DependentUpon>NoteByStatusXtraReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\XtraReportBase.resx">
+      <DependentUpon>XtraReportBase.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\Libs\DevExpress\DevExpress.Utils.v17.2.dll" />
+    <Analyzer Include="..\Libs\DevExpress\DevExpress.Utils.v17.2.UI.dll" />
+    <Analyzer Include="..\Libs\DevExpress\DevExpress.Xpf.Controls.v17.2.dll" />
+    <Analyzer Include="..\Libs\DevExpress\DevExpress.Xpf.Core.v17.2.dll" />
+    <Analyzer Include="..\Libs\DevExpress\DevExpress.Xpf.DataAccess.v17.2.dll" />
+    <Analyzer Include="..\Libs\DevExpress\DevExpress.Xpf.DocumentViewer.v17.2.Core.dll" />
+    <Analyzer Include="..\Libs\DevExpress\DevExpress.Xpf.Grid.v17.2.Core.dll" />
+    <Analyzer Include="..\Libs\DevExpress\DevExpress.Xpf.Grid.v17.2.dll" />
+    <Analyzer Include="..\Libs\DevExpress\DevExpress.Xpf.Grid.v17.2.Extensions.dll" />
+    <Analyzer Include="..\Libs\DevExpress\DevExpress.Xpf.LayoutControl.v17.2.dll" />
+    <Analyzer Include="..\Libs\DevExpress\DevExpress.Xpf.Printing.v17.2.dll" />
+    <Analyzer Include="..\Libs\DevExpress\DevExpress.Xpf.PropertyGrid.v17.2.dll" />
+    <Analyzer Include="..\Libs\DevExpress\DevExpress.Xpf.Ribbon.v17.2.dll" />
+    <Analyzer Include="..\Libs\DevExpress\DevExpress.Xpf.Themes.MetropolisDark.v17.2.dll" />
+    <Analyzer Include="..\Libs\DevExpress\DevExpress.Xpf.Themes.MetropolisLight.v17.2.dll" />
+    <Analyzer Include="..\Libs\DevExpress\DevExpress.Xpf.Themes.Office2016Colorful.v17.2.dll" />
+    <Analyzer Include="..\Libs\DevExpress\DevExpress.Xpf.Themes.Office2016ColorfulSE.v17.2.dll" />
+    <Analyzer Include="..\Libs\DevExpress\DevExpress.Xpf.Themes.Office2016DarkGraySE.v17.2.dll" />
+    <Analyzer Include="..\Libs\DevExpress\DevExpress.Xpf.Themes.Office2016White.v17.2.dll" />
+    <Analyzer Include="..\Libs\DevExpress\DevExpress.Xpo.v17.2.dll" />
+    <Analyzer Include="..\Libs\DevExpress\DevExpress.XtraGauges.v17.2.Core.dll" />
+    <Analyzer Include="..\Libs\DevExpress\DevExpress.XtraPrinting.v17.2.dll" />
+    <Analyzer Include="..\Libs\DevExpress\DevExpress.XtraReports.v17.2.dll" />
+    <Analyzer Include="..\Libs\DevExpress\DevExpress.XtraReports.v17.2.Extensions.dll" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

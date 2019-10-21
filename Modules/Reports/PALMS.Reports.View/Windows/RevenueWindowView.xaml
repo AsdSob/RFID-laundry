@@ -1,0 +1,146 @@
+﻿<controls:CustomWindow x:Class="PALMS.Reports.View.Windows.RevenueWindowView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:windows="clr-namespace:PALMS.Reports.ViewModel.Windows;assembly=PALMS.Reports.ViewModel"
+        xmlns:controls="clr-namespace:PALMS.View.Common.Controls;assembly=PALMS.View.Common"
+        xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+        xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+        xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
+        xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+        d:DataContext="{d:DesignInstance windows:RevenueWindowViewModel}"
+        mc:Ignorable="d" 
+        Height="600" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="0.3*"/>
+        </Grid.ColumnDefinitions>
+
+        <dxr:RibbonControl Grid.Row="0"
+                           Grid.ColumnSpan="2"
+                           Grid.Column="0"
+                           ShowApplicationButton="False"
+                           ToolbarShowMode="Hide"
+                           RibbonHeaderVisibility="Collapsed">
+            <dxr:RibbonDefaultPageCategory>
+                <dxr:RibbonPage>
+
+                    <dxr:RibbonPageGroup ShowCaptionButton="False">
+                        <dxb:BarButtonItem Content="Save"
+                                           Command="{Binding PrintCommand}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/print_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/print_64.png"
+                                           RibbonStyle="Large"/>
+
+                    </dxr:RibbonPageGroup>
+
+                </dxr:RibbonPage>
+            </dxr:RibbonDefaultPageCategory>
+        </dxr:RibbonControl>
+
+
+        <!-- Clients -->
+        <Grid Grid.Column="0" Grid.Row="1" Margin="5">
+            <dxg:GridControl 
+                             Width="Auto"
+                             Height="Auto"
+                             x:Name="GridControlClient"
+                             ItemsSource="{Binding Clients}"
+                             ShowBorder="True">
+
+                <dxg:GridControl.View>
+                    <dxg:TableView AutoWidth="True"
+                                   ShowGroupedColumns="True"
+                                   AllowFixedGroups="True"
+                                   ShowIndicator="True"
+                                   ShowGroupPanel="False"
+                                   AllowGrouping="False"
+                                   NavigationStyle="Cell"
+                                   EnableImmediatePosting="True"
+                                   AllowEditing="False" 
+                                   ShowSearchPanelMode="Always"
+                                   VerticalScrollbarVisibility="Auto"
+                                   HorizontalScrollbarVisibility="Visible"
+                                   AllowConditionalFormattingMenu="True" 
+                                   AllowScrollAnimation="True" 
+                                   >
+                    </dxg:TableView>
+                </dxg:GridControl.View>
+
+                <dxg:GridControl.Columns>
+
+                    <dxg:GridColumn FieldName="IsSelected" Header="*" Width="20" AllowEditing="True" HorizontalHeaderContentAlignment="Center" />
+                    <dxg:GridColumn FieldName="Id" Header="Id" Width="30" HorizontalHeaderContentAlignment="Center" />
+                    <dxg:GridColumn FieldName="ShortName" Width="150" HorizontalHeaderContentAlignment="Center"/>
+                    <dxg:GridColumn FieldName="Active" Header="Active" Width="50" HorizontalHeaderContentAlignment="Center" />
+                    <dxg:GridColumn FieldName="Name" Width="200" HorizontalHeaderContentAlignment="Center"/>
+
+                </dxg:GridControl.Columns>
+            </dxg:GridControl>
+        </Grid>
+
+
+        <!-- Date Range, parameters-->
+
+        <Grid Grid.Column="1" Grid.Row="1" Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <GroupBox Header="Start Date" 
+                      Grid.Row="0" 
+                      Grid.Column="0" 
+                      Margin="1">
+
+                <dxe:DateEdit DockPanel.Dock="Bottom" 
+                              Mask="Y"
+                              MaskUseAsDisplayFormat="True"
+                              VerticalAlignment="Center" 
+                              EditValue="{Binding DateStart, UpdateSourceTrigger=PropertyChanged}"
+                              AllowRoundOutOfRangeValue="False">
+
+                    <dxe:DateEdit.StyleSettings>
+                            <dxe:DateEditPickerStyleSettings />
+                        </dxe:DateEdit.StyleSettings>
+                </dxe:DateEdit>
+            </GroupBox>
+
+            <GroupBox Header="End Date" 
+                      Grid.Row="1" 
+                      Grid.Column="0" 
+                      Margin="1">
+
+                <dxe:DateEdit DockPanel.Dock="Bottom" 
+                              Mask="Y"
+                              MaskUseAsDisplayFormat="True"
+                              VerticalAlignment="Center" 
+                              EditValue="{Binding DateEnd, UpdateSourceTrigger=PropertyChanged}"
+                              AllowRoundOutOfRangeValue="False">
+
+                    <dxe:DateEdit.StyleSettings>
+                        <dxe:DateEditPickerStyleSettings />
+                    </dxe:DateEdit.StyleSettings>
+                </dxe:DateEdit>
+            </GroupBox>
+
+            <GroupBox Grid.Row="2" Grid.Column="0" Margin="0,10" Header="By Soiled kg" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">
+            <CheckBox HorizontalAlignment="Center"
+                      IsChecked="{Binding BySoiledKg, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"/>
+            </GroupBox>
+
+        </Grid>
+
+
+    </Grid>
+</controls:CustomWindow>

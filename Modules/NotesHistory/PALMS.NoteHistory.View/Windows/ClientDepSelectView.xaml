@@ -1,0 +1,115 @@
+﻿<controls:CustomWindow x:Class="PALMS.NoteHistory.View.Windows.ClientDepSelectView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PALMS.NoteHistory.View.Windows"
+             xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
+             xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             mc:Ignorable="d" 
+             xmlns:windows="clr-namespace:PALMS.NoteHistory.ViewModel.Windows;assembly=PALMS.NoteHistory.ViewModel"
+             xmlns:controls="clr-namespace:PALMS.View.Common.Controls;assembly=PALMS.View.Common"
+             d:DataContext="{d:DesignInstance windows:ClientDepSelectViewModel}"
+                       Height="600" Width="400">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <dxr:RibbonControl Grid.Row="0"
+                           Grid.Column="0"
+                           Grid.ColumnSpan="2"
+                           ShowApplicationButton="False"
+                           ToolbarShowMode="Hide"
+                           RibbonHeaderVisibility="Collapsed">
+            <dxr:RibbonDefaultPageCategory>
+                <dxr:RibbonPage>
+                    <dxr:RibbonPageGroup ShowCaptionButton="False">
+                        <dxb:BarButtonItem Content="Select"
+                                           Hint="Select Department For Note"
+                                           Command="{Binding SelectDepartCommand}"
+                                           IsEnabled="{Binding ElementName=ValidationContainer, Path=(dxe:ValidationService.HasValidationError)}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/add_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/add_64.png"
+                                           RibbonStyle="Large"/>
+                    </dxr:RibbonPageGroup>
+                </dxr:RibbonPage>
+            </dxr:RibbonDefaultPageCategory>
+        </dxr:RibbonControl>
+
+        <Grid Grid.Column="0" 
+              Grid.Row="1">
+            <dxg:GridControl 
+                Margin="10"
+                x:Name="GridControlClient"
+                SelectedItem="{Binding SelectedClient}"
+                ItemsSource="{Binding Clients}"
+                ShowBorder="True">
+
+                <dxg:GridControl.View>
+                    <dxg:TreeListView AutoWidth="True"
+                                      ShowIndicator="False"
+                                      ShowHorizontalLines="True"
+                                      SearchPanelFindMode="Always"
+                                      NavigationStyle="Cell"
+                                      EnableImmediatePosting="True"
+                                      AllowEditing="False" 
+                                      ParentFieldName="ParentId"
+                                      VerticalScrollbarVisibility="Auto"
+                                      KeyFieldName="Id"
+                                      ShowColumnHeaders="False"
+                                      ShowVerticalLines="False"/>
+
+                </dxg:GridControl.View>
+
+                <dxg:GridControl.Columns>
+                    <dxg:GridColumn FieldName="ShortName" Width="150" HorizontalHeaderContentAlignment="Center"/>
+                </dxg:GridControl.Columns>
+            </dxg:GridControl>
+        </Grid>
+
+        <Grid Grid.Column="1" 
+              Grid.Row="1">
+            <dxg:GridControl 
+                             Margin="10"
+                             x:Name="GridControlDepartment"
+                             SelectedItem="{Binding SelectedDepartment}"
+                             ItemsSource="{Binding SortedDepartments}"
+                             ShowBorder="True">
+
+
+                <dxmvvm:Interaction.Behaviors>
+                    <dxmvvm:EventToCommand EventName="MouseDoubleClick" Command="{Binding SelectDepartCommand}"/>
+                </dxmvvm:Interaction.Behaviors>
+
+                <dxg:GridControl.View>
+                    <dxg:TreeListView AutoWidth="True"
+                                      ShowIndicator="False"
+                                      ShowHorizontalLines="True"
+                                      SearchPanelFindMode="Always"
+                                      NavigationStyle="Cell"
+                                      EnableImmediatePosting="True"
+                                      AllowEditing="False" 
+                                      ParentFieldName="ParentId"
+                                      VerticalScrollbarVisibility="Auto"
+                                      KeyFieldName="Id"
+                                      ShowColumnHeaders="False"
+                                      ShowVerticalLines="False"/>
+
+                </dxg:GridControl.View>
+
+                <dxg:GridControl.Columns>
+                    <dxg:GridColumn FieldName="Name" Width="150" HorizontalHeaderContentAlignment="Center"/>
+                </dxg:GridControl.Columns>
+            </dxg:GridControl>
+        </Grid>
+    </Grid>
+</controls:CustomWindow>

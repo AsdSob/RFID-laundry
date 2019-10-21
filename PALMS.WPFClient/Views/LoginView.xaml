@@ -1,0 +1,106 @@
+﻿<UserControl x:Class="PALMS.WPFClient.Views.LoginView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:windowViewModel="clr-namespace:PALMS.ViewModels.WindowViewModel;assembly=PALMS.ViewModels"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance windowViewModel:LoginViewModel}">
+    <UserControl.Resources>
+        <Thickness x:Key="Margin">5</Thickness>
+    </UserControl.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="10"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MinWidth="100"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        
+        <Image Grid.Row="0"
+               Grid.Column="0"
+               Grid.ColumnSpan="2"
+               Source="/PALMS.View.Resources;component/Icons/logo.png"
+               Width="300"/>
+        
+        <!-- login -->
+        <TextBlock Grid.Row="1"
+                   Grid.Column="0"
+                   Text="Login"
+                   Opacity="0.7"
+                   Margin="{StaticResource Margin}"
+                   VerticalAlignment="Center"/>
+        <dxe:TextEdit Grid.Row="1"
+                      Grid.Column="1"
+                      Margin="{StaticResource Margin}"
+                      EditValue="{Binding Login, UpdateSourceTrigger=PropertyChanged}"
+                      BorderThickness="1"
+                      ShowBorder="False">
+            <dxmvvm:Interaction.Behaviors>
+                <dxmvvm:FocusBehavior SourceName="LayoutRoot" EventName="Loaded" FocusDelay="0:0:0.5" />
+            </dxmvvm:Interaction.Behaviors>
+        </dxe:TextEdit>
+        <Border Grid.Row="1"
+                Grid.Column="1"
+                BorderThickness="0,0,0,1"
+                Margin="0,0,5,0"
+                BorderBrush="Black"
+                Opacity="0.4"/>
+
+        <!-- password -->
+        <TextBlock Grid.Row="2"
+                   Grid.Column="0"
+                   Text="Password"
+                   Opacity="0.7"
+                   Margin="{StaticResource Margin}"
+                   VerticalAlignment="Center"/>
+        <dxe:PasswordBoxEdit Grid.Row="2"
+                             Grid.Column="1"
+                             ShowBorder="False"
+                             Margin="{StaticResource Margin}"
+                             EditValue="{Binding Password, UpdateSourceTrigger=PropertyChanged}" />
+        <Border Grid.Row="2"
+                Grid.Column="1"
+                BorderThickness="0,0,0,1"
+                Margin="0,0,5,0"
+                BorderBrush="Black"
+                Opacity="0.4"/>
+
+        <Grid Grid.Row="3"
+              Grid.Column="0"
+              Grid.ColumnSpan="2">
+            <TextBlock Text="{Binding ErrorText}"
+                       Visibility="{Binding ErrorText, Converter={StaticResource ObjectToVisibilityConverter}}"
+                       Margin="5,0,0,0"
+                       Foreground="Red"/>
+        </Grid>
+
+        <!-- buttons -->
+        <StackPanel Grid.Row="4"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+            <Button Content="OK"
+                    Command="{Binding LoginCommand}"
+                    Margin="5"
+                    Width="100"
+                    Height="24"
+                    IsDefault="True"/>
+            <Button Content="Cancel"
+                    Command="{Binding CancelCommand}"
+                    Margin="5"
+                    Width="100"
+                    Height="24"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

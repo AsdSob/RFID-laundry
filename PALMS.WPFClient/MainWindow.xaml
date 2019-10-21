@@ -1,0 +1,37 @@
+﻿<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+        x:Class="PALMS.WPFClient.MainWindow"
+        mc:Ignorable="d"
+        Title="PALMS"
+        Icon="/PALMS.WPFClient;component/Icons/master_lines.png"
+        Height="{StaticResource DefaultHeight}"
+        Width="{StaticResource DefaultWidth}"
+        WindowStyle="ThreeDBorderWindow"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        DataContext="{Binding Main, Source={StaticResource Locator}}">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Background="Transparent">
+            <ContentPresenter Content="{Binding MenuViewModel}" />
+        </Border>
+
+        <ContentPresenter Grid.Column="1" Content="{Binding Content}"/>
+
+        <!-- busy indicator -->
+        <dx:WaitIndicator x:Name="BusyIndicator"
+                          Content="Loading..."
+                          Grid.Row="0"
+                          Grid.Column="0"
+                          Grid.ColumnSpan="2"
+                          DeferedVisibility="{Binding IsBusy}"/>
+    </Grid>
+</Window>

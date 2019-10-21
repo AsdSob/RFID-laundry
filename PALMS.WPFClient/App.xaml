@@ -1,0 +1,53 @@
+<Application x:Class="PALMS.WPFClient.App" 
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+    StartupUri="MainWindow.xaml" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    d1p1:Ignorable="d" 
+    xmlns:d1p1="http://schemas.openxmlformats.org/markup-compatibility/2006">
+    
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/PALMS.View.Common;component/Themes/Styles.xaml"/>
+                
+                <ResourceDictionary Source="/PALMS.WPFClient;component/Themes/Styles.xaml"/>
+                <ResourceDictionary Source="/PALMS.WPFClient;component/Themes/ViewDictionary.xaml"/>
+
+                <ResourceDictionary Source="/PALMS.Settings.View;component/Themes/Styles.xaml"/>
+                <ResourceDictionary Source="/PALMS.Settings.View;component/Themes/ViewDictionary.xaml"/>
+
+                <!--<ResourceDictionary Source="/PALMS.MasterLinens.View;component/Themes/Styles.xaml"/>
+                <ResourceDictionary Source="/PALMS.MasterLinens.View;component/Themes/ViewDictionary.xaml"/>
+
+                <ResourceDictionary Source="/PALMS.LinenList.View;component/Themes/Styles.xaml"/>
+                <ResourceDictionary Source="/PALMS.LinenList.View;component/Themes/ViewDictionary.xaml"/>-->
+
+                <ResourceDictionary Source="/PALMS.TPS.View;component/Themes/Styles.xaml"/>
+                <ResourceDictionary Source="/PALMS.Tps.View;component/Themes/ViewDictionary.xaml"/>
+
+                <!--<ResourceDictionary Source="/PALMS.Notes.View;component/Themes/Styles.xaml"/>
+                <ResourceDictionary Source="/PALMS.Notes.View;component/Themes/ViewDictionary.xaml"/>
+
+                <ResourceDictionary Source="/PALMS.Invoices.View;component/Themes/Styles.xaml"/>
+                <ResourceDictionary Source="/PALMS.Invoices.View;component/Themes/ViewDictionary.xaml"/>
+
+                <ResourceDictionary Source="/PALMS.Invoices.View;component/Themes/Styles.xaml"/>
+                <ResourceDictionary Source="/PALMS.Invoices.View;component/Themes/ViewDictionary.xaml"/>
+
+                <ResourceDictionary Source="/PALMS.Reports.View;component/Themes/Styles.xaml"/>
+                <ResourceDictionary Source="/PALMS.Reports.View;component/Themes/ViewDictionary.xaml"/>
+
+                <ResourceDictionary Source="/PALMS.LaundryKg.View;component/Themes/Styles.xaml"/>
+                <ResourceDictionary Source="/PALMS.LaundryKg.View;component/Themes/ViewDictionary.xaml"/>
+
+                <ResourceDictionary Source="/PALMS.NoteHistory.View;component/Themes/Style.xaml"/>
+                <ResourceDictionary Source="/PALMS.NoteHistory.View;component/Themes/ViewDictionary.xaml"/>-->
+
+                <ResourceDictionary>
+                    <vm:ViewModelLocator x:Key="Locator" d:IsDataSource="True" xmlns:vm="clr-namespace:PALMS.WPFClient.ViewModel" />
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+  </Application.Resources>
+</Application>

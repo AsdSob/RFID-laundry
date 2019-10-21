@@ -1,0 +1,149 @@
+﻿<UserControl x:Class="PALMS.MasterLinens.View.TypeLinenTabView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:viewModel="clr-namespace:PALMS.MasterLinens.ViewModel;assembly=PALMS.MasterLinens.ViewModel"
+             xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
+             xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:behaviors="clr-namespace:PALMS.View.Common.Behaviors;assembly=PALMS.View.Common"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300"
+             d:DataContext="{d:DesignInstance viewModel:TypeLinenTabViewModel}">
+
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+         <!--buttons--> 
+        <dxr:RibbonControl Grid.Row="0"
+                           Grid.Column="0"
+                           ShowApplicationButton="False"
+                           ToolbarShowMode="Hide"
+                           RibbonHeaderVisibility="Collapsed">
+            <dxr:RibbonDefaultPageCategory>
+                <dxr:RibbonPage>
+                    <dxr:RibbonPageGroup Caption="Edit" ShowCaptionButton="False">
+                        <dxb:BarButtonItem Content="Save"
+                                           Hint="Save"
+                                           Command="{Binding SaveCommand}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/save_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/save_64.png"
+                                           RibbonStyle="Large"/>
+                        <dxb:BarButtonItem Content="Add"
+                                           Hint="Add new client"
+                                           Command="{Binding AddCommand}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/add_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/add_64.png"
+                                           RibbonStyle="SmallWithText"/>
+                        <dxb:BarButtonItem Content="Remove"
+                                           Hint="Remove"
+                                           Command="{Binding RemoveCommand}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/delete_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/delete_64.png"
+                                           RibbonStyle="SmallWithText"/>
+                        <dxb:BarButtonItem Content="Cancel"
+                                           Hint="Cancel edit"
+                                           Command="{Binding CancelCommand}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/cancel_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/cancel_64.png"
+                                           RibbonStyle="Large"/>
+
+                    </dxr:RibbonPageGroup>
+                </dxr:RibbonPage>
+            </dxr:RibbonDefaultPageCategory>
+        </dxr:RibbonControl>
+        
+        <!-- items -->
+        <Grid Grid.Row="1">
+
+            <dxg:GridControl x:Name="GridControlMasterLinen"
+                             ItemsSource="{Binding Items}"
+                             SelectedItem="{Binding SelectedItem}"
+                             ShowBorder="False">
+
+                <dxmvvm:Interaction.Behaviors>
+                    <dxmvvm:KeyToCommand KeyGesture="Del" Command="{Binding RemoveCommand}"/>
+                    <dxmvvm:KeyToCommand KeyGesture="Ctrl+N" Command="{Binding AddCommand}"/>
+                </dxmvvm:Interaction.Behaviors>
+
+                <i:Interaction.Behaviors>
+                    <behaviors:GridViewValidationBehavior IsValid="{Binding IsValid, Mode=OneWayToSource}"/>
+                    <behaviors:GridViewNewItemSelectionBehavior />
+                </i:Interaction.Behaviors>
+
+                <dxg:GridControl.View>
+                    <dxg:TableView AllowEditing="True"
+                                   AutoWidth="True"
+                                   ShowSearchPanelMode="Always"
+                                   ShowSearchPanelFindButton="True"
+                                   SearchPanelFindMode="Always"
+                                   ShowTotalSummary="False"
+                                   EnableImmediatePosting="True" />
+
+                </dxg:GridControl.View>
+
+                <dxg:GridControl.Columns>
+                    <dxg:GridColumn FieldName="Id" Header="ID" Width="20" AllowEditing="False" HorizontalHeaderContentAlignment="Left" >
+                        <dxg:GridColumn.EditSettings>
+                            <dxe:TextEditSettings HorizontalContentAlignment="Left"/>
+                        </dxg:GridColumn.EditSettings>
+                    </dxg:GridColumn>
+
+                    <dxg:GridColumn FieldName="Name" Header="Name">
+                    </dxg:GridColumn>
+
+                        <dxg:GridColumn FieldName="FamilyLinenId" Header="Family linen">
+
+                        <dxg:GridColumn.EditSettings>
+                            <dxe:ComboBoxEditSettings ItemsSource="{Binding ElementName=GridControlMasterLinen, Path=DataContext.FamilyLinenList}" 
+                                                      IsTextEditable="False"
+                                                      DisplayMember="Name" ValueMember="Id"/>
+                        </dxg:GridColumn.EditSettings>
+                    </dxg:GridColumn>
+
+                    <dxg:GridColumn FieldName="GroupLinenId" Header="Group linen">
+                        <dxg:GridColumn.EditSettings>
+                            <dxe:ComboBoxEditSettings ItemsSource="{Binding ElementName=GridControlMasterLinen, Path=DataContext.GroupLinenList}" 
+                                                      IsTextEditable="False"
+                                                      DisplayMember="Name" ValueMember="Id"/>
+                        </dxg:GridColumn.EditSettings>
+                    </dxg:GridColumn>
+
+                    <dxg:GridColumn FieldName="TypeLinenId" Header="Type linen">
+                        <dxg:GridColumn.EditSettings>
+                            <dxe:ComboBoxEditSettings ItemsSource="{Binding ElementName=GridControlMasterLinen, Path=DataContext.TypeLinenList}" 
+                                                      IsTextEditable="False"
+                                                      DisplayMember="Name" ValueMember="Id"/>
+                        </dxg:GridColumn.EditSettings>
+                    </dxg:GridColumn>
+
+                    <dxg:GridColumn FieldName="Weight" Header="Weight" Width="60" HorizontalHeaderContentAlignment="Center" >
+                        <dxg:GridColumn.CellTemplate>
+                            <DataTemplate>
+                                <dxe:SpinEdit Name="PART_Editor"
+                                              ShowEditorButtons="False"
+                                              AllowSpinOnMouseWheel="True"
+                                              AllowDefaultButton="False"
+                                              MinValue="0"
+                                              EditValueType="{x:Type sys:Int32}"
+                                              Increment="10"
+                                              MaxValue="1000000"/>
+                            </DataTemplate>
+                        </dxg:GridColumn.CellTemplate>
+                    </dxg:GridColumn>
+
+                </dxg:GridControl.Columns>
+            </dxg:GridControl>
+        </Grid>
+
+    </Grid>
+</UserControl>

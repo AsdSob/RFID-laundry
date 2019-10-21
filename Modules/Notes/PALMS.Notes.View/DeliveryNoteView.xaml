@@ -1,0 +1,661 @@
+﻿<UserControl x:Class="PALMS.Notes.View.DeliveryNoteView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:viewModel="clr-namespace:PALMS.Notes.ViewModel;assembly=PALMS.Notes.ViewModel"
+             xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
+             xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300"
+             d:DataContext="{d:DesignInstance viewModel:DeliveryNoteViewModel}">
+
+    <dxmvvm:Interaction.Behaviors>
+        <dxmvvm:KeyToCommand KeyGesture="Ctrl+s" Command="{Binding SaveChangesCommand}"/>
+        <dxmvvm:KeyToCommand KeyGesture="Ctrl+n" Command="{Binding AddNoteCommand}"/>
+        <dxmvvm:KeyToCommand KeyGesture="Ctrl+p" Command="{Binding PrintNoteCommand}"/>
+        <dxmvvm:KeyToCommand KeyGesture="Ctrl+q" Command="{Binding CopyLinenCommand}"/>
+        <dxmvvm:KeyToCommand KeyGesture="Ctrl+d" Command="{Binding RemoveNoteCommand}"/>
+        <!--<dxmvvm:KeyToCommand KeyGesture="Ctrl+Shift+c" Command="{Binding ChangeDepartmentCommand}"/>-->
+        <!--<dxmvvm:KeyToCommand KeyGesture="Ctrl+Shift+d" Command="{Binding DeleteNoteCommand}"/>-->
+        <!--<dxmvvm:KeyToCommand KeyGesture="Ctrl+Shift+s" Command="{Binding SaveNoteCommand}"/>-->
+        <!--<dxmvvm:KeyToCommand KeyGesture="Ctrl+g" Command="{Binding GenerateCommand}"/>-->
+        <!--<dxmvvm:KeyToCommand KeyGesture="Ctrl+x" Command="{Binding CalculationCommand}"/>-->
+    </dxmvvm:Interaction.Behaviors>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.7*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="0.1*"/>
+            <RowDefinition Height="0.15*"/>
+        </Grid.RowDefinitions>
+
+        <dxr:RibbonControl Grid.Row="0"
+                           Grid.Column="0"
+                           ShowApplicationButton="False"
+                           ToolbarShowMode="Hide"
+                           RibbonHeaderVisibility="Collapsed">
+            <dxr:RibbonDefaultPageCategory>
+                <dxr:RibbonPage>
+                    <dxr:RibbonPageGroup ShowCaptionButton="False"  >
+
+                        <dxb:BarButtonItem Content="Save"
+                                           Hint="Save changes"
+                                           Command="{Binding SaveChangesCommand}"
+                                           IsEnabled="{Binding ElementName=ValidationContainer, Path=(dxe:ValidationService.HasValidationError)}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/save_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/save_64.png"
+                                           RibbonStyle="Large"/>
+
+                        <dxb:BarButtonItem Content="New Note"
+                                           Command="{Binding AddNoteCommand}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/add_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/add_64.png"
+                                           RibbonStyle="SmallWithText"/>
+
+                        <dxb:BarButtonItem Content="Delete"
+                                           Command="{Binding RemoveNoteCommand}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/delete_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/delete_64.png"
+                                           RibbonStyle="SmallWithText"/>
+
+                        <dxb:BarButtonItem Content="Refresh"
+                                           Command="{Binding RefreshCommand}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/add_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/add_64.png"
+                                           RibbonStyle="SmallWithText"/>
+                    </dxr:RibbonPageGroup>
+
+                    <dxr:RibbonPageGroup ShowCaptionButton="False">
+
+                        <!--<dxb:BarEditItem >
+                            <dxb:BarEditItem.EditTemplate  >
+                                <DataTemplate>
+                                    <dxe:ComboBoxEdit DisplayMember="Description"
+                                                      ValueMember="Value"
+                                                      IsTextEditable="False"
+                                                      NullText="Report Type"
+                                                      ShowEditorButtons="True"
+                                                      NullValueButtonPlacement="EditBox"
+                                                      ItemsSource="{Binding Source={extensions:Enumeration {x:Type enumerations:NoteReportTypesEnum}}}" 
+                                                      SelectedItem="{Binding ElementName=DeliveryNote, Path=DataContext.SelectedReportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                </DataTemplate>
+                            </dxb:BarEditItem.EditTemplate>
+                        </dxb:BarEditItem>-->
+
+                        <dxb:BarButtonItem Content="Print Note"
+                                           Command="{Binding PrintNoteCommand}"
+                                           CommandParameter="0"
+                                           Glyph="/PALMS.View.Resources;component/Icons/print_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/print_64.png"
+                                           RibbonStyle="Large"/>
+
+                        <dxb:BarButtonItem Content="Total"
+                                           Command="{Binding PrintNoteCommand}"
+                                           CommandParameter="2"
+                                           Glyph="/PALMS.View.Resources;component/Icons/print_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/print_64.png"
+                                           RibbonStyle="SmallWithText"/>
+
+                        <dxb:BarButtonItem Content="Linen"
+                                           Command="{Binding PrintNoteCommand}"
+                                           CommandParameter="1"
+                                           Glyph="/PALMS.View.Resources;component/Icons/print_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/print_64.png"
+                                           RibbonStyle="SmallWithText"/>
+
+                        <dxb:BarButtonItem Content="Department"
+                                           Command="{Binding PrintNoteCommand}"
+                                           CommandParameter="3"
+                                           Glyph="/PALMS.View.Resources;component/Icons/print_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/print_64.png"
+                                           RibbonStyle="SmallWithText"/>
+
+                    </dxr:RibbonPageGroup>
+
+                    <dxr:RibbonPageGroup>
+
+                        <dxb:BarButtonItem Content="Extra/Less"
+                                           Hint="Add in Remark collection adn delivery difference"
+                                           Command="{Binding ShowQtyDifferenceCommand}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/add_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/add_64.png"
+                                           RibbonStyle="SmallWithText"/>
+
+                        <dxb:BarButtonItem Content="Balance"
+                                           Hint="Add in Remark collection adn delivery difference"
+                                           Command="{Binding ShowBalanceCommand}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/add_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/add_64.png"
+                                           RibbonStyle="SmallWithText"/>
+
+                        <dxb:BarButtonItem Content="Copy Qty"
+                                           Hint="Copy collection quantity to delivery quantity"
+                                           Command="{Binding CopyLinenCommand}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/copy_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/copy_64.png"
+                                           RibbonStyle="SmallWithText"/>
+
+                        <dxb:BarButtonItem Content="Add Linen"
+                                           Hint=" Add not listed linen"
+                                           Command="{Binding AddLinenCommand}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/add_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/add_64.png"
+                                           RibbonStyle="SmallWithText"/>
+
+                        <dxb:BarButtonItem Content="Delete Linen"
+                                           Hint="Delete Selected Linen"
+                                           Command="{Binding RemoveNoteRowCommand}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/cancel_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/cancel_64.png"
+                                           RibbonStyle="SmallWithText"/>                        
+                        
+                        <dxb:BarButtonItem Content="Pre-Invoice"
+                                           Hint="Move note to Pre-Invoice Section"
+                                           Command="{Binding GenerateCommand}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/save_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/save_64.png"
+                                           RibbonStyle="SmallWithText"/>
+
+                        <!--<dxb:BarButtonItem Content="Change dep"
+                                           Hint="Delete Selected Linen"
+                                           Command="{Binding ChangeDepartmentCommand}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/copy_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/copy_64.png"
+                                           RibbonStyle="SmallWithText"/>-->
+
+                    </dxr:RibbonPageGroup>
+
+                </dxr:RibbonPage>
+            </dxr:RibbonDefaultPageCategory>
+        </dxr:RibbonControl>
+
+        <!-- Client and Delivery Type -->
+
+        <Grid Grid.Column="0" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="70" />
+                <ColumnDefinition Width="70" />
+                <ColumnDefinition Width="70" />
+            </Grid.ColumnDefinitions>
+
+            <GroupBox Header="Client"
+                      Grid.Column="0">
+
+                <dxe:ComboBoxEdit x:Name="Clients"
+                                  DisplayMember="ShortName"
+                                  ValueMember="Id"
+                                  IsTextEditable="False"
+                                  NullText="Select Client"
+                                  ItemsSource="{Binding Clients}"
+                                  SelectedItem="{Binding SelectedClient}"/>
+            </GroupBox>
+
+            <GroupBox Header="Note Type"
+                      Grid.Column="1">
+                <dxe:ComboBoxEdit DisplayMember="Name"
+                                  ValueMember="Id"
+                                  IsTextEditable="False"
+                                  NullText="Select Delivery Type"
+                                  EditValue="{Binding SelectedNoteHeader.DeliveryTypeId, UpdateSourceTrigger=PropertyChanged}"
+                                  ItemsSource="{Binding DeliveryTypes}"/>
+            </GroupBox>
+
+            <GroupBox Header="Delivered"
+                      Grid.Column="2">
+                <CheckBox Background="LightSlateGray"
+                          HorizontalAlignment="Center"
+                          IsChecked="{Binding ShowClientReceivedNotes, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"/>
+            </GroupBox>
+
+            <GroupBox Header="PreInvoice"
+                      Grid.Column="3">
+                <CheckBox Background="LightSlateGray"
+                          HorizontalAlignment="Center"
+                          IsChecked="{Binding ShowPreInvoiceNotes, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"/>
+            </GroupBox>
+            <GroupBox Header="Client Qty"
+                      Grid.Column="4">
+                <CheckBox Background="LightSlateGray"
+                          HorizontalAlignment="Center"
+                          IsChecked="{Binding ShowClientReceivedQty, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"/>
+            </GroupBox>
+
+        </Grid>
+
+<!-- Notes -->
+
+        <Grid Grid.Column="0" 
+              Grid.Row="2" 
+              Grid.RowSpan="2">
+            <dxg:GridControl 
+                             Width="Auto"
+                             Height="Auto"
+                             x:Name="GridControlDepartment"
+                             SelectedItem="{Binding SelectedNoteHeader}"
+                             ItemsSource="{Binding SortedNoteHeaders}"
+                             ShowBorder="False">
+
+                <dxg:GridControl.View>
+                    <dxg:TableView AutoWidth="False"
+                                   ShowGroupedColumns="True"
+                                   AllowFixedGroups="True"
+                                   ShowIndicator="True"
+                                   ShowGroupPanel="False"
+                                   AllowGrouping="False"
+                                   NavigationStyle="Cell"
+                                   EnableImmediatePosting="True"
+                                   AllowEditing="False" 
+                                   ShowSearchPanelMode="Always"
+                                   VerticalScrollbarVisibility="Auto"
+                                   HorizontalScrollbarVisibility="Visible"
+                                   AllowConditionalFormattingMenu="True" 
+                                   AllowScrollAnimation="True" 
+                                   >
+
+                        <dxmvvm:Interaction.Behaviors>
+                            <dxmvvm:EventToCommand EventName="MouseDoubleClick" Command="{Binding DuplicateNotCommand}"/>
+                        </dxmvvm:Interaction.Behaviors>
+
+                        <dxg:TableView.FormatConditions>
+
+                            <dxg:FormatCondition  ApplyToRow="True" FieldName="Name" ValueRule="Expression" Expression="[ColorStatus]==1" PredefinedFormatName="LightRedFill"/>
+                            <dxg:FormatCondition  ApplyToRow="True" FieldName="Name" ValueRule="Expression" Expression="[ColorStatus]==2" PredefinedFormatName="YellowFillWithDarkYellowText"/>
+                            <dxg:FormatCondition  ApplyToRow="True" FieldName="Name" ValueRule="Expression" Expression="[ColorStatus]==3" PredefinedFormatName="LightGreenFill"/>
+                            <dxg:FormatCondition  ApplyToRow="False" FieldName="Name" ValueRule="Expression" Expression="[ColorStatus]==4" PredefinedFormatName="BoldText"/>
+
+                        </dxg:TableView.FormatConditions>
+
+
+                    </dxg:TableView>
+
+                </dxg:GridControl.View>
+
+                <dxg:GridControl.Columns>
+                    <dxg:GridColumn FieldName="IsSelected" Header="*" Width="20" AllowEditing="True"  HorizontalHeaderContentAlignment="Center" />
+                    <dxg:GridColumn FieldName="Name" Width="110" HorizontalHeaderContentAlignment="Center"/>
+
+
+                    <dxg:GridColumn FieldName="DepartmentId" 
+                                    Header="Department" 
+                                    AllowEditing="False" 
+                                    ShowGroupedColumn="True" 
+                                    Width="Auto">
+                        <dxg:GridColumn.EditSettings>
+                            <dxe:ComboBoxEditSettings ItemsSource="{Binding ElementName=GridControlLinen, Path=DataContext.Departments}" 
+                                                      IsTextEditable="False"
+                                                      DisplayMember="Name" 
+                                                      ValueMember="Id"/>
+                        </dxg:GridColumn.EditSettings>
+                    </dxg:GridColumn>
+
+                    <dxg:GridColumn FieldName="DeliveryDate" Header="Delivery"  Width="70"  HorizontalHeaderContentAlignment="Center">
+                        <dxg:GridColumn.EditSettings>
+                            <dxe:TextEditSettings DisplayFormat="d" />
+                        </dxg:GridColumn.EditSettings>
+                    </dxg:GridColumn>
+
+                    <dxg:GridColumn FieldName="ClientReceivedDate" Header="Time" Width="50"  HorizontalHeaderContentAlignment="Center">
+                        <dxg:GridColumn.EditSettings>
+                            <dxe:TextEditSettings DisplayFormat="t" />
+                        </dxg:GridColumn.EditSettings>
+                    </dxg:GridColumn>
+
+                    <dxg:GridColumn FieldName="NoteStatus" 
+                                    Header="Status" 
+                                    AllowEditing="False" 
+                                    ShowGroupedColumn="True" 
+                                    Width="80">
+                        <dxg:GridColumn.EditSettings>
+                            <dxe:ComboBoxEditSettings ItemsSource="{Binding ElementName=GridControlLinen, Path=DataContext.NoteStatuses}" 
+                                                      IsTextEditable="False"
+                                                      DisplayMember="Name" 
+                                                      ValueMember="Id"/>
+                        </dxg:GridColumn.EditSettings>
+                    </dxg:GridColumn>
+
+                    <dxg:GridColumn FieldName="CollectionDate" Header="Collection Date"  Width="70"  HorizontalHeaderContentAlignment="Center">
+                        <dxg:GridColumn.EditSettings>
+                            <dxe:TextEditSettings DisplayFormat="g" />
+                        </dxg:GridColumn.EditSettings>
+                    </dxg:GridColumn>
+                    <dxg:GridColumn FieldName="Comment" Width="20" HorizontalHeaderContentAlignment="Center"/>
+
+
+                </dxg:GridControl.Columns>
+
+            </dxg:GridControl>
+        </Grid>
+
+<!-- Note Rows -->
+
+        <Grid Grid.Column="1"
+              Grid.Row="0" 
+              Grid.RowSpan="3"
+              Margin="3"
+              x:Name="GridControlLinen"
+              >
+
+            <dxg:GridControl ItemsSource="{Binding SortedNoteRows}" SelectedItem="{Binding SelectedNoteRow}" >
+
+                <dxg:GridControl.View>
+                    <dxg:TableView AutoWidth="True"
+                                   ShowSearchPanelMode="Always"
+                                   ShowSearchPanelFindButton="True"
+                                   SearchPanelFindMode="Always"
+                                   ShowTotalSummary="True"
+                                   VerticalScrollbarVisibility="Auto"
+                                   EnableImmediatePosting="True"
+                                   AllowEditing="False" 
+                                   AllowGrouping="False"
+                                   ShowGroupPanel="False"
+                                   >
+
+                        <dxmvvm:Interaction.Behaviors>
+                            <dxmvvm:EventToCommand EventName="MouseDoubleClick" Command="{Binding DuplicateNoteRowCommand}"/>
+                        </dxmvvm:Interaction.Behaviors>
+
+                        <dxg:TableView.FormatConditions>
+
+                            <!--<dxg:FormatCondition  ApplyToRow="True" ValueRule="Expression" Expression="[ColorStatus]==1" PredefinedFormatName="GreenFillWithDarkGreenText" />
+                            <dxg:FormatCondition  ApplyToRow="True" FieldName="Name" ValueRule="Expression" Expression="[ColorStatus]==2" PredefinedFormatName="YellowFillWithDarkYellowText"/>
+                            <dxg:FormatCondition  ApplyToRow="True" FieldName="Name" ValueRule="Expression" Expression="[ColorStatus]==3" PredefinedFormatName="LightRedFillWithDarkRedText"/>-->
+
+
+                            <dxg:FormatCondition  ApplyToRow="True" FieldName="LinenName" ValueRule="Expression" Expression="[ColorStatus]==1" PredefinedFormatName="LightGreenFill" />
+                            <dxg:FormatCondition  ApplyToRow="True" FieldName="LinenName" ValueRule="Expression" Expression="[ColorStatus]==2" PredefinedFormatName="YellowFillWithDarkYellowText"/>
+                            <dxg:FormatCondition  ApplyToRow="True" FieldName="LinenName" ValueRule="Expression" Expression="[ColorStatus]==3" PredefinedFormatName="LightRedFill"/>
+
+                        </dxg:TableView.FormatConditions>
+
+                    </dxg:TableView>
+                </dxg:GridControl.View>
+
+                <dxg:GridControl.Columns>
+
+                    <dxg:GridColumn FieldName="Id" Header="Id" Width="30" />
+                    <dxg:GridColumn FieldName="LinenName" Header="Linen" Width="Auto" />
+
+                    <dxg:GridColumn FieldName="PrimeCollectedQty" Header="Collection Qty" Width="50" AllowEditing="True">
+                        <dxg:GridColumn.CellTemplate>
+                            <DataTemplate>
+                                <dxe:SpinEdit ShowEditorButtons="False"
+                                              AllowDefaultButton="False"
+                                              AllowSpinOnMouseWheel="False"
+                                              HorizontalContentAlignment="Center"
+                                              Name="PART_Editor"
+                                              Mask="{Binding RowData.Row.PriceUnit, Converter={StaticResource DoubleToIntConvertor}}"
+                                              MinValue="0"
+                                              MaxValue="1000000"/>
+                            </DataTemplate>
+                        </dxg:GridColumn.CellTemplate>
+                    </dxg:GridColumn>
+
+                    <dxg:GridColumn FieldName="PrimeDeliveredQty" 
+                                    Header="Delivery Qty" 
+                                    Width="50"
+                                    AllowEditing="True">
+                        <dxg:GridColumn.CellTemplate>
+                            <DataTemplate>
+                                <dxe:SpinEdit ShowEditorButtons="False"
+                                              AllowDefaultButton="False"
+                                              AllowSpinOnMouseWheel="False"
+                                              HorizontalContentAlignment="Center"
+                                              Name="PART_Editor"
+                                              Mask="{Binding RowData.Row.PriceUnit, Converter={StaticResource DoubleToIntConvertor}}"
+                                              MinValue="0"
+                                              MaxValue="1000000"/>
+                            </DataTemplate>
+                        </dxg:GridColumn.CellTemplate>
+                    </dxg:GridColumn>
+
+                    <dxg:GridColumn FieldName="ClientReceivedQty" 
+                                    Header="Received" 
+                                    Width="50"
+                                    AllowEditing="True">
+                        <dxg:GridColumn.CellTemplate>
+                            <DataTemplate>
+                                <dxe:SpinEdit ShowEditorButtons="False"
+                                              AllowDefaultButton="False"
+                                              AllowSpinOnMouseWheel="False"
+                                              HorizontalContentAlignment="Center"
+                                              Name="PART_Editor"
+                                              Mask="{Binding RowData.Row.PriceUnit, Converter={StaticResource DoubleToIntConvertor}}"
+                                              MinValue="0"
+                                              MaxValue="1000000"/>
+                            </DataTemplate>
+                        </dxg:GridColumn.CellTemplate>
+                    </dxg:GridColumn>
+
+                    <dxg:GridColumn FieldName="ServiceTypeId" 
+                                    Header="Service type" 
+                                    AllowEditing="True" 
+                                    ShowGroupedColumn="True" 
+                                    Width="50">
+                        <dxg:GridColumn.EditSettings>
+                            <dxe:ComboBoxEditSettings ItemsSource="{Binding ElementName=GridControlLinen, Path=DataContext.ServiceTypes}" 
+                                                      IsTextEditable="False"
+                                                      DisplayMember="Name" 
+                                                      ValueMember="Id"/>
+                        </dxg:GridColumn.EditSettings>
+                    </dxg:GridColumn>
+
+                    <dxg:GridColumn FieldName="Comment" Header="Remark" AllowEditing="True"/>
+
+                </dxg:GridControl.Columns>
+
+                <dxg:GridControl.TotalSummary>
+                    <dxg:GridSummaryItem FieldName="LinenName" SummaryType="Count" ShowInColumn="LinenName" />
+                    <dxg:GridSummaryItem FieldName="PrimeCollectedQty" SummaryType="Sum" ShowInColumn="PrimeCollectedQty" />
+                    <dxg:GridSummaryItem FieldName="PrimeDeliveredQty" SummaryType="Sum" ShowInColumn="PrimeDeliveredQty" />
+                    <dxg:GridSummaryItem FieldName="ClientReceivedQty" SummaryType="Sum" ShowInColumn="ClientReceivedQty" />
+
+                </dxg:GridControl.TotalSummary>
+
+            </dxg:GridControl>
+        </Grid>
+
+        <!-- Extra Information -->
+
+        <Grid Grid.Column="0" 
+              Grid.Row="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!--Delivery Date -->
+
+            <GroupBox Header="Collection Date" 
+                      Grid.Column="0" 
+                      Margin="0">
+
+
+                <dxe:DateEdit DockPanel.Dock="Bottom" 
+                              VerticalAlignment="Center" 
+                              EditValue="{Binding SelectedNoteHeader.CollectionDate, UpdateSourceTrigger=PropertyChanged}"
+                              AllowRoundOutOfRangeValue="False"
+                              >
+                    <!--<dxe:DateEdit.StyleSettings>
+                        <dxe:DateEditPickerStyleSettings />
+                    </dxe:DateEdit.StyleSettings>-->
+                </dxe:DateEdit>
+            </GroupBox>
+
+            <!--Delivery Date -->
+
+            <GroupBox Header="Delivery Date" 
+                      Grid.Column="1" 
+                      Margin="0">
+
+                <dxe:DateEdit DockPanel.Dock="Bottom" 
+                                  VerticalAlignment="Center" 
+                                  EditValue="{Binding SelectedNoteHeader.DeliveryDate, UpdateSourceTrigger=PropertyChanged}"
+                                  AllowRoundOutOfRangeValue="False">
+                    <!--<dxe:DateEdit.StyleSettings>
+                            <dxe:DateEditPickerStyleSettings />
+                        </dxe:DateEdit.StyleSettings>-->
+                </dxe:DateEdit>
+            </GroupBox>
+
+            <!-- Print Date -->
+
+            <GroupBox Header="Print Date" 
+                      Grid.Column="2" 
+                      Margin="0">
+
+                <dxe:DateEdit DockPanel.Dock="Bottom" 
+                              VerticalAlignment="Center" 
+                              EditValue="{Binding PrintTime, UpdateSourceTrigger=PropertyChanged}"
+                              AllowRoundOutOfRangeValue="False">
+                    <!--<dxe:DateEdit.StyleSettings>
+                        <dxe:DateEditPickerStyleSettings />
+                    </dxe:DateEdit.StyleSettings>-->
+                </dxe:DateEdit>
+            </GroupBox>
+
+        </Grid>
+
+
+        <Grid Grid.Column="1" 
+              Grid.Row="3" 
+              Grid.RowSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.15*"/>
+                <ColumnDefinition Width="0.25*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Weight-->
+
+            <!--<GroupBox Header="Weight" 
+                  Grid.Column="0" 
+                  Grid.Row="0"
+                  Grid.RowSpan="2"
+                  Margin="1">
+            <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+
+                    <DockPanel LastChildFill="False" Grid.Row="0">
+
+                        <TextBlock DockPanel.Dock="Left" Margin="0,0,5,0" Text="Collection" VerticalAlignment="Center"/>
+
+                        <dxe:SpinEdit MinValue="0"
+                                      DockPanel.Dock="Right"
+                                      Increment="1"
+                                      MinWidth="50"
+                                      Mask="n"
+                                      EditValue="{Binding SelectedNoteHeader.CollectionWeight,
+                                                      UpdateSourceTrigger=PropertyChanged,
+                                                      ValidatesOnDataErrors=True}"
+                                      MaskUseAsDisplayFormat="True"
+                                      AllowSpinOnMouseWheel="False"
+                                      ShowEditorButtons="False"/>
+                    </DockPanel>
+
+                    <DockPanel LastChildFill="False" Grid.Row="1">
+
+                        <TextBlock DockPanel.Dock="Left" Margin="0,0,5,0" Text="Delivery" VerticalAlignment="Center"/>
+
+                        <dxe:SpinEdit MinValue="0"
+                                      DockPanel.Dock="Right"
+                                      Increment="1"
+                                      MinWidth="50"
+                                      Mask="n"
+                                      EditValue="{Binding SelectedNoteHeader.DeliveryWeight,
+                                                      UpdateSourceTrigger=PropertyChanged,
+                                                      ValidatesOnDataErrors=True}"
+                                      MaskUseAsDisplayFormat="True"
+                                      AllowSpinOnMouseWheel="False"
+                                      ShowEditorButtons="False"/>
+                    </DockPanel>
+
+                </Grid>
+
+            </GroupBox>-->
+
+            <GroupBox Header="Delivery Kg" 
+                      Grid.Column="0" 
+                      Grid.Row="0"
+                      Margin="1">
+                <dxe:SpinEdit MinValue="0"
+                              Increment="1"
+                              Mask="n"
+                              EditValue="{Binding SelectedNoteHeader.DeliveryWeight,
+                                                      UpdateSourceTrigger=PropertyChanged,
+                                                      ValidatesOnDataErrors=True}"
+                              MaskUseAsDisplayFormat="True"
+                              AllowSpinOnMouseWheel="False"
+                              ShowEditorButtons="False"/>
+            </GroupBox>
+
+            <GroupBox Header="Collection Kg" 
+                      Grid.Column="0" 
+                      Grid.Row="1"
+                      Margin="1">
+
+                <dxe:SpinEdit MinValue="0"
+                              Increment="1"
+                              Mask="n"
+                              EditValue="{Binding SelectedNoteHeader.CollectionWeight,
+                                                      UpdateSourceTrigger=PropertyChanged,
+                                                      ValidatesOnDataErrors=True}"
+                              MaskUseAsDisplayFormat="True"
+                              AllowSpinOnMouseWheel="False"
+                              ShowEditorButtons="False"/>
+            </GroupBox>
+
+            <!-- Collection Serial Number-->
+
+            <GroupBox Header="Collection Sr.No." 
+                      Grid.Column="1" 
+                      Grid.Row="0"
+                      Margin="0">
+
+                <dxe:TextEdit EditValue="{Binding SelectedNoteHeader.CollectionSrNo, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" HorizontalContentAlignment="Right"/>
+            </GroupBox>
+
+            <!-- Comment -->
+
+            <GroupBox Header="Comment" 
+                  Grid.Column="2" 
+                  Grid.Row="0" 
+                  Grid.RowSpan="2"
+                  Margin="5,0">
+
+                <dxe:TextEdit AcceptsReturn="True" 
+                              Margin="0"
+                              dx:ScrollBarExtensions.AllowMouseScrolling="True"
+                              VerticalScrollBarVisibility="Auto"
+                              TextWrapping="Wrap" 
+                              HorizontalContentAlignment="Left" 
+                              VerticalContentAlignment="Top" 
+                              AllowDrop="True" 
+                              EditValue="{Binding SelectedNoteHeader.Comment, UpdateSourceTrigger=PropertyChanged}"/>
+            </GroupBox>
+
+        </Grid>
+
+    </Grid>
+</UserControl>

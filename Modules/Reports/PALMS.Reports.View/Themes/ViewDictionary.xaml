@@ -1,0 +1,25 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:viewModel="clr-namespace:PALMS.Reports.ViewModel;assembly=PALMS.Reports.ViewModel"
+                    xmlns:windowsView="clr-namespace:PALMS.Reports.View.Windows"
+                    xmlns:view="clr-namespace:PALMS.Reports.View"
+                    xmlns:windows="clr-namespace:PALMS.Reports.ViewModel.Windows;assembly=PALMS.Reports.ViewModel">
+
+
+    <DataTemplate DataType="{x:Type viewModel:ReportsViewModel}">
+        <view:ReportsView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type windows:CoordinateReportViewModel}">
+        <windowsView:CoordinateReportView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type windows:LaundryKgWindowViewModel}">
+        <windowsView:LaundryKgWindowView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type windows:RevenueWindowViewModel}">
+        <windowsView:RevenueWindowView/>
+    </DataTemplate>
+
+</ResourceDictionary>

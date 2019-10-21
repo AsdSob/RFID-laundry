@@ -1,0 +1,93 @@
+﻿<UserControl x:Class="PALMS.Settings.View.AppSettings.AppSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
+             xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+             xmlns:appSettings="clr-namespace:PALMS.Settings.ViewModel.AppSettings;assembly=PALMS.Settings.ViewModel"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300"
+             d:DataContext="{d:DesignInstance appSettings:AppSettingsViewModel}">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/PALMS.Settings.View;component/Themes/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- buttons -->
+        <dxr:RibbonControl Grid.Row="0"
+                           ShowApplicationButton="False"
+                           ToolbarShowMode="Hide"
+                           RibbonHeaderVisibility="Collapsed">
+            <dxr:RibbonDefaultPageCategory>
+                <dxr:RibbonPage Caption="Home">
+                    <dxr:RibbonPageGroup Caption="Edit" ShowCaptionButton="False">
+                        <dxb:BarButtonItem Content="Save"
+                                           Hint="Save"
+                                           Command="{Binding SaveCommand}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/save_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/save_64.png"
+                                           RibbonStyle="Large"/>
+                        <dxb:BarButtonItem Content="Check"
+                                           Hint="Check settings"
+                                           Command="{Binding CheckCommand}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/cancel_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/cancel_64.png"
+                                           RibbonStyle="Large" />
+                        <dxb:BarButtonItem Content="Cancel"
+                                           Hint="Cancel edit"
+                                           Command="{Binding CancelCommand}"
+                                           Glyph="/PALMS.View.Resources;component/Icons/cancel_32.png"
+                                           LargeGlyph="/PALMS.View.Resources;component/Icons/cancel_64.png"
+                                           RibbonStyle="Large" />
+                    </dxr:RibbonPageGroup>
+
+                    <dxr:RibbonPageGroup Caption="Theme">
+                        <dxr:RibbonGalleryBarItem Content="Themes">
+                            <dxmvvm:Interaction.Behaviors>
+                                <dxr:RibbonGalleryItemThemeSelectorBehavior />
+                            </dxmvvm:Interaction.Behaviors>
+                            <dxr:RibbonGalleryBarItem.Gallery>
+                                <dxb:Gallery ColCount="4"/>
+                            </dxr:RibbonGalleryBarItem.Gallery>
+                        </dxr:RibbonGalleryBarItem>
+                    </dxr:RibbonPageGroup>
+                </dxr:RibbonPage>
+            </dxr:RibbonDefaultPageCategory>
+        </dxr:RibbonControl>
+
+        <Grid Grid.Row="1" Margin="0,30">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- connection string -->
+            <StackPanel>
+                <TextBlock Text="Connection string"/>
+                <dxe:TextEdit EditValue="{Binding Settings.ConnectionString, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- busy indicator -->
+        <dx:WaitIndicator x:Name="BusyIndicator"
+                          Content="Wait..."
+                          Grid.Row="0"
+                          Grid.RowSpan="2"
+                          DeferedVisibility="{Binding IsBusy}"/>
+    </Grid>
+</UserControl>

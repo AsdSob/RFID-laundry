@@ -1,0 +1,30 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:viewModels="clr-namespace:PALMS.ViewModels;assembly=PALMS.ViewModels"
+                    xmlns:views="clr-namespace:PALMS.WPFClient.Views"
+                    xmlns:viewWindows="clr-namespace:PALMS.WPFClient.Windows"
+                    xmlns:windowViewModel="clr-namespace:PALMS.ViewModels.WindowViewModel;assembly=PALMS.ViewModels">
+    
+    <DataTemplate DataType="{x:Type viewModels:DataViewModel}">
+        <views:DataView/>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type viewModels:MenuViewModel}">
+        <views:MenuView/>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type windowViewModel:LoginViewModel}">
+        <views:LoginView/>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type viewModels:ClientsViewModel}">
+        <views:ClientsView/>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type viewModels:ClientDetailsViewModel}">
+        <viewWindows:ClientDetailsWindow/>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type viewModels:DepartmentDetailsViewModel}">
+        <viewWindows:DepartmentDetailsWindow/>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type viewModels:ChargeDetailsViewModel}">
+        <viewWindows:ChargeDetailsWindow/>
+    </DataTemplate>
+
+</ResourceDictionary>

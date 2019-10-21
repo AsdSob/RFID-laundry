@@ -1,0 +1,21 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:viewModel1="clr-namespace:PALMS.NoteHistory.ViewModel;assembly=PALMS.NoteHistory.ViewModel"
+                    xmlns:view1="clr-namespace:PALMS.NoteHistory.View"
+                    xmlns:window="clr-namespace:PALMS.NoteHistory.ViewModel.Windows;assembly=PALMS.NoteHistory.ViewModel"
+                    xmlns:windows="clr-namespace:PALMS.NoteHistory.View.Windows">
+
+
+    <DataTemplate DataType="{x:Type viewModel1:NoteHistoryViewModel}">
+        <view1:NoteHistoryView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type window:AddLinenListViewModel}">
+        <windows:AddLinenListWindow/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type window:ClientDepSelectViewModel}">
+        <windows:ClientDepSelectView/>
+    </DataTemplate>
+
+</ResourceDictionary>
