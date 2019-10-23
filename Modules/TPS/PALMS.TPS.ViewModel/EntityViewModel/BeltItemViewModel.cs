@@ -34,5 +34,11 @@ namespace PALMS.TPS.ViewModel.EntityViewModel
         {
             OriginalObject = entity;
         }
+
+        public void Update(CClientLinenViewModel entity)
+        {
+            OriginalObject = entity;
+            IsEmpty = false;
+        }
     }
 }

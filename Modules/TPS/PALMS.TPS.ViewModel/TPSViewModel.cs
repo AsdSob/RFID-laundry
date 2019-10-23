@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
@@ -165,6 +166,7 @@ namespace PALMS.TPS.ViewModel
             ManualHangBelt1 = new RelayCommand(ManualMode1);
             ManualHangBelt2 = new RelayCommand(ManualMode2);
 
+            PropertyChanged += OnPropertyChanged;
 
             PlcIp1 = "192.168.250.1";
             PlcIp2 = "192.168.250.2";
@@ -173,6 +175,10 @@ namespace PALMS.TPS.ViewModel
 
         }
 
+        private async void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            
+        }
 
         public async Task InitializeAsync()
         {
@@ -255,17 +261,18 @@ namespace PALMS.TPS.ViewModel
 
             SendToLine(1);
             Plc2.HangUpToPoint(Belt1SlotNumber);
+            Belt1Items.FirstOrDefault(x => x.SlotNumber == Belt1SlotNumber)?.Update(WaitingLinen);
+            WaitingLinen.StatusId = (int) LinenStatus.Conveyor;
         }
 
         public void ManualMode2()
         {
-            SendToLine(2);
-            Plc3.HangUpToPoint(Belt1SlotNumber);
+
         }
 
         public void AutoMode()
         {
-            if (Belt1Items.Count() < 500)
+            if (Belt1Items.Any(x=> x.OriginalObject == null))
             {
                 SendToLine(1);
             }
