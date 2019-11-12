@@ -42,6 +42,7 @@ namespace PALMS.TPS.ViewModel
         private int _setBelt1SlotNumb;
         private int _setBelt2SlotNumb;
 
+        public FinsTcp plc1test { get; set; }
         public int SetBelt2SlotNumb
         {
             get => _setBelt2SlotNumb;
@@ -165,13 +166,14 @@ namespace PALMS.TPS.ViewModel
 
             ManualHangBelt1 = new RelayCommand(ManualMode1);
             ManualHangBelt2 = new RelayCommand(ManualMode2);
+            ConnectionCommand = new RelayCommand(Start);
 
             PropertyChanged += OnPropertyChanged;
 
             PlcIp1 = "192.168.250.1";
             PlcIp2 = "192.168.250.2";
             PlcIp3 = "192.168.250.3";
-            LocalIp = "192.168.250.133";
+            LocalIp = "192.168.250.201";
 
         }
 
@@ -194,36 +196,40 @@ namespace PALMS.TPS.ViewModel
 
         public void Start()
         {
-            CheckConnection();
+            Plc1 = new FinsTcp(LocalIp, PlcIp1, 9600);
+            Plc2 = new FinsTcp(LocalIp, PlcIp2, 9600);
+            Plc3 = new FinsTcp(LocalIp, PlcIp3, 9600);
 
             Plc1.Start();
             Plc2.Start();
             Plc3.Start();
+
+            CheckConnection();
         }
 
         public void Stop()
         {
-            CheckConnection();
-
             Plc1.Stop();
             Plc2.Stop();
             Plc3.Stop();
+
+            CheckConnection();
         }
 
         public void Reset()
         {
-            CheckConnection();
-
             Plc2.Reset();
             Plc3.Reset();
+
+            CheckConnection();
         }
 
         public void Clear()
         {
-            CheckConnection();
-
             Plc2.Clear();
             Plc3.Clear();
+
+            CheckConnection();
         }
 
         public bool CheckClothReady()
