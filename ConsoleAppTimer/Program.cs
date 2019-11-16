@@ -13,36 +13,11 @@ namespace ConsoleAppTimer
     {
         static void Main(string[] args)
         {
-            var testTimer = new TestTimer(DoWork, 10000);
+            var testTimer = new TestTimer(DoWork, 1000);
             testTimer.Start();
 
             Console.WriteLine("timer started");
             Console.ReadKey();
-
-            bool exit = false;
-            ConsoleKey key;
-
-            while (!exit)
-            {
-                key = Console.ReadKey().Key;
-
-                if (key == ConsoleKey.Q)
-                {
-                    exit = true;
-
-                }
-
-                switch (key)
-                {
-                    case ConsoleKey.A: Console.WriteLine("AAAAAAAAAAAAA"); break;
-                    case ConsoleKey.B: Console.WriteLine("BBBBBBBBBBBBB"); break;
-                    case ConsoleKey.C: Console.WriteLine("CCCCCCCCCCCCC"); break;
-                    case ConsoleKey.D:
-                        ReadLine(); break;
-
-                }
-                
-            }
 
             testTimer.Stop();
             Console.WriteLine("\n timer stopped");

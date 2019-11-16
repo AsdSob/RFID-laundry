@@ -276,11 +276,17 @@ namespace TestConveyor
             }
 
             var i = Plc1.GetWaitHangNum();
-            if (i >= 1)
+            Console.WriteLine("\n Waiting Hang Qty = " + i);
+
+            if (i > 1)
             {
-                Console.WriteLine("\n Waiting Hang Qty = " + i);
                 Plc1.Sorting(1);
                 Plc1.ResetWaitHangNum();
+            }
+
+            if (i == 1)
+            {
+                Plc1.Sorting(1);
             }
 
             //if (i > 1)
