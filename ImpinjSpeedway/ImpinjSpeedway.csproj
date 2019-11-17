@@ -57,6 +57,7 @@
   <ItemGroup>
     <Compile Include="Rfid.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RfidCommands.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
