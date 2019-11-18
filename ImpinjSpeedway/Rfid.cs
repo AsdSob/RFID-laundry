@@ -10,7 +10,7 @@ namespace ImpinjSpeedway
         static void Main(string[] args)
         {
             RfidCommands reader = new RfidCommands();
-
+            TagReport tagReport = null;
             Console.WriteLine("Begin--------");
 
             bool exit = false;
@@ -33,29 +33,29 @@ namespace ImpinjSpeedway
 
                     case ConsoleKey.W:
                         reader.Start();
+                        Console.WriteLine("Started...");
                         break;
 
                     case ConsoleKey.E:
                         reader.Stop();
+                        Console.WriteLine("Stop...");
                         break;
 
                     case ConsoleKey.A:
-                        exit= true;
+                        exit = true;
                         break;
 
                     case ConsoleKey.Z:
-                        reader.Reader.TagsReported += DisplayTag;
+                        tagReport = reader.Reader.QueryTags(5);
+                        Console.WriteLine("Tag reading complete");
                         break;
+
                     case ConsoleKey.X:
-                        reader.Reader.TagsReported -= DisplayTag;
+                        DisplayTag(reader.Reader, tagReport);
                         break;
-
-
                 }
 
             }
-
-            reader.Reader.TagsReported += DisplayTag;
 
             Console.WriteLine("\n Disconnected !!!!!");
             Console.ReadKey();

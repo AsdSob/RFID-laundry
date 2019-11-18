@@ -10,8 +10,8 @@ namespace ImpinjSpeedway
 
         public bool Connection()
         {
-            //Reader.Stop();
-            //Reader.Disconnect();
+            Reader.Stop();
+            Reader.Disconnect();
             try
             {
                 Reader.Connect("192.168.250.55");
@@ -67,24 +67,22 @@ namespace ImpinjSpeedway
             Console.Write("\n RxSensitivityInDbm = ");
             var RxSensitivity = Console.ReadLine();
 
-            Console.Write("Number of Antenna to On =");
-            var i = Console.ReadKey();
-            ushort num = Convert.ToUInt16(i);
 
-            settings.Antennas.GetAntenna(num).IsEnabled = true;
-            settings.Antennas.GetAntenna(num).TxPowerInDbm = Convert.ToDouble(TxPower);
-            settings.Antennas.GetAntenna(num).RxSensitivityInDbm = Convert.ToDouble(RxSensitivity);
+            ushort i = 2;
+                settings.Antennas.GetAntenna(i).IsEnabled = true;
+                settings.Antennas.GetAntenna(i).TxPowerInDbm = Convert.ToDouble("15");
+                settings.Antennas.GetAntenna(i).RxSensitivityInDbm = Convert.ToDouble("-70");
+
+
         }
 
         public void Start()
         {
-            Console.Beep();
             Reader.Start();
         }
 
         public void Stop()
         {
-            Console.Beep();
             Reader.Stop();
         }
 
