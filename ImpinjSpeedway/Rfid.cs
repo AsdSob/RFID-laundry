@@ -46,21 +46,24 @@ namespace ImpinjSpeedway
                         break;
 
                     case ConsoleKey.Z:
-                        tagReport = reader.Reader.QueryTags(5);
-                        Console.WriteLine("Tag reading complete");
+                        reader.Reader.TagsReported += DisplayTag;
+
+                        //tagReport = reader.Reader.QueryTags(5);
+                        //Console.WriteLine("Tag reading complete");
                         break;
 
                     case ConsoleKey.X:
-                        DisplayTag(reader.Reader, tagReport);
+                        //DisplayTag(reader.Reader, tagReport);
                         break;
                 }
 
             }
-
+                
             Console.WriteLine("\n Disconnected !!!!!");
             Console.ReadKey();
 
         }
+
 
         private static void DisplayTag(ImpinjReader reader, TagReport report)
         {
@@ -74,5 +77,17 @@ namespace ImpinjSpeedway
             }
         }
 
+        private static ImpinjReader.ReaderStartedEventHandler ShowStarted()
+        {
+            Console.WriteLine("Impinj Started");
+            return null;
+        }
+
+        private static ImpinjReader.TagOpCompleteHandler ShowReadingComplete()
+        {
+            Console.WriteLine("Reading Complete");
+
+            return null;
+        }
     }
 }

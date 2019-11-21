@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,12 +19,14 @@ namespace ConsoleAppTimer
             testTimer.Start();
 
             Console.WriteLine("timer started");
-            Console.ReadKey();
 
+            Console.ReadKey();
             testTimer.Stop();
             Console.WriteLine("\n timer stopped");
             Console.ReadKey();
         }
+
+
 
         public static void ReadLine()
         {

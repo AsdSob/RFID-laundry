@@ -86,13 +86,12 @@ namespace TestConveyor
         {
             Console.WriteLine("");
             Console.WriteLine("---------------");
-            //Console.WriteLine("GetWaitHangNum() => " + Plc2.GetWaitHangNum());
-            //Console.WriteLine("GetBasePoint() => " + Plc2.GetBasePoint());
-            //Console.WriteLine("GetHanginpoint() => " + Plc2.GetHanginpoint());
-            //Console.WriteLine("GetNowPoint() => " + Plc2.GetNowPoint());
-            //Console.WriteLine("GetClotheInHook() => " + Plc2.GetClotheInHook());
-            //Console.WriteLine("GetWaitHangNum() => " + Plc1.GetWaitHangNum());
-            //Console.WriteLine("GetClotheReady() => " + Plc1.GetClotheReady());
+            Console.WriteLine("GetBasePoint() => " + Plc2.GetBasePoint());
+            Console.WriteLine("GetHanginpoint() => " + Plc2.GetHanginpoint());
+            Console.WriteLine("GetNowPoint() => " + Plc2.GetNowPoint());
+            Console.WriteLine("GetClotheInHook() => " + Plc2.GetClotheInHook());
+            Console.WriteLine("GetWaitHangNum() => " + Plc1.GetWaitHangNum());
+            Console.WriteLine("GetClotheReady() => " + Plc1.GetClotheReady());
             var i = 1;
             Tmr = new TestTimer();
             while (i<100)
@@ -160,6 +159,7 @@ namespace TestConveyor
             Plc1 = new FinsTcp(LocalIp, PlcIp1, 9600);
             Plc2 = new FinsTcp(LocalIp, PlcIp2, 9600);
             Plc3 = new FinsTcp(LocalIp, PlcIp3, 9600);
+
 
             CheckConnection();
         }

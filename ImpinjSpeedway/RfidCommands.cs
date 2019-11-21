@@ -8,13 +8,12 @@ namespace ImpinjSpeedway
         public ImpinjReader Reader = new ImpinjReader();
         public Settings settings;
 
-        public bool Connection()
+        public bool Connection(string address)
         {
-            Reader.Stop();
-            Reader.Disconnect();
             try
             {
                 Reader.Connect("192.168.250.55");
+                Reader.Stop();
 
             }
             catch (OctaneSdkException ee)
@@ -39,15 +38,17 @@ namespace ImpinjSpeedway
             settings.Report.IncludePeakRssi = true;
             settings.Report.IncludeSeenCount = true;
             settings.Report.IncludePcBits = true;
+            settings.Report.IncludeSeenCount = true;
 
             settings.ReaderMode = ReaderMode.MaxThroughput;//.AutoSetDenseReader;
             settings.SearchMode = SearchMode.DualTarget;//.DualTarget;
             settings.Session = 1;
             settings.TagPopulationEstimate = Convert.ToUInt16(200);
 
+            settings.Report.Mode = ReportMode.Individual;
+
             Antenna();
 
-            settings.Report.Mode = ReportMode.Individual;
             Reader.ApplySettings(settings);
 
             return Reader.IsConnected;
@@ -61,11 +62,11 @@ namespace ImpinjSpeedway
 
             Console.WriteLine($"Number of Antennas = {j}");
 
-            Console.Write("TxPowerInDbm = ");
-            var TxPower = Console.ReadLine();
+            //Console.Write("TxPowerInDbm = ");
+            //var TxPower = Console.ReadLine();
 
-            Console.Write("\n RxSensitivityInDbm = ");
-            var RxSensitivity = Console.ReadLine();
+            //Console.Write("\n RxSensitivityInDbm = ");
+            //var RxSensitivity = Console.ReadLine();
 
 
             ushort i = 2;
@@ -84,6 +85,12 @@ namespace ImpinjSpeedway
         public void Stop()
         {
             Reader.Stop();
+        }
+
+        public bool Connect(string address)
+        {
+            Connection(address);
+            return Reader.IsConnected;
         }
 
 
