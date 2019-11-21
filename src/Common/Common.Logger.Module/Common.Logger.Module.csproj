@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="4.9.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Common.Logger.Serilog\Common.Logger.Serilog.csproj" />
+    <ProjectReference Include="..\Common.Logger\Common.Logger.csproj" />
+  </ItemGroup>
+
+</Project>

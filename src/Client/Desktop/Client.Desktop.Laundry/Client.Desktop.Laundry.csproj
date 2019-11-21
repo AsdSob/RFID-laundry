@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="4.9.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\Common.Logger.Module\Common.Logger.Module.csproj" />
+    <ProjectReference Include="..\..\..\Common\Common.Logger\Common.Logger.csproj" />
+    <ProjectReference Include="..\..\..\Storage\Storage.Module\Storage.Module.csproj" />
+    <ProjectReference Include="..\Client.Desktop.ViewModels.Common\Client.Desktop.ViewModels.Common.csproj" />
+    <ProjectReference Include="..\Client.Desktop.ViewModels\Client.Desktop.ViewModels.csproj" />
+    <ProjectReference Include="..\Client.Desktop.Views\Client.Desktop.Views.csproj" />
+  </ItemGroup>
+
+</Project>
