@@ -1,0 +1,19 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:viewModels="clr-namespace:Client.Desktop.ViewModels;assembly=Client.Desktop.ViewModels"
+                    xmlns:views="clr-namespace:Client.Desktop.Laundry.Views"
+                    xmlns:content="clr-namespace:Client.Desktop.ViewModels.Content;assembly=Client.Desktop.ViewModels">
+
+    <DataTemplate DataType="{x:Type viewModels:MenuViewModel}">
+        <views:MenuView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type content:DataViewModel}">
+        <views:DataView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type content:AddViewModel}">
+        <views:AddView/>
+    </DataTemplate>
+
+</ResourceDictionary>

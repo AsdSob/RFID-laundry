@@ -12,11 +12,12 @@ namespace Common.Logger.Module
                 .AutoActivate()
                 .SingleInstance();
             builder.Register(x =>
-            {
-                var loggerFactory = x.Resolve<ILoggerFactory>();
+                {
+                    var loggerFactory = x.Resolve<ILoggerFactory>();
 
-                return loggerFactory.CreateLogger("main");
-            }).As<ILogger>();
+                    return loggerFactory.CreateLogger("main");
+                }).As<ILogger>()
+                .SingleInstance();
         }
     }
 

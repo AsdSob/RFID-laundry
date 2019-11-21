@@ -1,5 +1,7 @@
 ﻿using Autofac;
+using Client.Desktop.Laundry.Module;
 using Client.Desktop.ViewModels;
+using Client.Desktop.ViewModels.Content;
 using Common.Logger.Module;
 using Storage.Module;
 
@@ -24,6 +26,10 @@ namespace Client.Desktop.Laundry.ViewModels
         private void RegisterViewModels(ContainerBuilder builder)
         {
             builder.RegisterType<MainViewModel>().SingleInstance();
+            builder.RegisterType<MenuViewModel>().SingleInstance();
+
+            builder.RegisterType<DataViewModel>().SingleInstance();
+            builder.RegisterType<AddViewModel>().SingleInstance();
         }
 
         private void RegisterModules(ContainerBuilder builder)

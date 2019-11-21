@@ -1,6 +1,6 @@
 ﻿using Autofac;
 
-namespace Client.Desktop.Laundry.ViewModels
+namespace Client.Desktop.Laundry.Module
 {
     public static class MainModuleExtension
     {
