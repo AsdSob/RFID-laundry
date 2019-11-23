@@ -7,7 +7,6 @@ using System.Windows.Media.Imaging;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Win32;
-using PALMS.Data.Objects.ClientModel;
 using PALMS.ViewModels.Common;
 using PALMS.ViewModels.Common.Services;
 

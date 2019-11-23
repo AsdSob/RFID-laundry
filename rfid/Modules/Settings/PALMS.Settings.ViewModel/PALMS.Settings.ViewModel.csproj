@@ -72,9 +72,15 @@
     <Compile Include="AppSettings\AppSettingsProvider.cs" />
     <Compile Include="AppSettings\AppSettingsViewModel.cs" />
     <Compile Include="AppSettings\IAppSettingsProvider.cs" />
+    <Compile Include="EntityViewModels\ClientInfoViewModel.cs" />
+    <Compile Include="EntityViewModels\ClientLinenViewModel.cs" />
+    <Compile Include="EntityViewModels\ClientStaffViewModel.cs" />
+    <Compile Include="EntityViewModels\ClientViewModel.cs" />
+    <Compile Include="EntityViewModels\ConveyorItemViewModel.cs" />
+    <Compile Include="EntityViewModels\DepartmentViewModel.cs" />
+    <Compile Include="EntityViewModels\MasterLinenViewModel.cs" />
     <Compile Include="ISettingsContent.cs" />
     <Compile Include="LaundryDetails\VendorDetailsViewModel.cs" />
-    <Compile Include="LaundryDetails\PrimeInfoViewModel.cs" />
     <Compile Include="SettingsModule.cs" />
     <Compile Include="SettingsSection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
