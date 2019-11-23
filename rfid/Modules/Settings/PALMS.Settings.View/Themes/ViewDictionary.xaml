@@ -2,16 +2,10 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:viewModel="clr-namespace:PALMS.Settings.ViewModel;assembly=PALMS.Settings.ViewModel"
                     xmlns:view="clr-namespace:PALMS.Settings.View"
-                    xmlns:dictionaries="clr-namespace:PALMS.Settings.View.Dictionaries"
-                    xmlns:dictionaryViewModel="clr-namespace:PALMS.Settings.ViewModel.Dictionaries;assembly=PALMS.Settings.ViewModel"
                     xmlns:appSettings="clr-namespace:PALMS.Settings.ViewModel.AppSettings;assembly=PALMS.Settings.ViewModel"
                     xmlns:appSettings1="clr-namespace:PALMS.Settings.View.AppSettings"
                     xmlns:laundryDetails="clr-namespace:PALMS.Settings.ViewModel.LaundryDetails;assembly=PALMS.Settings.ViewModel"
-                    xmlns:laundryDetails1="clr-namespace:PALMS.Settings.View.LaundryDetails"
-                    xmlns:audit="clr-namespace:PALMS.Settings.ViewModel.Audit;assembly=PALMS.Settings.ViewModel"
-                    xmlns:audit1="clr-namespace:PALMS.Settings.View.Audit"
-                    xmlns:noteLinenReplacement="clr-namespace:PALMS.Settings.ViewModel.NoteLinenReplacement;assembly=PALMS.Settings.ViewModel"
-                    xmlns:noteLinenReplacement1="clr-namespace:PALMS.Settings.View.NoteLinenReplacement">
+                    xmlns:laundryDetails1="clr-namespace:PALMS.Settings.View.LaundryDetails">
 
     <DataTemplate DataType="{x:Type viewModel:SettingsViewModel}">
         <view:SettingsView/>
@@ -21,36 +15,8 @@
         <view:TabsView/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type dictionaryViewModel:DictionariesViewModel}">
-        <dictionaries:DictionariesView/>
-    </DataTemplate>
-
-    <DataTemplate DataType="{x:Type dictionaryViewModel:GroupLinenDictionaryViewModel}">
-        <dictionaries:GroupLinenDictionaryView/>
-    </DataTemplate>
-
-    <DataTemplate DataType="{x:Type dictionaryViewModel:TypeLinenDictionaryViewModel}">
-        <dictionaries:TypeLinenDictionaryView/>
-    </DataTemplate>
-
-    <DataTemplate DataType="{x:Type dictionaryViewModel:FamilyLinenDictionaryViewModel}">
-        <dictionaries:FamilyLinenDictionaryView/>
-    </DataTemplate>
-
-    <DataTemplate DataType="{x:Type dictionaryViewModel:TrackingTypeDictionaryViewModel}">
-        <dictionaries:TrackingTypeDictionaryView/>
-    </DataTemplate>
-
     <DataTemplate DataType="{x:Type appSettings:AppSettingsViewModel}">
         <appSettings1:AppSettingsView/>
-    </DataTemplate>
-
-    <DataTemplate DataType="{x:Type audit:AuditHistoryViewModel}">
-        <audit1:AuditHistoryView/>
-    </DataTemplate>
-
-    <DataTemplate DataType="{x:Type noteLinenReplacement:NoteLinenReplacementViewModel}">
-        <noteLinenReplacement1:NoteLinenReplacementView/>
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type laundryDetails:VendorDetailsViewModel}">

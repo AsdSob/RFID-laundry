@@ -5,10 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using PALMS.Settings.ViewModel.AppSettings;
-using PALMS.Settings.ViewModel.Audit;
-using PALMS.Settings.ViewModel.Dictionaries;
 using PALMS.Settings.ViewModel.LaundryDetails;
-using PALMS.Settings.ViewModel.NoteLinenReplacement;
 using PALMS.ViewModels.Common;
 using PALMS.ViewModels.Common.Services;
 
@@ -30,11 +27,8 @@ namespace PALMS.Settings.ViewModel
 
             Items = new ObservableCollection<TabViewModel>
             {
-                new TabViewModel(resolver.Resolve<DictionariesViewModel>()),
-                new TabViewModel(resolver.Resolve<AppSettingsViewModel>()),
                 new TabViewModel(resolver.Resolve<VendorDetailsViewModel>()),
-                new TabViewModel(resolver.Resolve<AuditHistoryViewModel>()),
-                new TabViewModel(resolver.Resolve<NoteLinenReplacementViewModel>())
+                new TabViewModel(resolver.Resolve<AppSettingsViewModel>()),
             };
         }
 

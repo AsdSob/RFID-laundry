@@ -1,9 +1,6 @@
 ﻿using Autofac;
 using PALMS.Settings.ViewModel.AppSettings;
-using PALMS.Settings.ViewModel.Audit;
-using PALMS.Settings.ViewModel.Dictionaries;
 using PALMS.Settings.ViewModel.LaundryDetails;
-using PALMS.Settings.ViewModel.NoteLinenReplacement;
 using PALMS.ViewModels.Common;
 using PALMS.ViewModels.Common.Services;
 
@@ -20,20 +17,11 @@ namespace PALMS.Settings.ViewModel
                 .SingleInstance();
 
             container.RegisterType<TabsViewModel>().SingleInstance();
-            container.RegisterType<DictionariesViewModel>().SingleInstance();
-            container.RegisterType<GroupLinenDictionaryViewModel>().SingleInstance();
-            container.RegisterType<FamilyLinenDictionaryViewModel>().SingleInstance();
-            container.RegisterType<TypeLinenDictionaryViewModel>().SingleInstance();
-            container.RegisterType<TrackingTypeDictionaryViewModel>().SingleInstance();
 
             container.RegisterType<AppSettingsViewModel>().SingleInstance();
             container.RegisterType<AppSettingsProvider>().As<IAppSettingsProvider>().As<IAppSettings>().SingleInstance();
 
             container.RegisterType<VendorDetailsViewModel>().SingleInstance();
-
-            container.RegisterType<AuditHistoryViewModel>().SingleInstance();
-
-            container.RegisterType<NoteLinenReplacementViewModel>().SingleInstance();
         }
     }
 }

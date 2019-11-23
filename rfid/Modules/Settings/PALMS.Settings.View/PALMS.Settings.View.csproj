@@ -84,30 +84,8 @@
     <Compile Include="AppSettings\AppSettingsView.xaml.cs">
       <DependentUpon>AppSettingsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Audit\AuditHistoryView.xaml.cs">
-      <DependentUpon>AuditHistoryView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Behaviors\DictionaryEditBehavior.cs" />
-    <Compile Include="Dictionaries\DictionariesView.xaml.cs">
-      <DependentUpon>DictionariesView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dictionaries\FamilyLinenDictionaryView.xaml.cs">
-      <DependentUpon>FamilyLinenDictionaryView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dictionaries\GroupLinenDictionaryView.xaml.cs">
-      <DependentUpon>GroupLinenDictionaryView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dictionaries\TrackingTypeDictionaryView.xaml.cs">
-      <DependentUpon>TrackingTypeDictionaryView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dictionaries\TypeLinenDictionaryView.xaml.cs">
-      <DependentUpon>TypeLinenDictionaryView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="LaundryDetails\LaundryDetailsView.xaml.cs">
       <DependentUpon>LaundryDetailsView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="NoteLinenReplacement\NoteLinenReplacementView.xaml.cs">
-      <DependentUpon>NoteLinenReplacementView.xaml</DependentUpon>
     </Compile>
     <Compile Include="TabsView.xaml.cs">
       <DependentUpon>TabsView.xaml</DependentUpon>
@@ -116,35 +94,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Audit\AuditHistoryView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dictionaries\DictionariesView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dictionaries\FamilyLinenDictionaryView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dictionaries\GroupLinenDictionaryView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dictionaries\TrackingTypeDictionaryView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dictionaries\TypeLinenDictionaryView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="LaundryDetails\LaundryDetailsView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="NoteLinenReplacement\NoteLinenReplacementView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

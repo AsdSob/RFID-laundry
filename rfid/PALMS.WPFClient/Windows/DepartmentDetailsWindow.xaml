@@ -10,7 +10,6 @@
                        xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
                        xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
                        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-                       xmlns:behaviors="clr-namespace:PALMS.Settings.View.Behaviors;assembly=PALMS.Settings.View"
                        xmlns:behaviors1="clr-namespace:PALMS.View.Common.Behaviors;assembly=PALMS.View.Common"
                        xmlns:utils="clr-namespace:PALMS.ViewModels.Common;assembly=PALMS.ViewModels.Common"
                        xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
@@ -118,12 +117,6 @@
                                       KeyFieldName="KeyId"/>
                 </dxg:GridControl.View>
 
-                <i:Interaction.Behaviors>
-                    <behaviors:DictionaryEditBehavior/>
-                    <behaviors1:GridViewNewItemSelectionBehavior />
-                    <behaviors1:GridViewValidationBehavior IsValid="{Binding IsValid, Mode=OneWayToSource}"/>
-                </i:Interaction.Behaviors>
-
                 <dxg:GridControl.Columns>
 
                     <dxg:GridColumn FieldName="Name" Width="Auto">
@@ -189,12 +182,6 @@
 
                     </dxg:GridControl.View>
 
-                    <i:Interaction.Behaviors>
-                        <behaviors:DictionaryEditBehavior/>
-                        <behaviors1:GridViewNewItemSelectionBehavior />
-                        <behaviors1:GridViewValidationBehavior IsValid="{Binding IsValid, Mode=OneWayToSource}"/>
-                        <behaviors1:OrderBehavior/>
-                    </i:Interaction.Behaviors>
                     <dxmvvm:Interaction.Behaviors>
                         <dxg:GridDragDropManager />
                     </dxmvvm:Interaction.Behaviors>
