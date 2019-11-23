@@ -71,20 +71,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Services\AuditRepository.cs" />
-    <Compile Include="WindowViewModel\ChargeDetailsViewModel.cs" />
-    <Compile Include="WindowViewModel\ClientDetailsViewModel.cs" />
-    <Compile Include="WindowViewModel\ClientEditViewModel.cs" />
-    <Compile Include="WindowViewModel\DepartmentDetailsViewModel.cs" />
-    <Compile Include="EntityViewModel\ClientInfoViewModel.cs" />
-    <Compile Include="EntityViewModel\ClientViewModel.cs" />
     <Compile Include="Common\HasChangesHelper.cs" />
     <Compile Include="Common\HasViewModelAttribute.cs" />
     <Compile Include="Common\Helper.cs" />
     <Compile Include="DataViewModel.cs" />
-    <Compile Include="EntityViewModel\DepartmentContractViewModel.cs" />
-    <Compile Include="EntityViewModel\DepartmentViewModel.cs" />
-    <Compile Include="EntityViewModel\InvoiceDetailsViewModel.cs" />
-    <Compile Include="EntityViewModel\MasterLinenViewModel.cs" />
     <Compile Include="MainViewModel.cs" />
     <Compile Include="MenuItemViewModel.cs" />
     <Compile Include="MenuViewModel.cs" />

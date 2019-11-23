@@ -74,7 +74,6 @@
     <Compile Include="AppSettings\IAppSettingsProvider.cs" />
     <Compile Include="ISettingsContent.cs" />
     <Compile Include="LaundryDetails\VendorDetailsViewModel.cs" />
-    <Compile Include="LaundryDetails\PrimeInfoViewModel.cs" />
     <Compile Include="SettingsModule.cs" />
     <Compile Include="SettingsSection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
