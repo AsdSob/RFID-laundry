@@ -20,12 +20,18 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
         private readonly IDispatcher _dispatcher;
         private readonly IDataService _dataService;
         private readonly IDialogService _dialogService;
+        private PrimeInfoViewModel _primeInfo;
         private BitmapImage _vendorLogo;
 
         public BitmapImage VendorLogo
         {
             get => _vendorLogo;
             set => Set(ref _vendorLogo, value);
+        }
+        public PrimeInfoViewModel PrimeInfo
+        {
+            get => _primeInfo;
+            set => Set(ref _primeInfo, value);
         }
 
         public RelayCommand SaveCommand { get; }
@@ -39,17 +45,18 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
 
         public async Task InitializeAsync()
         {
-            if (0 == 0)
+            var primeInfo =  await _dataService.GetAsync<PrimeInfo>();
+            if (primeInfo.Count == 0)
             {
-               
+                _dispatcher.RunInMainThread(() => PrimeInfo = new PrimeInfoViewModel());
                 return;
             }
-            
+            _dispatcher.RunInMainThread(() => PrimeInfo = new PrimeInfoViewModel(primeInfo?.FirstOrDefault()));
         }
 
         public void Cancel()
         {
-
+            PrimeInfo.Reset();
         }
 
         public async void Save()
@@ -58,6 +65,9 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
 
             if (!_dialogService.ShowQuestionDialog(" Do you want to Save all changes ?"))
                 return;
+            
+            PrimeInfo.AcceptChanges();
+            await _dataService.AddOrUpdateAsync(PrimeInfo.OriginalObject);
         }
 
         public VendorDetailsViewModel(IDispatcher dispatcher, IDataService dataService, IDialogService dialogService)
@@ -76,12 +86,16 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-
+            if (e.PropertyName == nameof(PrimeInfo))
+            {
+                SaveCommand.RaiseCanExecuteChanged();
+                CancelCommand.RaiseCanExecuteChanged();
+            }
         }
 
         public bool PrimeInfoChanges()
         {
-            return false;
+            return PrimeInfo.HasChanges();
         }
 
         private void AddLogo()
@@ -94,7 +108,8 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
                         "Portable Network Graphic (*.png)|*.png";
             if (op.ShowDialog() == true)
             {
-
+                PrimeInfo.Logo = Extension.GetBitmapImage(File.ReadAllBytes(op.FileName));
+                PrimeInfo.SetLogoBytes(File.ReadAllBytes(op.FileName));
             }
         }
 

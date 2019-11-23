@@ -59,7 +59,9 @@ namespace PALMS.WPFClient.ViewModel
             builder.RegisterType<MenuViewModel>().SingleInstance();
 
             builder.RegisterType<DataViewModel>();
-
+            builder.RegisterType<ClientDetailsViewModel>();
+            builder.RegisterType<DepartmentDetailsViewModel>();
+            builder.RegisterType<ChargeDetailsViewModel>();
         }
 
         private static void RegisterModules(ContainerBuilder container)

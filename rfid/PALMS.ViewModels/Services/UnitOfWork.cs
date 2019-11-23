@@ -77,7 +77,7 @@ namespace PALMS.ViewModels.Services
         {
             // use any actions of context for loading
 
-            await _context.Clients.ToListAsync();
+            await _context.GroupLinens.ToListAsync();
         }
 
         public virtual void Dispose(bool disposing)
