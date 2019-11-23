@@ -66,18 +66,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Dictionaries\TrackingTypeViewModel.cs" />
     <Compile Include="Enumerations\EnumDict.cs" />
     <Compile Include="Enumerations\UnitViewModel.cs" />
     <Compile Include="Extensions\DateExtension.cs" />
     <Compile Include="Extensions\EnumerationExtension.cs" />
     <Compile Include="Extensions\EnumExtentions.cs" />
     <Compile Include="Interfaces\IOrderItem.cs" />
-    <Compile Include="Dictionaries\DictionaryItemBaseViewModel.cs" />
-    <Compile Include="Dictionaries\DictionaryItemViewModel.cs" />
-    <Compile Include="Dictionaries\FamilyLinenViewModel.cs" />
-    <Compile Include="Dictionaries\GroupLinenViewModel.cs" />
-    <Compile Include="Dictionaries\TypeLinenViewModel.cs" />
     <Compile Include="Extensions\Extension.cs" />
     <Compile Include="Extensions\ValidationExtension.cs" />
     <Compile Include="IInitializationAsync.cs" />
