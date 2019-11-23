@@ -35,6 +35,27 @@ namespace Client.Desktop.ViewModels.Common.ViewModels
             return true;
         }
 
+        protected bool Set<T>(ref T field, T newValue, bool broadcast = false, [CallerMemberName] string propertyName = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, newValue))
+                return false;
+            T oldValue = field;
+            field = newValue;
+            this.RaisePropertyChanged<T>(propertyName);
+            return true;
+        }
+
+        public virtual void RaisePropertyChanged<T>(string propertyExpression)
+        {
+            if (this.PropertyChanged == null)
+                return;
+            string propertyName = propertyExpression;
+            if (string.IsNullOrEmpty(propertyName))
+                return;
+            this.RaisePropertyChanged(propertyName);
+        }
+
+
         public virtual void RaisePropertyChanged<T>(Expression<Func<T>> propertyExpression)
         {
             if (this.PropertyChanged == null)
@@ -132,4 +153,5 @@ namespace Client.Desktop.ViewModels.Common.ViewModels
             this._execute.Invoke();
         }
     }
+
 }

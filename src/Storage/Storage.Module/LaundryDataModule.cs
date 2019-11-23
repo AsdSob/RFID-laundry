@@ -14,7 +14,7 @@ namespace Storage.Module
 
                     return new DbConfiguration
                     {
-                        ConnectionString = "Host=127.0.0.1;Port=5432;Database=laundry;User Id=postgres;Password=postgres;Timeout=100;Command Timeout=300;"
+                        ConnectionString = "Host=127.0.0.1;Port=5432;Database=laundry;User Id=postgres;Password=2235542;Timeout=100;Command Timeout=300;"
                     };
                 })
                 .As<IDbConfiguration>();

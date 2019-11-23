@@ -6,12 +6,7 @@ using System.Threading.Tasks;
 
 namespace TestConveyor
 {
-    public class Item
+    class ConveyorItemViewModel
     {
-        public string Tag { get; set; }
-        public int SlotNum { get; set; }
-        public bool IsEmpty { get; set; }
-
-
     }
 }

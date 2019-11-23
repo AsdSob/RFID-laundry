@@ -2,7 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:viewModels="clr-namespace:Client.Desktop.ViewModels;assembly=Client.Desktop.ViewModels"
                     xmlns:views="clr-namespace:Client.Desktop.Laundry.Views"
-                    xmlns:content="clr-namespace:Client.Desktop.ViewModels.Content;assembly=Client.Desktop.ViewModels">
+                    xmlns:views1="clr-namespace:Client.Desktop.Laundry.Views.Operation"
+                    xmlns:content="clr-namespace:Client.Desktop.ViewModels.Content;assembly=Client.Desktop.ViewModels"
+                    xmlns:operation="clr-namespace:Client.Desktop.ViewModels.Content.Operation;assembly=Client.Desktop.ViewModels">
 
     <DataTemplate DataType="{x:Type viewModels:MenuViewModel}">
         <views:MenuView/>
@@ -14,6 +16,10 @@
 
     <DataTemplate DataType="{x:Type content:AddViewModel}">
         <views:AddView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type operation:UniformConveyorViewModel}">
+        <views1:UniformConveyorView/>
     </DataTemplate>
 
 </ResourceDictionary>
