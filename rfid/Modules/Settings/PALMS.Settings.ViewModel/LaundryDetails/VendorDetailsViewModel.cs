@@ -47,7 +47,7 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
         private bool _isAutoMode;
         private int _setBelt1SlotNumb;
         private int _setBelt2SlotNumb;
-        private ConveyorItemViewModel _passingItem;
+        private string _passingItem;
         private ConveyorItemViewModel _hangingItem;
 
         public ConveyorItemViewModel HangingItem
@@ -55,7 +55,7 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
             get => _hangingItem;
             set => Set(() => HangingItem, ref _hangingItem, value);
         }
-        public ConveyorItemViewModel PassingItem
+        public string PassingItem
         {
             get => _passingItem;
             set => Set(() => PassingItem, ref _passingItem, value);
@@ -188,20 +188,22 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
             AddBeltItems();
 
             PropertyChanged += OnPropertyChanged;
-
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(IsAutoMode))
             {
-                RunAutoMode();
+                if (IsAutoMode)
+                {
+                    Task.Factory.StartNew(() => RunAutoMode());
+                }
             }
             if (e.PropertyName == nameof(PassingItem))
             {
-                if (PassingItem == null)
+                if (PassingItem == null) 
                 {
-                    CheckClothReady();
+                    Task.Factory.StartNew(() => CheckClothReady());
                 }
             }
         }
@@ -331,34 +333,42 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
                 : Belt2Items.FirstOrDefault(x => x.SlotNumber == slotNumb).IsEmpty;
         }
 
-        //public void CheckLinenRfid()
-        //{
-        //    var tagReport = _data.FirstOrDefault(x => x.Key == 1).Value.Keys;
+        public void CheckLinenRfid()
+        {
+            var tagReport = _data.FirstOrDefault(x => x.Key == 1).Value.Keys;
 
-        //    if (tagReport.Count > 1)
-        //    {
-        //        //ToDo: show errror msg, manual check the linen
-        //    }
+            if (tagReport.Count > 1)
+            {
+                if(_dialogService.ShowWarnigDialog("More then 1 chip in Antenna 1"));
+                CheckLinenRfid();
+            }
 
-        //    var clientLinen = ClientLinens.FirstOrDefault(x => x.RfidTag == tagReport.FirstOrDefault());
+            PassingItem = tagReport.FirstOrDefault();
 
-        //    //check tag in existing list of linen, if false give option to add item
-        //    if (clientLinen == null)
-        //    {
-        //        //TODO: RfidTag doesnt exsit in DB, Ask to new add in DB?
-        //    }
-        //    else
-        //    {
-        //        PassingItem = clientLinen;
-        //    }
-        //}
+            ////Check for RFID availability
+            //var clientLinen = ClientLinens.FirstOrDefault(x => x.RfidTag == tagReport.FirstOrDefault());
+
+            ////check tag in existing list of linen, if false give option to add item
+            //if (clientLinen == null)
+            //{
+            //    if (_dialogService.ShowQuestionDialog("Rfid Tag doesnt exist in DB. \n Would you like to add new Item?")
+            //    )
+            //    {
+            //        //TODO: Show new window to add new Linen
+            //    }
+            //}
+            //else
+            //{
+            //    PassingItem = clientLinen;
+            //}
+        }
         #endregion
 
         #region Manual Mode
 
         private void ManualSendToBelt1()
         {
-            if (PassingItem == null)
+            if (String.IsNullOrEmpty(PassingItem))
             {
                 _dialogService.ShowInfoDialog("No Linen");
                 return;
@@ -416,20 +426,67 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
             IsAutoMode = !IsAutoMode;
         }
 
+        //TODO: zapusk v otdelnom potoke i otkluchenie po komande
         private void RunAutoMode()
         {
-            if (!IsAutoMode ) return;
-
             while (IsAutoMode)
             {
-                CheckClothReady();
+                if (String.IsNullOrEmpty(PassingItem))
+                {
+                    Thread.Sleep(500);
+                    continue;
+                }
+
+                var currentSlot = 0;
+                if (CheckBeltFull(1))
+                {
+                    currentSlot = Belt1.GetNowPoint();
+
+                    while (!CheckBeltSlot(1, currentSlot))
+                    {
+                        currentSlot++;
+
+                        if (currentSlot >= 600)
+                        {
+                            currentSlot = 1;
+                        }
+                    }
+                    SendToBelt(Belt1, currentSlot);
+                }
+                else if (CheckBeltFull(2))
+                {
+                    currentSlot = Belt2.GetNowPoint();
+
+                    while (!CheckBeltSlot(2, currentSlot))
+                    {
+                        currentSlot++;
+
+                        if (currentSlot >= 780)
+                        {
+                            currentSlot = 1;
+                        }
+                    }
+                    SendToBelt(Belt2, currentSlot);
+                }
+
             }
-
-
-
 
         }
 
+        private bool CheckBeltFull(int beltNumb)
+        {
+            if (beltNumb == 1)
+            {
+                return Belt1Items.Any(x => x.IsEmpty);
+            }
+            
+            if(beltNumb == 2)
+            {
+                return Belt1Items.Any(x => x.IsEmpty);
+            }
+
+            return false;
+        }
 
         #endregion
 
