@@ -8,12 +8,13 @@ namespace ImpinjSpeedway
         public ImpinjReader Reader = new ImpinjReader();
         public Settings settings;
 
-        public bool Connection(string address)
+        public bool Connection()
         {
+            //Reader.Stop();
+            //Reader.Disconnect();
             try
             {
                 Reader.Connect("192.168.250.55");
-                Reader.Stop();
 
             }
             catch (OctaneSdkException ee)
@@ -38,17 +39,15 @@ namespace ImpinjSpeedway
             settings.Report.IncludePeakRssi = true;
             settings.Report.IncludeSeenCount = true;
             settings.Report.IncludePcBits = true;
-            settings.Report.IncludeSeenCount = true;
 
             settings.ReaderMode = ReaderMode.MaxThroughput;//.AutoSetDenseReader;
             settings.SearchMode = SearchMode.DualTarget;//.DualTarget;
             settings.Session = 1;
             settings.TagPopulationEstimate = Convert.ToUInt16(200);
 
-            settings.Report.Mode = ReportMode.Individual;
-
             Antenna();
 
+            settings.Report.Mode = ReportMode.Individual;
             Reader.ApplySettings(settings);
 
             return Reader.IsConnected;
@@ -60,20 +59,12 @@ namespace ImpinjSpeedway
             settings.Antennas.DisableAll();
             var j = settings.Antennas.AntennaConfigs.Count;
 
-            Console.WriteLine($"Number of Antennas = {j}");
-
-            //Console.Write("TxPowerInDbm = ");
-            //var TxPower = Console.ReadLine();
-
-            //Console.Write("\n RxSensitivityInDbm = ");
-            //var RxSensitivity = Console.ReadLine();
-
-
-            ushort i = 2;
+            for (ushort i = 1; i <= 4; i++)
+            {
                 settings.Antennas.GetAntenna(i).IsEnabled = true;
                 settings.Antennas.GetAntenna(i).TxPowerInDbm = Convert.ToDouble("15");
                 settings.Antennas.GetAntenna(i).RxSensitivityInDbm = Convert.ToDouble("-70");
-
+            }
 
         }
 
@@ -86,14 +77,6 @@ namespace ImpinjSpeedway
         {
             Reader.Stop();
         }
-
-        public bool Connect(string address)
-        {
-            Connection(address);
-            return Reader.IsConnected;
-        }
-
-
 
     }
 }

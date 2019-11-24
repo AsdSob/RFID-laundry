@@ -43,7 +43,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
                 <StackPanel Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0" Orientation = "Horizontal">
@@ -90,17 +90,23 @@
                 <Label Grid.Column="0" Grid.Row="2" Content="Staff Id/Name"/>
                 <Label Grid.Column="0" Grid.Row="3" Content="Linen"/>
                 <Label Grid.Column="0" Grid.Row="4" Content="Tag Id"/>-->
-                <Label Grid.Column="0" Grid.Row="0" Content="Belt No"/>
-                <Label Grid.Column="0" Grid.Row="1" Content="Slot No"/>
-                <Label Grid.Column="0" Grid.Row="2" Content="Tag Id"/>
+
+                <Label Grid.Column="0" Grid.Row="0" Content="-Passing Tag-"/>
+
+                <Label Grid.Column="0" Grid.Row="1" Content="Belt No"/>
+                <Label Grid.Column="0" Grid.Row="2" Content="Slot No"/>
+                <Label Grid.Column="0" Grid.Row="3" Content="Tag Id"/>
 
                 <!--<Label Grid.Column="1" Grid.Row="0" Content="{Binding }"/>-->
                 <!--<Label Grid.Column="1" Grid.Row="1" Content="{Binding }"/>-->
                 <!--<Label Grid.Column="1" Grid.Row="2" Content="{Binding }"/>-->
                 <!--<Label Grid.Column="1" Grid.Row="3" Content="{Binding }"/>-->
-                <Label Grid.Column="1" Grid.Row="0" Content="{Binding HangingItem.BeltNumber}"/>
-                <Label Grid.Column="1" Grid.Row="1" Content="{Binding HangingItem.SlotNumber}"/>
-                <Label Grid.Column="1" Grid.Row="2" Content="{Binding HangingItem.RfidTag}"/>
+
+                <Label Grid.Column="1" Grid.Row="0" Content="{Binding PassingTag}"/>
+
+                <Label Grid.Column="1" Grid.Row="1" Content="{Binding HangingItem.BeltNumber}"/>
+                <Label Grid.Column="1" Grid.Row="2" Content="{Binding HangingItem.SlotNumber}"/>
+                <Label Grid.Column="1" Grid.Row="3" Content="{Binding HangingItem.RfidTag}"/>
 
             </Grid>
         </GroupBox>
@@ -158,12 +164,15 @@
                       >
 
                 <DataGrid.Columns>
-                    <DataGridCheckBoxColumn IsReadOnly="False" Header="*" Binding="{Binding IsSelected}" />
-                    <DataGridTextColumn Header="Slot" Binding="{Binding SlotNumber}" />
+                    <DataGridCheckBoxColumn Width="50" IsReadOnly="False" Header="*" Binding="{Binding IsSelected}" />
+                    <DataGridTextColumn Width="50" Header="Slot" Binding="{Binding SlotNumber}" />
                     <DataGridTextColumn Header="Empty" Binding="{Binding IsEmpty}" />
                 </DataGrid.Columns>
 
             </DataGrid>
         </GroupBox>
+
+
+
     </Grid>
 </UserControl>

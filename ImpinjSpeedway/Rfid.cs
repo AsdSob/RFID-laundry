@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Threading;
 using Impinj.OctaneSdk;
 
 namespace ImpinjSpeedway
@@ -6,6 +8,8 @@ namespace ImpinjSpeedway
     public class Rfid
     {
         public static bool IsConnected;
+        public static ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>> _data =
+            new ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>>();
 
         static void Main(string[] args)
         {
@@ -27,67 +31,81 @@ namespace ImpinjSpeedway
                         Console.WriteLine($"Reader Connected - {IsConnected}");
                         break;
 
-                    case ConsoleKey.Q:
-                        reader.Antenna();
-                        break;
-
                     case ConsoleKey.W:
+                        Console.Write("Read seconds => ");
+
+                        var time =Convert.ToInt32(Console.ReadLine());
                         reader.Start();
-                        Console.WriteLine("Started...");
+                        reader.Reader.TagsReported += DisplayTag;
+                        Thread.Sleep(time);
+                        reader.Reader.TagsReported -= DisplayTag;
+                        reader.Stop();
+
+                        Console.Write("\n Reading Complete");
                         break;
 
-                    case ConsoleKey.E:
-                        reader.Stop();
-                        Console.WriteLine("Stop...");
+                    case ConsoleKey.S:
+                        ShowTags(_data);
+                        Console.ReadKey();
                         break;
 
                     case ConsoleKey.A:
                         exit = true;
                         break;
-
-                    case ConsoleKey.Z:
-                        reader.Reader.TagsReported += DisplayTag;
-
-                        //tagReport = reader.Reader.QueryTags(5);
-                        //Console.WriteLine("Tag reading complete");
-                        break;
-
-                    case ConsoleKey.X:
-                        //DisplayTag(reader.Reader, tagReport);
-                        break;
                 }
 
             }
-                
+
             Console.WriteLine("\n Disconnected !!!!!");
             Console.ReadKey();
 
         }
 
+        private static void ShowTags(ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>> data)
+        {
+            foreach (var item in data)
+            {
+                Console.WriteLine($"\n antenna = --{item.Key}--");
+                foreach (var tuple in item.Value)
+                {
+                    Console.WriteLine($"Tag = {tuple.Key} | {tuple.Value.Item1}, {tuple.Value.Item2}");
+                }
+            }
+        }
 
         private static void DisplayTag(ImpinjReader reader, TagReport report)
         {
             foreach (Tag tag in report)
             {
-                if (tag.Epc != null)
-                {
-                    Console.WriteLine(
-                        $"Reader= {reader.Name} /Antenna= {tag.AntennaPortNumber} /EPC= {tag.Epc} /RSS= {tag.PeakRssiInDbm} /Frequency= {tag.ChannelInMhz} /Phase= {tag.PhaseAngleInRadians}");
-                }
+                AddData(tag.AntennaPortNumber, tag.Epc.ToString(), tag.LastSeenTime.LocalDateTime);
             }
         }
 
-        private static ImpinjReader.ReaderStartedEventHandler ShowStarted()
+        private static void AddData(int antenna, string epc, DateTime time)
         {
-            Console.WriteLine("Impinj Started");
-            return null;
+            // проверка ест ли словарь антенны 
+            if (!_data.TryGetValue(antenna, out ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>> val))
+            {
+                val = new ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>();
+
+                _data.TryAdd(antenna, val);
+            }
+
+            // проверка на наличие чипа в словаре
+            if (!val.TryGetValue(epc, out Tuple<DateTime?, DateTime?> times))
+            {
+                times = new Tuple<DateTime?, DateTime?>(time, null);
+                val.TryAdd(epc, times);
+            }
+            else
+            {
+                val.TryUpdate(epc, new Tuple<DateTime?, DateTime?>(times.Item1, time), times);
+                //данные можно сохранять в БД, но метке можно обнулить
+            }
+
+            // если метка повторно падает в считыватель, то нужно предыдущие данные сохранять в БД
         }
 
-        private static ImpinjReader.TagOpCompleteHandler ShowReadingComplete()
-        {
-            Console.WriteLine("Reading Complete");
 
-            return null;
-        }
     }
 }

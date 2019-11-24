@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Activities.Statements;
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -10,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using Impinj.OctaneSdk;
 using PALMS.ViewModels.Common;
 using PALMS.ViewModels.Common.Services;
 
@@ -49,7 +49,13 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
         private int _setBelt2SlotNumb;
         private string _passingTag;
         private ConveyorItemViewModel _hangingItem;
+        private RfidCommon _impinj;
 
+        public RfidCommon Impinj
+        {
+            get => _impinj;
+            set => Set(() => Impinj, ref _impinj, value);
+        }
         public ConveyorItemViewModel HangingItem
         {
             get => _hangingItem;
@@ -155,12 +161,10 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
         #endregion
 
 
-
         public async Task InitializeAsync()
         {
  
         }
-
         
         public VendorDetailsViewModel(IDispatcher dispatcher, IDataService dataService, IDialogService dialogService)
         {
@@ -196,14 +200,14 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
             {
                 if (IsAutoMode)
                 {
-                    Task.Factory.StartNew(() => RunAutoMode());
+                    Task.Factory.StartNew(RunAutoMode);
                 }
             }
             if (e.PropertyName == nameof(PassingTag))
             {
                 if (PassingTag == null) 
                 {
-                    Task.Factory.StartNew(() => CheckClothReady());
+                    Task.Factory.StartNew(CheckClothReady);
                 }
             }
         }
@@ -277,6 +281,7 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
                 {
                     BeltNumber = 1,
                     SlotNumber = i,
+                    IsEmpty =  true,
                 });
             }
 
@@ -302,7 +307,7 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
             //TODO: zapustit etot metod v otdelnom potoke i v postoyannom zapuske
             while (!Plc1.GetClotheReady())
             {
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
             }
                 
             var i = Plc1.GetWaitHangNum();
@@ -310,8 +315,7 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
             if (i > 1)
             {
                 if (_dialogService.ShowWarnigDialog(
-                    "There are more then 1 hanger in belt sorting point\n Please remove all hangers and pass again \n\n Press ok once all done")
-                )
+                    "There are more then 1 hanger in belt sorting point\n Please remove all hangers and pass again \n\n Press ok once all done"))
                 {
                     ResetClothCount();
                 }
@@ -326,6 +330,7 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
         }
         public void CheckLinenRfid()
         {
+            StartReadTags();
             var tagReport = _data.FirstOrDefault(x => x.Key == 1).Value.Keys;
 
             if (tagReport.Count > 1)
@@ -378,11 +383,9 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
                     return false;
             }
         }
-
         #endregion
 
         #region Manual Mode
-
         private void ManualSendToBelt1()
         {
             if (String.IsNullOrEmpty(PassingTag))
@@ -396,7 +399,12 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
             //перед отправкой проверить на заполненость линии и слота
 
             if (CheckBeltSlot(beltNumb, SetBelt1SlotNumb))
+            {
                 SendToBelt(1, SetBelt1SlotNumb);
+                return;
+            }
+
+            _dialogService.ShowInfoDialog("Selected slot is not empty");
         }
 
         private void ManualSendToBelt2()
@@ -442,7 +450,7 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
                     Thread.Sleep(500);
                 }
             }
-            Thread.Sleep(2000);
+            Thread.Sleep(1000);
 
             // начала загрузки в слот
             while (!belt.GetClotheInHook())
@@ -475,11 +483,9 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
                 SlotNumber = slotNumb,
             };
         }
-
         #endregion
 
         #region Auto Mode
-
         private void AutoMode()
         {
             IsAutoMode = !IsAutoMode;
@@ -504,7 +510,7 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
                     while (!CheckBeltSlot(1, currentSlot))
                     {
                         currentSlot++;
-                        if (currentSlot >= 600) currentSlot = 1;
+                        if (currentSlot > 600) currentSlot = 1;
                     }
                     SendToBelt(1, currentSlot);
                 }
@@ -517,17 +523,39 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
                     while (!CheckBeltSlot(2, currentSlot))
                     {
                         currentSlot++;
-                        if (currentSlot >= 780) currentSlot = 1;
+                        if (currentSlot > 780) currentSlot = 1;
                     }
                     SendToBelt(2, currentSlot);
                 }
             }
         }
-
         #endregion
 
 
 
+        #region Rfid Reader
+
+        private void StartReadTags()
+        {
+            Impinj.Connect();
+
+            Impinj.Start();
+            Impinj.Reader.TagsReported += DisplayTag;
+
+            Thread.Sleep(1000);
+
+            Impinj.Reader.TagsReported -= DisplayTag;
+            Impinj.Stop();
+
+        }
+
+        private void DisplayTag(ImpinjReader reader, TagReport report)
+        {
+            foreach (Tag tag in report)
+            {
+                AddData(tag.AntennaPortNumber, tag.Epc.ToString(), tag.LastSeenTime.LocalDateTime);
+            }
+        }
 
         private void AddData(int antenna, string epc, DateTime time)
         {
@@ -554,7 +582,7 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
             // если метка повторно падает в считыватель, то нужно предыдущие данные сохранять в БД
         }
 
-
+        #endregion
 
     }
 }
