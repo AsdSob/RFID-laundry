@@ -53,14 +53,7 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
         {
             if (e.PropertyName == nameof(RfidTag))
             {
-                if (RfidTag == null)
-                {
-                    IsEmpty = true;
-                }
-                else
-                {
-                    IsEmpty = false;
-                }
+                IsEmpty = String.IsNullOrWhiteSpace(RfidTag);
             }
 
         }

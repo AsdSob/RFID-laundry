@@ -47,7 +47,7 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
         private bool _isAutoMode;
         private int _setBelt1SlotNumb;
         private int _setBelt2SlotNumb;
-        private string _passingItem;
+        private string _passingTag;
         private ConveyorItemViewModel _hangingItem;
 
         public ConveyorItemViewModel HangingItem
@@ -55,10 +55,10 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
             get => _hangingItem;
             set => Set(() => HangingItem, ref _hangingItem, value);
         }
-        public string PassingItem
+        public string PassingTag
         {
-            get => _passingItem;
-            set => Set(() => PassingItem, ref _passingItem, value);
+            get => _passingTag;
+            set => Set(() => PassingTag, ref _passingTag, value);
         }
         public int SetBelt2SlotNumb
         {
@@ -199,9 +199,9 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
                     Task.Factory.StartNew(() => RunAutoMode());
                 }
             }
-            if (e.PropertyName == nameof(PassingItem))
+            if (e.PropertyName == nameof(PassingTag))
             {
-                if (PassingItem == null) 
+                if (PassingTag == null) 
                 {
                     Task.Factory.StartNew(() => CheckClothReady());
                 }
@@ -297,7 +297,6 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
 
         #region Plc1 Waiting and linen data
 
-
         private void CheckClothReady()
         {
             //TODO: zapustit etot metod v otdelnom potoke i v postoyannom zapuske
@@ -325,25 +324,17 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
             // проверить и вызвать метод считывателя. 
             CheckLinenRfid();
         }
-
-        private bool CheckBeltSlot(int beltNumb, int slotNumb)
-        {
-            return beltNumb == 1
-                ? Belt1Items.FirstOrDefault(x => x.SlotNumber == slotNumb).IsEmpty
-                : Belt2Items.FirstOrDefault(x => x.SlotNumber == slotNumb).IsEmpty;
-        }
-
         public void CheckLinenRfid()
         {
             var tagReport = _data.FirstOrDefault(x => x.Key == 1).Value.Keys;
 
             if (tagReport.Count > 1)
             {
-                if(_dialogService.ShowWarnigDialog("More then 1 chip in Antenna 1"));
+                if (_dialogService.ShowWarnigDialog("More then 1 chip in Antenna 1")) ;
                 CheckLinenRfid();
             }
 
-            PassingItem = tagReport.FirstOrDefault();
+            PassingTag = tagReport.FirstOrDefault();
 
             ////Check for RFID availability
             //var clientLinen = ClientLinens.FirstOrDefault(x => x.RfidTag == tagReport.FirstOrDefault());
@@ -359,16 +350,42 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
             //}
             //else
             //{
-            //    PassingItem = clientLinen;
+            //    PassingTag = clientLinen;
             //}
         }
+
+        private bool CheckBeltSlot(int beltNumb, int slotNumb)
+        {
+            switch (beltNumb)
+            {
+                case 1:
+                    return Belt1Items.FirstOrDefault(x => x.SlotNumber == slotNumb).IsEmpty;
+                case 2:
+                    return Belt2Items.FirstOrDefault(x => x.SlotNumber == slotNumb).IsEmpty;
+                default:
+                    return false;
+            }
+        }
+        private bool CheckBeltFull(int beltNumb)
+        {
+            switch (beltNumb)
+            {
+                case 1:
+                    return Belt1Items.Any(x => x.IsEmpty);
+                case 2:
+                    return Belt1Items.Any(x => x.IsEmpty);
+                default:
+                    return false;
+            }
+        }
+
         #endregion
 
         #region Manual Mode
 
         private void ManualSendToBelt1()
         {
-            if (String.IsNullOrEmpty(PassingItem))
+            if (String.IsNullOrEmpty(PassingTag))
             {
                 _dialogService.ShowInfoDialog("No Linen");
                 return;
@@ -379,7 +396,7 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
             //перед отправкой проверить на заполненость линии и слота
 
             if (CheckBeltSlot(beltNumb, SetBelt1SlotNumb))
-                SendToBelt(Belt1, SetBelt1SlotNumb);
+                SendToBelt(1, SetBelt1SlotNumb);
         }
 
         private void ManualSendToBelt2()
@@ -387,7 +404,30 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
 
         }
 
-        private void SendToBelt(FinsTcp belt, int slotNumb)
+        private void SendToBelt(int beltNumb, int slotNumb)
+        {
+            FinsTcp belt = null;
+            switch (beltNumb)
+            {
+                case 1:
+                    belt = Belt1;
+                    break;
+                case 2:
+                    belt = Belt2;
+                    break;
+            }
+            if(belt == null) return;
+
+
+            belt.Sorting(beltNumb);
+            SetHangingItem(beltNumb, slotNumb);
+
+            HangToBeltSlot(belt, slotNumb);
+
+            UpdateConveyorItem(beltNumb, slotNumb);
+        }
+
+        private void HangToBeltSlot(FinsTcp belt, int slotNumb)
         {
             // Подготовка слота 
             if (belt.GetNowPoint() != slotNumb)
@@ -417,6 +457,25 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
                 Thread.Sleep(500);
             }
         }
+
+        private void UpdateConveyorItem(int beltNumb, int slotNumb)
+        {
+            var item = BeltItems.FirstOrDefault(x => x.BeltNumber == beltNumb && x.SlotNumber == slotNumb);
+
+            item.RfidTag = PassingTag;
+            PassingTag = null;
+        }
+
+        private void SetHangingItem(int beltNumb, int slotNumb)
+        {
+            HangingItem = new ConveyorItemViewModel()
+            {
+                BeltNumber = beltNumb,
+                RfidTag = PassingTag,
+                SlotNumber = slotNumb,
+            };
+        }
+
         #endregion
 
         #region Auto Mode
@@ -431,13 +490,13 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
         {
             while (IsAutoMode)
             {
-                if (String.IsNullOrEmpty(PassingItem))
+                if (String.IsNullOrEmpty(PassingTag))
                 {
-                    Thread.Sleep(500);
-                    continue;
+                    Thread.Sleep(500); continue;
                 }
-
                 var currentSlot = 0;
+
+                //Belt 1 проверка слота
                 if (CheckBeltFull(1))
                 {
                     currentSlot = Belt1.GetNowPoint();
@@ -445,14 +504,12 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
                     while (!CheckBeltSlot(1, currentSlot))
                     {
                         currentSlot++;
-
-                        if (currentSlot >= 600)
-                        {
-                            currentSlot = 1;
-                        }
+                        if (currentSlot >= 600) currentSlot = 1;
                     }
-                    SendToBelt(Belt1, currentSlot);
+                    SendToBelt(1, currentSlot);
                 }
+
+                //Belt 2 проверка слота
                 else if (CheckBeltFull(2))
                 {
                     currentSlot = Belt2.GetNowPoint();
@@ -460,32 +517,11 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
                     while (!CheckBeltSlot(2, currentSlot))
                     {
                         currentSlot++;
-
-                        if (currentSlot >= 780)
-                        {
-                            currentSlot = 1;
-                        }
+                        if (currentSlot >= 780) currentSlot = 1;
                     }
-                    SendToBelt(Belt2, currentSlot);
+                    SendToBelt(2, currentSlot);
                 }
-
             }
-
-        }
-
-        private bool CheckBeltFull(int beltNumb)
-        {
-            if (beltNumb == 1)
-            {
-                return Belt1Items.Any(x => x.IsEmpty);
-            }
-            
-            if(beltNumb == 2)
-            {
-                return Belt1Items.Any(x => x.IsEmpty);
-            }
-
-            return false;
         }
 
         #endregion

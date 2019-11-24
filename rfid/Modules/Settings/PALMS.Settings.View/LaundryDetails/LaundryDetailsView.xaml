@@ -85,18 +85,22 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <Label Grid.Column="0" Grid.Row="0" Content="Client"/>
+                <!--<Label Grid.Column="0" Grid.Row="0" Content="Client"/>
                 <Label Grid.Column="0" Grid.Row="1" Content="Department"/>
                 <Label Grid.Column="0" Grid.Row="2" Content="Staff Id/Name"/>
                 <Label Grid.Column="0" Grid.Row="3" Content="Linen"/>
-                <Label Grid.Column="0" Grid.Row="4" Content="Tag Id"/>
+                <Label Grid.Column="0" Grid.Row="4" Content="Tag Id"/>-->
+                <Label Grid.Column="0" Grid.Row="0" Content="Belt No"/>
+                <Label Grid.Column="0" Grid.Row="1" Content="Slot No"/>
+                <Label Grid.Column="0" Grid.Row="2" Content="Tag Id"/>
 
-                <!--<Label Grid.Column="1" Grid.Row="0" Content="{Binding }"/>
-                <Label Grid.Column="1" Grid.Row="1" Content="{Binding }"/>
-                <Label Grid.Column="1" Grid.Row="2" Content="{Binding }"/>
-                <Label Grid.Column="1" Grid.Row="3" Content="{Binding }"/>
-                <Label Grid.Column="1" Grid.Row="4" Content="{Binding }"/>
-                <Label Grid.Column="1" Grid.Row="5" Content="{Binding }"/>-->
+                <!--<Label Grid.Column="1" Grid.Row="0" Content="{Binding }"/>-->
+                <!--<Label Grid.Column="1" Grid.Row="1" Content="{Binding }"/>-->
+                <!--<Label Grid.Column="1" Grid.Row="2" Content="{Binding }"/>-->
+                <!--<Label Grid.Column="1" Grid.Row="3" Content="{Binding }"/>-->
+                <Label Grid.Column="1" Grid.Row="0" Content="{Binding HangingItem.BeltNumber}"/>
+                <Label Grid.Column="1" Grid.Row="1" Content="{Binding HangingItem.SlotNumber}"/>
+                <Label Grid.Column="1" Grid.Row="2" Content="{Binding HangingItem.RfidTag}"/>
 
             </Grid>
         </GroupBox>
@@ -145,7 +149,9 @@
                       Height="NaN"
                       ItemsSource="{Binding Belt1Items}"
                       VerticalScrollBarVisibility="Visible"
+                      Width="400"
                       AllowDrop="True" 
+                      HorizontalAlignment="Stretch"
                       EnableRowVirtualization="True" 
                       IsReadOnly="True" 
                       IsTextSearchCaseSensitive="False"

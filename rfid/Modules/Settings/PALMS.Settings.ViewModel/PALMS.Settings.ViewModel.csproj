@@ -94,6 +94,8 @@
     <Compile Include="ISettingsContent.cs" />
     <Compile Include="LaundryDetails\ConveyorItemViewModel.cs" />
     <Compile Include="LaundryDetails\PlcControl.cs" />
+    <Compile Include="LaundryDetails\Rfid.cs" />
+    <Compile Include="LaundryDetails\RfidCommon.cs" />
     <Compile Include="LaundryDetails\VendorDetailsViewModel.cs" />
     <Compile Include="SettingsModule.cs" />
     <Compile Include="SettingsSection.cs" />
