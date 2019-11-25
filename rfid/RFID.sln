@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2027
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PALMS.WPFClient", "PALMS.WPFClient\PALMS.WPFClient.csproj", "{D41A8E6F-5CE9-4BDA-85DF-4CF7CED9DCD3}"
 EndProject
@@ -24,6 +24,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PALMS.Settings.View", "Modules\Settings\PALMS.Settings.View\PALMS.Settings.View.csproj", "{044B24DE-186B-4D28-B83F-F63BEE4F5AFB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PALMS.Settings.ViewModel", "Modules\Settings\PALMS.Settings.ViewModel\PALMS.Settings.ViewModel.csproj", "{24C0B14B-4995-4102-83A8-348A23B400B7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Laundry", "Laundry", "{DFB5F73E-354A-44F8-A71B-012F9374E80D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laundristic.ViewModel", "Modules\Laundristic\Laundristic.ViewModel\Laundristic.ViewModel.csproj", "{723C9130-21CC-4797-8154-D789730C5870}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laundristic.View", "Modules\Laundristic\Laundristic.View\Laundristic.View.csproj", "{9BF3D35C-5268-4B0A-9C97-6E0863FB8808}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +69,14 @@ Global
 		{24C0B14B-4995-4102-83A8-348A23B400B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24C0B14B-4995-4102-83A8-348A23B400B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24C0B14B-4995-4102-83A8-348A23B400B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{723C9130-21CC-4797-8154-D789730C5870}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{723C9130-21CC-4797-8154-D789730C5870}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{723C9130-21CC-4797-8154-D789730C5870}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{723C9130-21CC-4797-8154-D789730C5870}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BF3D35C-5268-4B0A-9C97-6E0863FB8808}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BF3D35C-5268-4B0A-9C97-6E0863FB8808}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BF3D35C-5268-4B0A-9C97-6E0863FB8808}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BF3D35C-5268-4B0A-9C97-6E0863FB8808}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -74,6 +88,9 @@ Global
 		{CB74702E-F1A7-452D-A2BA-8E6DB7DAB0A5} = {827696FB-1BD7-46B0-88A8-53F9B812A8A6}
 		{044B24DE-186B-4D28-B83F-F63BEE4F5AFB} = {CB74702E-F1A7-452D-A2BA-8E6DB7DAB0A5}
 		{24C0B14B-4995-4102-83A8-348A23B400B7} = {CB74702E-F1A7-452D-A2BA-8E6DB7DAB0A5}
+		{DFB5F73E-354A-44F8-A71B-012F9374E80D} = {827696FB-1BD7-46B0-88A8-53F9B812A8A6}
+		{723C9130-21CC-4797-8154-D789730C5870} = {DFB5F73E-354A-44F8-A71B-012F9374E80D}
+		{9BF3D35C-5268-4B0A-9C97-6E0863FB8808} = {DFB5F73E-354A-44F8-A71B-012F9374E80D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CC88E397-DD5F-448F-A9C9-D766B88E241E}

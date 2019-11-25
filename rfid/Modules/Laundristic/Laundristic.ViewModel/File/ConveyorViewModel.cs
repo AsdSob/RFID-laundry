@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
@@ -15,17 +17,10 @@ using Laundristic.ViewModel.EntityViewModel;
 using PALMS.ViewModels.Common;
 using PALMS.ViewModels.Common.Services;
 
-namespace PALMS.Settings.ViewModel.LaundryDetails
+namespace Laundristic.ViewModel.File
 {
-    public class VendorDetailsViewModel : ViewModelBase, ISettingsContent, IInitializationAsync
+    public class ConveyorViewModel : ViewModelBase, IInitializationAsync
     {
-        public string Error { get; }
-        public string Name => "PrimeInfo";
-        public bool HasChanges()
-        {
-            throw new NotImplementedException();
-        }
-
         private readonly IDispatcher _dispatcher;
         private readonly IDataService _dataService;
         private readonly IDialogService _dialogService;
@@ -178,10 +173,10 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
 
         public async Task InitializeAsync()
         {
- 
+
         }
-        
-        public VendorDetailsViewModel(IDispatcher dispatcher, IDataService dataService, IDialogService dialogService)
+
+        public ConveyorViewModel(IDispatcher dispatcher, IDataService dataService, IDialogService dialogService)
         {
             _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
             _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
@@ -221,7 +216,7 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
             }
             if (e.PropertyName == nameof(PassingTag))
             {
-                if (PassingTag == null) 
+                if (PassingTag == null)
                 {
                     Task.Factory.StartNew(CheckClothReady);
                 }
@@ -230,7 +225,7 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
 
         private ObservableCollection<ConveyorItemViewModel> SortBeltItems(int beltNumb)
         {
-            return BeltItems?.Where(x => x.BeltNumber == beltNumb)?.ToObservableCollection();
+            return BeltItems?.Where(x => x.BeltNumber == beltNumb).ToObservableCollection();
         }
 
         public void StartConveyor()
@@ -299,7 +294,7 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
                 {
                     BeltNumber = 1,
                     SlotNumber = i,
-                    IsEmpty =  true,
+                    IsEmpty = true,
                 });
             }
 
@@ -333,7 +328,7 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
             {
                 Thread.Sleep(500);
             }
-                
+
             var i = Plc1.GetWaitHangNum();
 
             if (i > 1)
@@ -419,7 +414,7 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
                     belt = Belt2;
                     break;
             }
-            if(belt == null) return;
+            if (belt == null) return;
 
 
             Plc1.Sorting(beltNumb);
@@ -433,7 +428,7 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
         private void HangToBeltSlot(FinsTcp belt, int slotNumb)
         {
             // Подготовка слота 
-            if (belt.GetNowPoint() != slotNumb) 
+            if (belt.GetNowPoint() != slotNumb)
             {
                 belt.SetNowPoint(slotNumb);
                 Thread.Sleep(500);
@@ -642,7 +637,7 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
             {
                 Thread.Sleep(500);
             }
-            
+
         }
 
 
@@ -660,7 +655,7 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
         {
             var list = "";
 
-            
+
 
             return list;
         }

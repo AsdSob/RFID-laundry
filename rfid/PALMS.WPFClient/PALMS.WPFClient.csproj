@@ -294,6 +294,14 @@
     <Resource Include="Icons\clients.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Modules\Laundristic\Laundristic.ViewModel\Laundristic.ViewModel.csproj">
+      <Project>{723c9130-21cc-4797-8154-d789730c5870}</Project>
+      <Name>Laundristic.ViewModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Modules\Laundristic\Laundristic.View\Laundristic.View.csproj">
+      <Project>{9bf3d35c-5268-4b0a-9c97-6e0863fb8808}</Project>
+      <Name>Laundristic.View</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Modules\Settings\PALMS.Settings.ViewModel\PALMS.Settings.ViewModel.csproj">
       <Project>{24c0b14b-4995-4102-83a8-348a23b400b7}</Project>
       <Name>PALMS.Settings.ViewModel</Name>

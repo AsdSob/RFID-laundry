@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 
-namespace PALMS.Settings.ViewModel.LaundryDetails
+namespace Laundristic.ViewModel.EntityViewModel
 {
     public class ConveyorItemViewModel : ViewModelBase
     {
