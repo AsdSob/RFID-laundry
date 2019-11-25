@@ -50,7 +50,19 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
         private string _passingTag;
         private ConveyorItemViewModel _hangingItem;
         private RfidCommon _impinj;
+        private string _clothToTakeOut;
+        private int _waitingClothCount;
 
+        public int WaitingClothCount
+        {
+            get => _waitingClothCount;
+            set => Set(() => WaitingClothCount, ref _waitingClothCount, value);
+        }
+        public string ClothToTakeOut
+        {
+            get => _clothToTakeOut;
+            set => Set(() => ClothToTakeOut, ref _clothToTakeOut, value);
+        }
         public RfidCommon Impinj
         {
             get => _impinj;
@@ -155,6 +167,7 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
         public RelayCommand StopConveyorCommand { get; }
         public RelayCommand AutoModeCommand { get; }
         public RelayCommand ResetClothCountCommand { get; }
+        public RelayCommand GetClothCountCommand { get; }
         public RelayCommand SendToBelt1Command { get; }
         public RelayCommand SendToBelt2Command { get; }
 
@@ -179,6 +192,7 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
             StopConveyorCommand = new RelayCommand(StopConveyor);
             AutoModeCommand = new RelayCommand(AutoMode);
             ResetClothCountCommand = new RelayCommand(ResetClothCount);
+            GetClothCountCommand = new RelayCommand(GetClothCount);
 
             Plc1Ip = "192.168.250.1";
             Plc2Ip = "192.168.250.2";
@@ -222,13 +236,15 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
             Plc1.Start();
             Belt1.Start();
             Belt2.Start();
+
+            Task.Factory.StartNew(CheckClothReady);
         }
 
         public void StopConveyor()
         {
-            Plc1.Start();
-            Belt1.Start();
-            Belt2.Start();
+            Plc1.Stop();
+            Belt1.Stop();
+            Belt2.Stop();
         }
 
         public void ConnectConveyor()
@@ -298,6 +314,12 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
         private void ResetClothCount()
         {
             Plc1.ResetWaitHangNum();
+            CheckClothReady();
+        }
+
+        private void GetClothCount()
+        {
+            WaitingClothCount = Plc1.GetWaitHangNum();
         }
 
         #region Plc1 Waiting and linen data
@@ -325,38 +347,9 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
                 }
             }
 
+            PassingTag = "--12345--";
             // проверить и вызвать метод считывателя. 
-            CheckLinenRfid();
-        }
-        public void CheckLinenRfid()
-        {
-            StartReadTags();
-            var tagReport = _data.FirstOrDefault(x => x.Key == 1).Value.Keys;
-
-            if (tagReport.Count > 1)
-            {
-                if (_dialogService.ShowWarnigDialog("More then 1 chip in Antenna 1")) ;
-                CheckLinenRfid();
-            }
-
-            PassingTag = tagReport.FirstOrDefault();
-
-            ////Check for RFID availability
-            //var clientLinen = ClientLinens.FirstOrDefault(x => x.RfidTag == tagReport.FirstOrDefault());
-
-            ////check tag in existing list of linen, if false give option to add item
-            //if (clientLinen == null)
-            //{
-            //    if (_dialogService.ShowQuestionDialog("Rfid Tag doesnt exist in DB. \n Would you like to add new Item?")
-            //    )
-            //    {
-            //        //TODO: Show new window to add new Linen
-            //    }
-            //}
-            //else
-            //{
-            //    PassingTag = clientLinen;
-            //}
+            //CheckLinenRfid();
         }
 
         private bool CheckBeltSlot(int beltNumb, int slotNumb)
@@ -427,7 +420,7 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
             if(belt == null) return;
 
 
-            belt.Sorting(beltNumb);
+            Plc1.Sorting(beltNumb);
             SetHangingItem(beltNumb, slotNumb);
 
             HangToBeltSlot(belt, slotNumb);
@@ -532,8 +525,40 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
         #endregion
 
 
-
         #region Rfid Reader
+
+        public void CheckLinenRfid()
+        {
+            _data.Clear();
+
+            StartReadTags();
+            var tagReport = _data.FirstOrDefault(x => x.Key == 1).Value.Keys;
+
+            if (tagReport.Count > 1)
+            {
+                if (_dialogService.ShowWarnigDialog("More then 1 chip in Antenna 1")) ;
+                CheckLinenRfid();
+            }
+
+            PassingTag = tagReport.FirstOrDefault();
+
+            ////Check for RFID availability
+            //var clientLinen = ClientLinens.FirstOrDefault(x => x.RfidTag == tagReport.FirstOrDefault());
+
+            ////check tag in existing list of linen, if false give option to add item
+            //if (clientLinen == null)
+            //{
+            //    if (_dialogService.ShowQuestionDialog("Rfid Tag doesnt exist in DB. \n Would you like to add new Item?")
+            //    )
+            //    {
+            //        //TODO: Show new window to add new Linen
+            //    }
+            //}
+            //else
+            //{
+            //    PassingTag = clientLinen;
+            //}
+        }
 
         private void StartReadTags()
         {
@@ -582,6 +607,61 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
             // если метка повторно падает в считыватель, то нужно предыдущие данные сохранять в БД
         }
 
+        #endregion
+
+        #region Packing Uniform
+
+        private void TakeClothBelt1()
+        {
+            if (String.IsNullOrEmpty(ClothToTakeOut)) return;
+
+            TakeCloth(Belt1, ClothToTakeOut);
+        }
+
+        private void TakeClothBelt2()
+        {
+            if (String.IsNullOrEmpty(ClothToTakeOut)) return;
+
+            TakeCloth(Belt2, ClothToTakeOut);
+        }
+
+        private void PackCloth()
+        {
+            Plc1.Packclothes();
+        }
+
+        private void TakeCloth(FinsTcp belt, string linenList)
+        {
+            // Take out clothes
+            belt.TakeOutClothes(linenList);
+
+            //Working state of the clothes taking device
+            while (belt.GetTakeOutClothesState())
+            {
+                Thread.Sleep(500);
+            }
+            
+        }
+
+
+        private void AutoPacking()
+        {
+
+        }
+
+        private void GetStaffList()
+        {
+
+        }
+
+        private string GetStaffUniformSlots()
+        {
+            var list = "";
+
+            
+
+            return list;
+        }
         #endregion
 
     }

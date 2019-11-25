@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="ConveyorItemViewModel.cs" />
     <Compile Include="PlcControl.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

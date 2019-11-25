@@ -60,13 +60,12 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
             settings.Antennas.DisableAll();
             var j = settings.Antennas.AntennaConfigs.Count;
 
-            for (ushort i = 1; i <= 4; i++)
+            for (ushort i = 1; i <= j; i++)
             {
                 settings.Antennas.GetAntenna(i).IsEnabled = true;
                 settings.Antennas.GetAntenna(i).TxPowerInDbm = Convert.ToDouble("15");
                 settings.Antennas.GetAntenna(i).RxSensitivityInDbm = Convert.ToDouble("-70");
             }
-
         }
 
         public void Start()
@@ -84,8 +83,6 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
             Connection();
             return Reader.IsConnected;
         }
-
-
 
     }
 }
