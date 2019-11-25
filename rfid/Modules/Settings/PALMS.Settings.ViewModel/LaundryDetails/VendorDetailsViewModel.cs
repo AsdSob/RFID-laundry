@@ -10,8 +10,6 @@ using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Impinj.OctaneSdk;
-using Laundristic.ViewModel.Common;
-using Laundristic.ViewModel.EntityViewModel;
 using PALMS.ViewModels.Common;
 using PALMS.ViewModels.Common.Services;
 
@@ -433,7 +431,7 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
         private void HangToBeltSlot(FinsTcp belt, int slotNumb)
         {
             // Подготовка слота 
-            if (belt.GetNowPoint() != slotNumb) 
+            if (belt.GetNowPoint() != slotNumb)
             {
                 belt.SetNowPoint(slotNumb);
                 Thread.Sleep(500);

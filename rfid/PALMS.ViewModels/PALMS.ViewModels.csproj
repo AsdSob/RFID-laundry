@@ -98,14 +98,6 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="..\Modules\Laundristic\Laundristic.ViewModel\Laundristic.ViewModel.csproj">
-      <Project>{723c9130-21cc-4797-8154-d789730c5870}</Project>
-      <Name>Laundristic.ViewModel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Modules\Settings\PALMS.Settings.ViewModel\PALMS.Settings.ViewModel.csproj">
-      <Project>{24C0B14B-4995-4102-83A8-348A23B400B7}</Project>
-      <Name>PALMS.Settings.ViewModel</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PALMS.Data\PALMS.Data.csproj">
       <Project>{EECF015E-F60A-44E2-8608-57CA748CBCF1}</Project>
       <Name>PALMS.Data</Name>

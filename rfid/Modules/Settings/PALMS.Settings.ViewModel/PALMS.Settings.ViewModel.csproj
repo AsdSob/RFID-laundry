@@ -92,6 +92,9 @@
     <Compile Include="AppSettings\AppSettingsViewModel.cs" />
     <Compile Include="AppSettings\IAppSettingsProvider.cs" />
     <Compile Include="ISettingsContent.cs" />
+    <Compile Include="LaundryDetails\ConveyorItemViewModel.cs" />
+    <Compile Include="LaundryDetails\PlcControl.cs" />
+    <Compile Include="LaundryDetails\RfidCommon.cs" />
     <Compile Include="LaundryDetails\VendorDetailsViewModel.cs" />
     <Compile Include="SettingsModule.cs" />
     <Compile Include="SettingsSection.cs" />
@@ -115,10 +118,6 @@
     <ProjectReference Include="..\..\..\PALMS.ViewModels.Common\PALMS.ViewModels.Common.csproj">
       <Project>{D214AFD7-00A3-46B0-9DC6-6851207DEA6B}</Project>
       <Name>PALMS.ViewModels.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Laundristic\Laundristic.ViewModel\Laundristic.ViewModel.csproj">
-      <Project>{723C9130-21CC-4797-8154-D789730C5870}</Project>
-      <Name>Laundristic.ViewModel</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

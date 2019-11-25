@@ -18,7 +18,7 @@ namespace PALMS.ViewModels
         private MenuViewModel _menuViewModel;
         private readonly IAuthService _authService;
         private bool _isBusy;
-        private Type _previousMenuSelectedItem;
+        private ISection _previousMenuSelectedItem;
         private ICollection<RoleEnum> _roles;
 
         public object Content
@@ -79,7 +79,6 @@ namespace PALMS.ViewModels
                 if (menuViewModel.SelectedItem == null || Equals(menuViewModel.SelectedItem, _previousMenuSelectedItem))
                     return;
 
-
                 if (!CanChangeModule())
                 {
                     _dialogService.ShowWarnigDialog("You have unsaved data!");
@@ -94,7 +93,7 @@ namespace PALMS.ViewModels
                     return;
                 }
 
-                var contentType = menuViewModel.SelectedItem;
+                var contentType = menuViewModel.SelectedItem.GetType().BaseType?.GetGenericArguments()[0];
 
                 // TODO: use IResolver
                 Content = _resolver.Resolve(contentType);

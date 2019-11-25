@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Windows.Forms;
 using FinsUdp;
+using System.Windows.Forms;
 
-namespace Laundristic.ViewModel.Common
+namespace PALMS.Settings.ViewModel.LaundryDetails
 {
     public class FinsTcp
     {

@@ -15,16 +15,16 @@
         DataContext="{Binding Main, Source={StaticResource Locator}}">
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-        <Border Grid.Row="0" Background="Transparent">
+        <Border Grid.Column="0" Background="Transparent">
             <ContentPresenter Content="{Binding MenuViewModel}" />
         </Border>
 
-        <ContentPresenter Grid.Row="1" Content="{Binding Content}"/>
+        <ContentPresenter Grid.Column="1" Content="{Binding Content}"/>
 
         <!-- busy indicator -->
         <dx:WaitIndicator x:Name="BusyIndicator"
