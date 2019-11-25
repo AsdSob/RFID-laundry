@@ -443,13 +443,13 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
                     Thread.Sleep(500);
                 }
             }
-            Thread.Sleep(1000);
+            Thread.Sleep(500);
 
             // начала загрузки в слот
             while (!belt.GetClotheInHook())
             {
                 belt.Hang_In();
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
             }
 
             // ожыдание окончание загрузки в слот
