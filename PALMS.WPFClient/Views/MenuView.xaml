@@ -5,75 +5,18 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
              xmlns:viewModels="clr-namespace:PALMS.ViewModels;assembly=PALMS.ViewModels"
-             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-             xmlns:common="clr-namespace:PALMS.ViewModels.Common;assembly=PALMS.ViewModels.Common"
-             xmlns:behaviors="clr-namespace:PALMS.View.Common.Behaviors;assembly=PALMS.View.Common"
              d:DesignHeight="300" d:DesignWidth="100"
              d:DataContext="{d:DesignInstance viewModels:MenuViewModel}">
 
-    <UserControl.Resources>
-        <Style x:Key="MenuItemContainerStyle" TargetType="{x:Type dxe:ListBoxEditItem}">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate>
-                        <Border x:Name="ContentBorder"
-                                d:DataContext="{d:DesignInstance common:ISection}"
-                                Visibility="{Binding IsVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                IsEnabled="{Binding IsEnable}"
-                                Margin="0,10"
-                                Padding="0,2"
-                                Height="68"
-                                ToolTip="{Binding Name}">
-                            <Image Source="{Binding Image}" Height="64" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="dxe:ListBoxEditItem.IsSelected" Value="True">
-                                <Setter TargetName="ContentBorder" Property="Background"
-                                        Value="{StaticResource WindowTitleBackgroudBrush}" />
-                            </Trigger>
-                            <Trigger Property="dxe:ListBoxEditItem.IsMouseOver" Value="True">
-                                <Setter TargetName="ContentBorder" Property="Opacity"
-                                        Value="{StaticResource OverOpacity}" />
-                            </Trigger>
-                            <MultiDataTrigger>
-                                <MultiDataTrigger.Conditions>
-                                    <Condition Binding="{Binding ElementName=ContentBorder, Path=IsEnabled }"
-                                               Value="false" />
-                                </MultiDataTrigger.Conditions>
-                                <MultiDataTrigger.Setters>
-                                    <Setter TargetName="ContentBorder"
-                                            Property="Opacity"
-                                            Value="0.3" />
-                                </MultiDataTrigger.Setters>
-                            </MultiDataTrigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </UserControl.Resources>
+    <Menu DockPanel.Dock="Top">
+        <MenuItem Header="_File">
+            <MenuItem Header="Home" Command="{Binding NewCommand}"/>
+            <Separator />
+            <MenuItem Header="_Exit" Command="{Binding ExitCommand}"/>
+        </MenuItem>
 
-    <i:Interaction.Behaviors>
-        <behaviors:InitializationAsyncBehavior/>
-    </i:Interaction.Behaviors>
-
-    <Grid Width="100">
-        <Border BorderThickness="0,0,1,0" BorderBrush="LightGray">
-            <dxe:ListBoxEdit ItemsSource="{Binding Items}"
-                             SelectedItem="{Binding SelectedItem}"
-                             Style="{StaticResource ListBoxEditDefaultStyle}"
-                             ItemContainerStyle="{StaticResource MenuItemContainerStyle}"
-                             HorizontalContentAlignment="Center"
-                             ScrollViewer.VerticalScrollBarVisibility="Auto"
-                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                
-                <dxe:ListBoxEdit.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel />
-                    </ItemsPanelTemplate>
-                </dxe:ListBoxEdit.ItemsPanel>
-            </dxe:ListBoxEdit>
-        </Border>
-    </Grid>
+        <MenuItem Header="_Operation">
+            <MenuItem Header="Conveyor" Command="{Binding ConveyorCommand}"/>
+        </MenuItem>
+    </Menu>
 </UserControl>

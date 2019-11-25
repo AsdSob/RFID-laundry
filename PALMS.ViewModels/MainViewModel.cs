@@ -18,7 +18,7 @@ namespace PALMS.ViewModels
         private MenuViewModel _menuViewModel;
         private readonly IAuthService _authService;
         private bool _isBusy;
-        private ISection _previousMenuSelectedItem;
+        private Type _previousMenuSelectedItem;
         private ICollection<RoleEnum> _roles;
 
         public object Content
@@ -93,7 +93,7 @@ namespace PALMS.ViewModels
                     return;
                 }
 
-                var contentType = menuViewModel.SelectedItem.GetType().BaseType?.GetGenericArguments()[0];
+                var contentType = menuViewModel.SelectedItem;
 
                 // TODO: use IResolver
                 Content = _resolver.Resolve(contentType);

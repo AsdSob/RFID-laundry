@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
+using PALMS.Settings.ViewModel.LaundryDetails;
 using PALMS.ViewModels.Common;
 using PALMS.ViewModels.Common.Services;
 
@@ -13,22 +16,29 @@ namespace PALMS.ViewModels
     {
         private readonly IResolver _resolver;
         private ObservableCollection<ISection> _items;
-        private ISection _selectedItem;
+        private Type _selectedItem;
         
         public ObservableCollection<ISection> Items
         {
             get => _items;
             set => Set(ref _items, value);
         }
-        public ISection SelectedItem
+        public Type SelectedItem
         {
             get => _selectedItem;
             set => Set(ref _selectedItem, value);
         }
 
+        public ICommand NewCommand { get; }
+        public ICommand ConveyorCommand { get; }
+        public ICommand ExitCommand { get; }
+
         public MenuViewModel(IResolver resolver)
         {
             _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver));
+
+            NewCommand = new RelayCommand(() => Select(typeof(DataViewModel)));
+            ConveyorCommand = new RelayCommand(() => Select(typeof(VendorDetailsViewModel)));
 
             Items = new ObservableCollection<ISection>();
         }
@@ -47,6 +57,12 @@ namespace PALMS.ViewModels
 
             //    Helper.RunInMainThread(() => SelectedItem = Items.FirstOrDefault());
             //});
+        }
+
+        private void Select(Type type)
+        {
+            // TODO: use enum?
+            SelectedItem = type;
         }
 
         private IEnumerable<ISection> GetSections()
