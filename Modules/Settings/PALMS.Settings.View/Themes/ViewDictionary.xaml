@@ -4,8 +4,8 @@
                     xmlns:view="clr-namespace:PALMS.Settings.View"
                     xmlns:appSettings="clr-namespace:PALMS.Settings.ViewModel.AppSettings;assembly=PALMS.Settings.ViewModel"
                     xmlns:appSettings1="clr-namespace:PALMS.Settings.View.AppSettings"
-                    xmlns:laundryDetails="clr-namespace:PALMS.Settings.ViewModel.LaundryDetails;assembly=PALMS.Settings.ViewModel"
-                    xmlns:laundryDetails1="clr-namespace:PALMS.Settings.View.LaundryDetails">
+                    xmlns:viewModels="clr-namespace:PALMS.Settings.ViewModel.ViewModels;assembly=PALMS.Settings.ViewModel"
+                    xmlns:view1="clr-namespace:PALMS.Settings.View.View">
 
     <DataTemplate DataType="{x:Type viewModel:SettingsViewModel}">
         <view:SettingsView/>
@@ -19,7 +19,15 @@
         <appSettings1:AppSettingsView/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type laundryDetails:VendorDetailsViewModel}">
-        <laundryDetails1:LaundryDetailsView/>
+    <DataTemplate DataType="{x:Type viewModels:VendorDetailsViewModel}">
+        <view1:LaundryDetailsView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type viewModels:ClientViewModel}">
+        <view1:ClientView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type viewModels:LinenViewModel}">
+        <view1:LinenView/>
     </DataTemplate>
 </ResourceDictionary>

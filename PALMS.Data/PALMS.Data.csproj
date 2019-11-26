@@ -57,6 +57,10 @@
   <ItemGroup>
     <Compile Include="Audit\AuditModel.cs" />
     <Compile Include="Objects\ClientModel\Client.cs" />
+    <Compile Include="Objects\ClientModel\ClientLinen.cs" />
+    <Compile Include="Objects\ClientModel\ClientStaff.cs" />
+    <Compile Include="Objects\ClientModel\Department.cs" />
+    <Compile Include="Objects\ClientModel\MasterLinen.cs" />
     <Compile Include="Objects\EntityModel\Entity.cs" />
     <Compile Include="Objects\EntityModel\EntityBase.cs" />
     <Compile Include="Objects\EntityModel\NameEntity.cs" />

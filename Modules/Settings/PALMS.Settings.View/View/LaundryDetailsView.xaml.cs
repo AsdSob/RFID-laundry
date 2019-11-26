@@ -1,6 +1,4 @@
-﻿using System.Windows.Controls;
-
-namespace PALMS.Settings.View.LaundryDetails
+﻿namespace PALMS.Settings.View.View
 {
     /// <summary>
     /// Interaction logic for LaundryDetailsView.xaml

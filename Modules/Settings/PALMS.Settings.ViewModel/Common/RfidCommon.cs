@@ -1,7 +1,7 @@
 ﻿using System;
 using Impinj.OctaneSdk;
 
-namespace PALMS.Settings.ViewModel.LaundryDetails
+namespace PALMS.Settings.ViewModel.Common
 {
     public class RfidCommon
     {

@@ -84,17 +84,27 @@
     <Compile Include="AppSettings\AppSettingsView.xaml.cs">
       <DependentUpon>AppSettingsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="LaundryDetails\LaundryDetailsView.xaml.cs">
+    <Compile Include="View\ClientView.xaml.cs">
+      <DependentUpon>ClientView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\LaundryDetailsView.xaml.cs">
       <DependentUpon>LaundryDetailsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="TabsView.xaml.cs">
       <DependentUpon>TabsView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\LinenView.xaml.cs">
+      <DependentUpon>LinenView.xaml</DependentUpon>
+    </Compile>
     <Page Include="AppSettings\AppSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="LaundryDetails\LaundryDetailsView.xaml">
+    <Page Include="View\ClientView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\LaundryDetailsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -115,6 +125,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\ViewDictionary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\LinenView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -201,6 +215,9 @@
     <Resource Include="Icons\tracking_256.png" />
     <Resource Include="Icons\tracking_32.png" />
     <Resource Include="Icons\tracking_64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Windows\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

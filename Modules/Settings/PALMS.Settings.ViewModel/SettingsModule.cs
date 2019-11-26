@@ -1,6 +1,6 @@
 ﻿using Autofac;
 using PALMS.Settings.ViewModel.AppSettings;
-using PALMS.Settings.ViewModel.LaundryDetails;
+using PALMS.Settings.ViewModel.ViewModels;
 using PALMS.ViewModels.Common;
 using PALMS.ViewModels.Common.Services;
 
@@ -22,6 +22,8 @@ namespace PALMS.Settings.ViewModel
             container.RegisterType<AppSettingsProvider>().As<IAppSettingsProvider>().As<IAppSettings>().SingleInstance();
 
             container.RegisterType<VendorDetailsViewModel>().SingleInstance();
+            container.RegisterType<ClientViewModel>().SingleInstance();
+            container.RegisterType<LinenViewModel>().SingleInstance();
         }
     }
 }

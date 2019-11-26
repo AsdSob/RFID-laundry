@@ -48,33 +48,37 @@ namespace PALMS.ViewModels.Common.Enumerations
         [Description("By Department")] ByDepartment = 3,
     }
 
-    public enum NoteTypeEnum
+    public enum LinenStatus
     {
-        [Description("Standard")] Standard = 1,
-
-        [Description("Note With Price")] WithPrice = 2,
+        [Description("Soiled")] Soiled = 1,
+        [Description("Collection")] Collection = 2,
+        [Description("Received")] Received = 3,
+        [Description("Washing")] Washing = 4,
+        [Description("Conveyor")] Conveyor = 5,
+        [Description("Packed")] Packed = 6,
+        [Description("Ready")] Ready = 7,
+        [Description("Send")] Send = 8,
+        [Description("In Use")] InUse = 9,
     }
 
-    public enum InvoiceTypeEnum
+    public enum DepartmentType
     {
-        [Description("Standard")] Standard = 1,
+        [Description("Housekeeping")] Housekeeping = 1,
+        [Description("Food & Beverage")] FnB = 2,
+        [Description("Recreation")] Recreation = 3,
+        [Description("Uniform")] Uniform = 4,
+        [Description("Guest laundry")] GuestLaundry = 5,
     }
 
-    public enum LabelTypeEnum
+    public enum Cities
     {
-        [Description("Regular")] Regular = 1,
-        [Description("Damage")] Damage = 2,
-        [Description("New")] New = 3,
-        [Description("Stain")] Stain = 4,
-        [Description("Express")] Express = 5,
-        [Description("Client Name")] Name = 6,
+        [Description("Abu Dhabi")] AbuDhabi = 1,
+        [Description("Dubai")] Dubai = 2,
+        [Description("Sharjah")] Sharjah = 3,
+        [Description("Ajman")] Ajman = 4,
+        [Description("Ras Al Khaimah")] RAK = 5,
+        [Description("Fujairah")] Fujairah = 6,
+        [Description("Umm Al Quwain")] UAQ = 7,
     }
 
-    public enum TrackingStatusEnum
-    {
-        [Description("Accept")] Accept = 1,
-        [Description("Open")] Open = 2,
-        [Description("In Progress")] InProgress = 3,
-        [Description("Close")] Close = 4,
-    }
 }

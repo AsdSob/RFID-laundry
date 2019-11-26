@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 
-namespace PALMS.Settings.ViewModel.LaundryDetails
+namespace PALMS.Settings.ViewModel.EntityViewModels
 {
     public class ConveyorItemViewModel : ViewModelBase
     {
@@ -15,7 +11,13 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
         private int _slotNumber;
         private int _beltNumber;
         private string _rfidTag;
+        private ClientLinenEntityViewModel _originalObject;
 
+        public ClientLinenEntityViewModel OriginalObject
+        {
+            get => _originalObject;
+            set => Set(() => OriginalObject, ref _originalObject, value);
+        }
         public string RfidTag
         {
             get => _rfidTag;
@@ -42,7 +44,11 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
             set => Set(ref _isSelected, value);
         }
 
-
+        public ConveyorItemViewModel(ClientLinenEntityViewModel entity)
+        {
+            OriginalObject = entity;
+            PropertyChanged += OnPropertyChanged;
+        }
 
         public ConveyorItemViewModel()
         {

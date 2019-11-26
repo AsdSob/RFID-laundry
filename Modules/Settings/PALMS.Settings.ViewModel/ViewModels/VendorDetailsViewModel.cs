@@ -10,10 +10,12 @@ using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Impinj.OctaneSdk;
+using PALMS.Settings.ViewModel.Common;
+using PALMS.Settings.ViewModel.EntityViewModels;
 using PALMS.ViewModels.Common;
 using PALMS.ViewModels.Common.Services;
 
-namespace PALMS.Settings.ViewModel.LaundryDetails
+namespace PALMS.Settings.ViewModel.ViewModels
 {
     public class VendorDetailsViewModel : ViewModelBase, ISettingsContent, IInitializationAsync
     {
@@ -543,7 +545,7 @@ namespace PALMS.Settings.ViewModel.LaundryDetails
             PassingTag = tagReport.FirstOrDefault();
 
             ////Check for RFID availability
-            //var clientLinen = ClientLinens.FirstOrDefault(x => x.RfidTag == tagReport.FirstOrDefault());
+            //var clientLinen = ClientLinens.FirstOrDefault(x => x.Tag == tagReport.FirstOrDefault());
 
             ////check tag in existing list of linen, if false give option to add item
             //if (clientLinen == null)

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using PALMS.Settings.ViewModel.AppSettings;
-using PALMS.Settings.ViewModel.LaundryDetails;
+using PALMS.Settings.ViewModel.ViewModels;
 using PALMS.ViewModels.Common;
 using PALMS.ViewModels.Common.Services;
 

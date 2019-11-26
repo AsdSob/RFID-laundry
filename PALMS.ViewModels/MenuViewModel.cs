@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using PALMS.Settings.ViewModel.LaundryDetails;
+using PALMS.Settings.ViewModel.ViewModels;
 using PALMS.ViewModels.Common;
 using PALMS.ViewModels.Common.Services;
 
@@ -32,11 +32,15 @@ namespace PALMS.ViewModels
         public ICommand NewCommand { get; }
         public ICommand ConveyorCommand { get; }
         public ICommand ExitCommand { get; }
+        public ICommand ClientCommand { get; }
+        public ICommand LinenCommand { get; }
 
         public MenuViewModel(IResolver resolver)
         {
             _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver));
 
+            ClientCommand = new RelayCommand(() => Select(typeof(ClientViewModel)));
+            LinenCommand = new RelayCommand(() => Select(typeof(LinenViewModel)));
             NewCommand = new RelayCommand(() => Select(typeof(DataViewModel)));
             ConveyorCommand = new RelayCommand(() => Select(typeof(VendorDetailsViewModel)));
 
