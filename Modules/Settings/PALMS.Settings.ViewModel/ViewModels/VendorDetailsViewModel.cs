@@ -319,25 +319,17 @@ namespace PALMS.Settings.ViewModel.ViewModels
             CheckClothReady();
         }
 
-        private void GetClothCount()
-        {
-            WaitingClothCount = Plc1.GetWaitHangNum();
-        }
-
         #region Plc1 Waiting and linen data
 
         private void CheckClothReady()
         {
             //TODO: zapustit etot metod v otdelnom potoke i v postoyannom zapuske
-            while (!Plc1.GetClotheReady())
-            {
-                Thread.Sleep(500);
-            }
                 
             var i = Plc1.GetWaitHangNum();
 
             if (i > 1)
             {
+
                 if (_dialogService.ShowWarnigDialog(
                     "There are more then 1 hanger in belt sorting point\n Please remove all hangers and pass again \n\n Press ok once all done"))
                 {
@@ -347,6 +339,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 {
                     CheckClothReady();
                 }
+
             }
 
             PassingTag = "--12345--";
@@ -378,6 +371,12 @@ namespace PALMS.Settings.ViewModel.ViewModels
                     return false;
             }
         }
+
+        private void GetClothCount()
+        {
+            WaitingClothCount = Plc1.GetWaitHangNum();
+        }
+
         #endregion
 
         #region Manual Mode

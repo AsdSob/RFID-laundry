@@ -5,6 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PALMS.Settings.View.View"
              xmlns:viewModels="clr-namespace:PALMS.Settings.ViewModel.ViewModels;assembly=PALMS.Settings.ViewModel"
+             xmlns:collections="clr-namespace:System.Collections;assembly=mscorlib"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance viewModels:ClientViewModel}">
@@ -15,10 +18,195 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="1.5*" />
         </Grid.ColumnDefinitions>
-                
+
+        <!-- Clients/Location -->
+        <GroupBox Grid.Row="1" Grid.Column="0" Margin="10" Header="Clients" FontWeight="Bold" >
+            <Grid x:Name="GridControlClient">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal">
+                    <Button Margin = "5" Padding="20,2"  Content="Add" Command="{Binding AddClientCommand}"/>
+                    <Button Margin = "5" Padding="20,2"  Content="Delete" Command="{Binding RemoveClientCommand}"/>
+                    <Button Margin = "5" Padding="20,2"  Content="Save" Command="{Binding SaveCommand}"/>
+                </StackPanel>
+
+                <dxg:GridControl Grid.Row="1" Grid.Column="0" 
+                                 ItemsSource="{Binding Clients}" 
+                                 SelectedItem="{Binding SelectedClient}" >
+
+                    <dxg:GridControl.View>
+                        <dxg:TreeListView AutoWidth="True"
+                                          ShowIndicator="False"
+                                          ShowHorizontalLines="True"
+                                          ShowVerticalLines="True"
+                                          SearchPanelFindMode="Always"
+                                          NavigationStyle="Cell"
+                                          EnableImmediatePosting="True"
+                                          AllowEditing="True" 
+                                          ParentFieldName="ParentId"
+                                          VerticalScrollbarVisibility="Auto"
+                                          KeyFieldName="Id"
+                                          ShowColumnHeaders="True"
+                                          />
+                    </dxg:GridControl.View>
+
+                    <dxg:GridControl.Columns>
+                        <dxg:GridColumn FieldName="Id" Header="Id" Width="30" AllowEditing="False" >
+                            <dxg:GridColumn.EditSettings>
+                                <dxe:TextEditSettings HorizontalContentAlignment="Stretch" />
+                            </dxg:GridColumn.EditSettings>
+                        </dxg:GridColumn>
+
+                        <dxg:GridColumn FieldName="Active" Header="Active" Width="50" >
+                            <dxg:GridColumn.CellTemplate>
+                                <DataTemplate>
+                                    <dxe:CheckEdit AllowNullInput="True" HorizontalContentAlignment="Center" HorizontalAlignment="Center" />
+                                </DataTemplate>
+                            </dxg:GridColumn.CellTemplate>
+                        </dxg:GridColumn>
+
+                        <dxg:GridColumn FieldName="Name" Header="Name" Width="Auto" />
+                        <dxg:GridColumn FieldName="ShortName" Header="Short Name" Width="Auto" />
+
+                        <dxg:GridColumn FieldName="ParentId" 
+                                        Header="Parent" 
+                                        ShowGroupedColumn="True" 
+                                        Width="50">
+                            <dxg:GridColumn.EditSettings>
+                                <dxe:ComboBoxEditSettings ItemsSource="{Binding ElementName=GridControlClient, Path=DataContext.SortedClients}" 
+                                                          IsTextEditable="False"
+                                                          DisplayMember="Name" 
+                                                          AllowNullInput="True"
+                                                          ValueMember="Id"/>
+                            </dxg:GridColumn.EditSettings>
+                        </dxg:GridColumn>
+
+                        <dxg:GridColumn FieldName="CityId" 
+                                        Header="City" 
+                                        ShowGroupedColumn="True" 
+                                        Width="50">
+                            <dxg:GridColumn.EditSettings>
+                                    <dxe:ComboBoxEditSettings ItemsSource="{Binding ElementName=GridControlClient, Path=DataContext.Cities}" 
+                                                          IsTextEditable="False"
+                                                          DisplayMember="Name" 
+                                                          AllowNullInput="True"
+                                                          ValueMember="Id"/>
+                            </dxg:GridColumn.EditSettings>
+                        </dxg:GridColumn>
+
+                    </dxg:GridControl.Columns>
+                </dxg:GridControl>
+
+
+            </Grid>
+        </GroupBox>
+        
+        <!-- Departments -->
+        <GroupBox Grid.Row="1" Grid.Column="1" Margin="10" Header="Department" FontWeight="Bold" >
+            <Grid x:Name="GridControlDepartment">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal">
+                    <Button Margin = "5" Padding="20,2"  Content="Add" Command="{Binding AddDepartmentCommand}"/>
+                    <Button Margin = "5" Padding="20,2"  Content="Delete" Command="{Binding RemoveDepartmentCommand}"/>
+                    <Button Margin = "5" Padding="20,2"  Content="Save" Command="{Binding SaveCommand}"/>
+
+                </StackPanel>
+
+                <dxg:GridControl Grid.Row="1" Grid.Column="0" 
+                                 ItemsSource="{Binding SortedDepartments}" 
+                                 SelectedItem="{Binding SelectedDepartment}" >
+
+                    <dxg:GridControl.View>
+                        <dxg:TableView AutoWidth="True"
+                                   ShowSearchPanelMode="Always"
+                                   ShowSearchPanelFindButton="True"
+                                   SearchPanelFindMode="Always"
+                                   ShowTotalSummary="True"
+                                   VerticalScrollbarVisibility="Auto"
+                                   EnableImmediatePosting="True"
+                                   AllowEditing="True" 
+                                   AllowGrouping="False"
+                                   ShowGroupPanel="False"
+                                   >
+                        </dxg:TableView>
+                    </dxg:GridControl.View>
+
+                    <dxg:GridControl.Columns>
+                        <dxg:GridColumn FieldName="Id" Header="Id" Width="30" AllowEditing="False" />
+                        <dxg:GridColumn FieldName="Name" Header="Name" Width="Auto" />
+                    </dxg:GridControl.Columns>
+                </dxg:GridControl>
+
+
+            </Grid>
+        </GroupBox>
+
+        <!-- Staff -->
+        <GroupBox Grid.Row="1" Grid.Column="2" Margin="10" Header="Department" FontWeight="Bold" >
+            <Grid x:Name="GridControlStaff">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal">
+                    <Button Margin = "5" Padding="20,2"  Content="Add" Command="{Binding AddStaffCommand}"/>
+                    <Button Margin = "5" Padding="20,2"  Content="Delete" Command="{Binding RemoveStaffCommand}"/>
+                    <Button Margin = "5" Padding="20,2"  Content="Save" Command="{Binding SaveCommand}"/>
+
+                </StackPanel>
+
+                <dxg:GridControl Grid.Row="1" Grid.Column="0" 
+                                 ItemsSource="{Binding SortedStaff}" 
+                                 SelectedItem="{Binding SelectedStaff}" >
+
+                    <dxg:GridControl.View>
+                        <dxg:TableView AutoWidth="True"
+                                   ShowSearchPanelMode="Always"
+                                   ShowSearchPanelFindButton="True"
+                                   SearchPanelFindMode="Always"
+                                   ShowTotalSummary="True"
+                                   VerticalScrollbarVisibility="Auto"
+                                   EnableImmediatePosting="True"
+                                   AllowEditing="True" 
+                                   AllowGrouping="False"
+                                   ShowGroupPanel="False"
+                                   >
+                        </dxg:TableView>
+                    </dxg:GridControl.View>
+
+                    <dxg:GridControl.Columns>
+                        <dxg:GridColumn FieldName="Id" Header="Id" Width="30" AllowEditing="False" />
+                        <dxg:GridColumn FieldName="Name" Header="Name" Width="Auto" />
+                        <dxg:GridColumn FieldName="StaffId" Header="Staff Id" Width="70" />
+
+                        <dxg:GridColumn FieldName="PackingValue" Header="Packing" Width="40" />
+                    </dxg:GridControl.Columns>
+                </dxg:GridControl>
+
+
+            </Grid>
+        </GroupBox>
+
     </Grid>
 </UserControl>

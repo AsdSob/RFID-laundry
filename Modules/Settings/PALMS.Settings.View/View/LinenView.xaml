@@ -3,12 +3,202 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:PALMS.Settings.View.View"
              xmlns:viewModels="clr-namespace:PALMS.Settings.ViewModel.ViewModels;assembly=PALMS.Settings.ViewModel"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance viewModels:LinenViewModel}">
     <Grid>
-            
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+
+        <Grid Grid.Row="1" Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Client -->
+            <GroupBox Grid.Row="0" Header="Client">
+                <dxe:ComboBoxEdit x:Name="Clients"
+                                  DisplayMember="Name"
+                                  ValueMember="Id"
+                                  IsTextEditable="False"
+                                  NullText="Select Client"
+                                  ItemsSource="{Binding Clients}"
+                                  SelectedItem="{Binding SelectedClient}"/>
+            </GroupBox>
+
+            <!-- Department -->
+            <GroupBox Grid.Row="1" Header="Department">
+                <dxe:ComboBoxEdit x:Name="Department"
+                                  DisplayMember="Name"
+                                  ValueMember="Id"
+                                  IsTextEditable="False"
+                                  NullText="Select Department"
+                                  ItemsSource="{Binding SortedDepartments}"
+                                  SelectedItem="{Binding SelectedDepartment}"/>
+            </GroupBox>
+
+            <!-- Staff -->
+            <GroupBox Grid.Row="2" Header="Staff">
+                <dxe:ComboBoxEdit x:Name="Staff"
+                                  DisplayMember="Name"
+                                  ValueMember="Id"
+                                  AllowDefaultButton="True"
+                                  IsTextEditable="False"
+                                  NullText="Select Staff"
+                                  ItemsSource="{Binding SortedStaff}"
+                                  SelectedItem="{Binding SelectedStaff}"/>
+            </GroupBox>
+
+        </Grid>
+
+
+        <!-- Client Linen -->
+
+        <GroupBox Grid.Row="1" Grid.Column="1" Header="Client Linen">
+
+            <Grid x:Name="GridControlClientLinen">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal">
+                    <Button Margin = "5" Padding="20,2"  Content="Add" Command="{Binding AddClientLinenCommand}"/>
+                    <Button Margin = "5" Padding="20,2"  Content="Delete" Command="{Binding DeleteClientLinenCommand}"/>
+                    <Button Margin = "5" Padding="20,2"  Content="Save" Command="{Binding SaveCommand}"/>
+
+                </StackPanel>
+
+                <dxg:GridControl Grid.Row="1" Grid.Column="0" 
+                                 ItemsSource="{Binding SortedLinens}" 
+                                 SelectedItem="{Binding SelectedLinen}" >
+
+                    <dxg:GridControl.View>
+                        <dxg:TableView AutoWidth="True"
+                                   ShowSearchPanelMode="Always"
+                                   ShowSearchPanelFindButton="True"
+                                   SearchPanelFindMode="Always"
+                                   ShowTotalSummary="True"
+                                   VerticalScrollbarVisibility="Auto"
+                                   EnableImmediatePosting="True"
+                                   AllowEditing="True" 
+                                   AllowGrouping="False"
+                                   ShowGroupPanel="False"
+                                   >
+                        </dxg:TableView>
+                    </dxg:GridControl.View>
+
+                    <dxg:GridControl.Columns>
+                        <dxg:GridColumn FieldName="Id" Header="Id" Width="30" AllowEditing="False" />
+
+                        <dxg:GridColumn FieldName="MasterLinenId" 
+                                            Header="Master Linen" 
+                                            ShowGroupedColumn="True" 
+                                            Width="100">
+                            <dxg:GridColumn.EditSettings>
+                                <dxe:ComboBoxEditSettings ItemsSource="{Binding ElementName=GridControlClientLinen, Path=DataContext.MasterLinens}" 
+                                                              IsTextEditable="False"
+                                                              DisplayMember="Name" 
+                                                              AllowNullInput="True"
+                                                              ValueMember="Id"/>
+                            </dxg:GridColumn.EditSettings>
+                        </dxg:GridColumn>
+
+                        <dxg:GridColumn FieldName="StaffId" 
+                                            Header="Staff" 
+                                            ShowGroupedColumn="True" 
+                                            Width="100">
+                            <dxg:GridColumn.EditSettings>
+                                <dxe:ComboBoxEditSettings ItemsSource="{Binding ElementName=GridControlClientLinen, Path=DataContext.SortedStaff}" 
+                                                              IsTextEditable="False"
+                                                              DisplayMember="Name" 
+                                                              AllowNullInput="True"
+                                                              ValueMember="Id"/>
+                            </dxg:GridColumn.EditSettings>
+                        </dxg:GridColumn>
+
+                        <dxg:GridColumn FieldName="Tag" Header="Tag" Width="Auto" />
+                        <dxg:GridColumn FieldName="PackingValue" Header="P Value" Width="50" />
+
+                    </dxg:GridControl.Columns>
+                </dxg:GridControl>
+
+
+            </Grid>
+        </GroupBox>
+
+        <!-- Client Linen -->
+
+        <GroupBox Grid.Row="1" Grid.Column="2" Header="Master Linen">
+
+            <Grid x:Name="GridControlMasterLinen">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal">
+                    <Button Margin = "5" Padding="20,2"  Content="Add" Command="{Binding AddMasterLinenCommand}"/>
+                    <Button Margin = "5" Padding="20,2"  Content="Delete" Command="{Binding DeleteMasterLinenCommand}"/>
+                    <Button Margin = "5" Padding="20,2"  Content="Save" Command="{Binding SaveCommand}"/>
+
+                </StackPanel>
+
+                <dxg:GridControl Grid.Row="1" Grid.Column="0" 
+                                 ItemsSource="{Binding SortedMasterLinens}" 
+                                 SelectedItem="{Binding SelectedMasterLinen}" >
+
+                    <dxg:GridControl.View>
+                        <dxg:TableView AutoWidth="True"
+                                   ShowSearchPanelMode="Always"
+                                   ShowSearchPanelFindButton="True"
+                                   SearchPanelFindMode="Always"
+                                   ShowTotalSummary="True"
+                                   VerticalScrollbarVisibility="Auto"
+                                   EnableImmediatePosting="True"
+                                   AllowEditing="True" 
+                                   AllowGrouping="False"
+                                   ShowGroupPanel="False"
+                                   >
+                        </dxg:TableView>
+                    </dxg:GridControl.View>
+
+                    <dxg:GridControl.Columns>
+
+                        <dxg:GridColumn FieldName="Id" Header="Id" Width="30" AllowEditing="False" />
+                        <dxg:GridColumn FieldName="Name" Header="Name" Width="Auto" />
+                        <dxg:GridColumn FieldName="PackingValue" Header="P Value" Width="50" />
+
+                    </dxg:GridControl.Columns>
+                </dxg:GridControl>
+
+
+            </Grid>
+        </GroupBox>
+
+
+
+
+
     </Grid>
 </UserControl>
