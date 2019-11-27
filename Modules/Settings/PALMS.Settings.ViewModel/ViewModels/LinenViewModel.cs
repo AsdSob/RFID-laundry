@@ -228,7 +228,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         {
             var department = new ObservableCollection<DepartmentEntityViewModel>();
 
-            department = Departments.Where(x => x.ClientId == SelectedClient.Id).ToObservableCollection();
+            department = Departments.Where(x => x.ClientId == SelectedClient?.Id).ToObservableCollection();
 
             return department;
         }
@@ -237,7 +237,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         {
             var staff = new ObservableCollection<ClientStaffEntityViewModel>();
 
-            staff = Staff.Where(x => x.DepartmentId == SelectedDepartment.Id).ToObservableCollection();
+            staff = Staff.Where(x => x.DepartmentId == SelectedDepartment?.Id).ToObservableCollection();
 
             return staff;
         }
@@ -287,7 +287,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         {
             var linen = new ObservableCollection<ClientLinenEntityViewModel>();
 
-            linen = ClientLinens.Where(x => x.StaffId == SelectedStaff.Id).ToObservableCollection();
+            linen = ClientLinens.Where(x => x.StaffId == SelectedStaff?.Id).ToObservableCollection();
 
             return linen;
         }
@@ -312,7 +312,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
             ClientLinens.Add(newLinen);
 
-            RaisePropertyChanged(() => SortClientLinen());
+            RaisePropertyChanged(() => SortedLinens);
         }
 
         private void RemoveClientLinen()

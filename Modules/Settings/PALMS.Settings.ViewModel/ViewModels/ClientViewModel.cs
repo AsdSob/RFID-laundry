@@ -173,7 +173,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
             if (Staff.Any(x => x.HasChanges()))
             {
-                var staff = Staff.Where(x => x.HasChanges());
+                var staff = Staff.Where(x => x.HasChanges()).ToList();
 
                 staff.ForEach(x => x.AcceptChanges());
 
@@ -267,7 +267,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private ObservableCollection<ClientStaffEntityViewModel> SortStaff()
         {
-            if (SelectedClient == null) return null;
+            if (SelectedDepartment == null) return null;
 
             var staff = Staff.Where(x => x.DepartmentId == SelectedDepartment.Id).ToObservableCollection();
 

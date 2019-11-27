@@ -13,6 +13,10 @@ namespace PALMS.Data.Services
 
 
         public DbSet<Client> Clients { get; set; }
+        public DbSet<Department> Departments { get; set; }
+        public DbSet<ClientLinen> ClientLinens { get; set; }
+        public DbSet<ClientStaff> ClientStaves { get; set; }
+        public DbSet<MasterLinen> MasterLinens { get; set; }
 
 
         public DataContext(string connectionString) : base(connectionString)

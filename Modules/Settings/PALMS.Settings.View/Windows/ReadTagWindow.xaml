@@ -21,10 +21,10 @@
     </Grid.ColumnDefinitions>
 
     <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal">
-        <Button Margin = "5" Padding="20,2"  Content="Add" Command="{Binding StartReadCommand}"/>
-        <Button Margin = "5" Padding="20,2"  Content="Delete" Command="{Binding StopReadCommand}"/>
-        <Button Margin = "5" Padding="20,2"  Content="Save" Command="{Binding AddCommand}"/>
-        <Button Margin = "5" Padding="20,2"  Content="Save" Command="{Binding CloseCommand}"/>
+        <Button Margin = "5" Padding="20,2"  Content="Start" Command="{Binding StartReadCommand}"/>
+        <Button Margin = "5" Padding="20,2"  Content="Stop" Command="{Binding StopReadCommand}"/>
+        <Button Margin = "5" Padding="20,2"  Content="Add" Command="{Binding AddCommand}"/>
+        <Button Margin = "5" Padding="20,2"  Content="Close" Command="{Binding CloseCommand}"/>
     </StackPanel>
 
         <GroupBox Grid.Column="0" Grid.Row="1" Header="Antenna">
