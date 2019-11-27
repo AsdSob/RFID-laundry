@@ -83,6 +83,7 @@
                     <Button Margin = "5" Padding="20,2"  Content="Add" Command="{Binding AddClientLinenCommand}"/>
                     <Button Margin = "5" Padding="20,2"  Content="Delete" Command="{Binding DeleteClientLinenCommand}"/>
                     <Button Margin = "5" Padding="20,2"  Content="Save" Command="{Binding SaveCommand}"/>
+                    <Button Margin = "5" Padding="20,2"  Content="Get Tag" Command="{Binding GetRfidTagCommand}"/>
 
                 </StackPanel>
 

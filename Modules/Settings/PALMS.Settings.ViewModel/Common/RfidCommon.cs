@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Threading;
 using Impinj.OctaneSdk;
 
 namespace PALMS.Settings.ViewModel.Common
@@ -7,6 +9,9 @@ namespace PALMS.Settings.ViewModel.Common
     {
         public ImpinjReader Reader = new ImpinjReader();
         public Impinj.OctaneSdk.Settings settings;
+
+        private ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>> _data =
+            new ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>>();
 
         public bool Connection()
         {
@@ -82,6 +87,69 @@ namespace PALMS.Settings.ViewModel.Common
         {
             Connection();
             return Reader.IsConnected;
+        }
+
+        public ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>> GetTagsSorted(int readTime)
+        {
+            Connect();
+
+            Start();
+            Reader.TagsReported += DisplayTag;
+
+            Thread.Sleep(readTime);
+
+            Reader.TagsReported -= DisplayTag;
+            Stop();
+
+            return _data;
+        }
+
+        public void StartRead()
+        {
+            Connect();
+
+            Start();
+            Reader.TagsReported += DisplayTag;
+        }
+
+        public ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>> StopRead()
+        {
+            Reader.TagsReported -= DisplayTag;
+            Stop();
+            return _data;
+        }
+
+        private void DisplayTag(ImpinjReader reader, TagReport report)
+        {
+            foreach (Tag tag in report)
+            {
+                AddData(tag.AntennaPortNumber, tag.Epc.ToString(), tag.LastSeenTime.LocalDateTime);
+            }
+        }
+
+        private void AddData(int antenna, string epc, DateTime time)
+        {
+            // проверка ест ли словарь антенны 
+            if (!_data.TryGetValue(antenna, out ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>> val))
+            {
+                val = new ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>();
+
+                _data.TryAdd(antenna, val);
+            }
+
+            // проверка на наличие чипа в словаре
+            if (!val.TryGetValue(epc, out Tuple<DateTime?, DateTime?> times))
+            {
+                times = new Tuple<DateTime?, DateTime?>(time, null);
+                val.TryAdd(epc, times);
+            }
+            else
+            {
+                val.TryUpdate(epc, new Tuple<DateTime?, DateTime?>(times.Item1, time), times);
+                //данные можно сохранять в БД, но метке можно обнулить
+            }
+
+            // если метка повторно падает в считыватель, то нужно предыдущие данные сохранять в БД
         }
 
     }

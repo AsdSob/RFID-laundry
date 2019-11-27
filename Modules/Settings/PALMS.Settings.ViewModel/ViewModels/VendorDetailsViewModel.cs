@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Impinj.OctaneSdk;
+using PALMS.Data.Objects.ClientModel;
 using PALMS.Settings.ViewModel.Common;
 using PALMS.Settings.ViewModel.EntityViewModels;
 using PALMS.ViewModels.Common;
@@ -54,7 +55,13 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private RfidCommon _impinj;
         private string _clothToTakeOut;
         private int _waitingClothCount;
+        private ObservableCollection<ClientLinenEntityViewModel> _clientLinens;
 
+        public ObservableCollection<ClientLinenEntityViewModel> ClientLinens
+        {
+            get => _clientLinens;
+            set => Set(() => ClientLinens, ref _clientLinens, value);
+        }
         public int WaitingClothCount
         {
             get => _waitingClothCount;
@@ -178,7 +185,9 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         public async Task InitializeAsync()
         {
- 
+            var linen = await _dataService.GetAsync<ClientLinen>();
+            var linens = linen.Select(x => new ClientLinenEntityViewModel(x));
+            _dispatcher.RunInMainThread(() => ClientLinens = linens.ToObservableCollection());
         }
         
         public VendorDetailsViewModel(IDispatcher dispatcher, IDataService dataService, IDialogService dialogService)
@@ -323,28 +332,35 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private void CheckClothReady()
         {
-            //TODO: zapustit etot metod v otdelnom potoke i v postoyannom zapuske
+            //TODO: zapustit etot metod v otdelnom potoke i v postoyannom zapuske & _dialogService if i>1
                 
-            var i = Plc1.GetWaitHangNum();
+            //var i = Plc1.GetWaitHangNum();
 
-            if (i > 1)
+            //if (i > 1)
+            //{
+            //    if (_dialogService.ShowWarnigDialog(
+            //        "There are more then 1 hanger in belt sorting point\n Please remove all hangers and pass again \n\n Press ok once all done"))
+            //    {
+            //        ResetClothCount();
+            //    }
+            //    else
+            //    {
+            //        CheckClothReady();
+            //    }
+            //}
+
+            if (Plc1.GetClotheReady())
             {
-
-                if (_dialogService.ShowWarnigDialog(
-                    "There are more then 1 hanger in belt sorting point\n Please remove all hangers and pass again \n\n Press ok once all done"))
-                {
-                    ResetClothCount();
-                }
-                else
-                {
-                    CheckClothReady();
-                }
-
+                // проверить и вызвать метод считывателя. 
+                CheckLinenRfid();
+            }
+            else
+            {
+                Thread.Sleep(300);
+                CheckClothReady();
             }
 
-            PassingTag = "--12345--";
-            // проверить и вызвать метод считывателя. 
-            //CheckLinenRfid();
+
         }
 
         private bool CheckBeltSlot(int beltNumb, int slotNumb)
@@ -384,7 +400,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         {
             if (String.IsNullOrEmpty(PassingTag))
             {
-                _dialogService.ShowInfoDialog("No Linen");
+                //_dialogService.ShowInfoDialog("No Linen");
                 return;
             }
 
@@ -398,7 +414,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 return;
             }
 
-            _dialogService.ShowInfoDialog("Selected slot is not empty");
+            //_dialogService.ShowInfoDialog("Selected slot is not empty");
         }
 
         private void ManualSendToBelt2()
@@ -422,6 +438,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
 
             Plc1.Sorting(beltNumb);
+            Plc1.ResetWaitHangNum();
+
             SetHangingItem(beltNumb, slotNumb);
 
             HangToBeltSlot(belt, slotNumb);
@@ -532,20 +550,21 @@ namespace PALMS.Settings.ViewModel.ViewModels
         {
             _data.Clear();
 
-            StartReadTags();
+            _data = Impinj.GetTagsSorted(1000);
             var tagReport = _data.FirstOrDefault(x => x.Key == 1).Value.Keys;
 
-            if (tagReport.Count > 1)
-            {
-                if (_dialogService.ShowWarnigDialog("More then 1 chip in Antenna 1")) ;
-                CheckLinenRfid();
-            }
+            //if (tagReport.Count > 1)
+            //{
+            //    if (_dialogService.ShowWarnigDialog("More then 1 chip in Antenna 1")) ;
+            //    CheckLinenRfid();
+            //}
 
             PassingTag = tagReport.FirstOrDefault();
+            
+            //Check for RFID availability
+            var clientLinen = ClientLinens.FirstOrDefault(x => x.Tag == tagReport.FirstOrDefault());
 
-            ////Check for RFID availability
-            //var clientLinen = ClientLinens.FirstOrDefault(x => x.Tag == tagReport.FirstOrDefault());
-
+            HangingItem = new ConveyorItemViewModel(clientLinen);
             ////check tag in existing list of linen, if false give option to add item
             //if (clientLinen == null)
             //{
@@ -559,53 +578,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
             //{
             //    PassingTag = clientLinen;
             //}
-        }
-
-        private void StartReadTags()
-        {
-            Impinj.Connect();
-
-            Impinj.Start();
-            Impinj.Reader.TagsReported += DisplayTag;
-
-            Thread.Sleep(1000);
-
-            Impinj.Reader.TagsReported -= DisplayTag;
-            Impinj.Stop();
-
-        }
-
-        private void DisplayTag(ImpinjReader reader, TagReport report)
-        {
-            foreach (Tag tag in report)
-            {
-                AddData(tag.AntennaPortNumber, tag.Epc.ToString(), tag.LastSeenTime.LocalDateTime);
-            }
-        }
-
-        private void AddData(int antenna, string epc, DateTime time)
-        {
-            // проверка ест ли словарь антенны 
-            if (!_data.TryGetValue(antenna, out ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>> val))
-            {
-                val = new ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>();
-
-                _data.TryAdd(antenna, val);
-            }
-
-            // проверка на наличие чипа в словаре
-            if (!val.TryGetValue(epc, out Tuple<DateTime?, DateTime?> times))
-            {
-                times = new Tuple<DateTime?, DateTime?>(time, null);
-                val.TryAdd(epc, times);
-            }
-            else
-            {
-                val.TryUpdate(epc, new Tuple<DateTime?, DateTime?>(times.Item1, time), times);
-                //данные можно сохранять в БД, но метке можно обнулить
-            }
-
-            // если метка повторно падает в считыватель, то нужно предыдущие данные сохранять в БД
         }
 
         #endregion

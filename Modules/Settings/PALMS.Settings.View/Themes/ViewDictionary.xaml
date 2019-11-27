@@ -5,7 +5,9 @@
                     xmlns:appSettings="clr-namespace:PALMS.Settings.ViewModel.AppSettings;assembly=PALMS.Settings.ViewModel"
                     xmlns:appSettings1="clr-namespace:PALMS.Settings.View.AppSettings"
                     xmlns:viewModels="clr-namespace:PALMS.Settings.ViewModel.ViewModels;assembly=PALMS.Settings.ViewModel"
-                    xmlns:view1="clr-namespace:PALMS.Settings.View.View">
+                    xmlns:view1="clr-namespace:PALMS.Settings.View.View"
+                    xmlns:windows="clr-namespace:PALMS.Settings.ViewModel.Windows;assembly=PALMS.Settings.ViewModel"
+                    xmlns:windows1="clr-namespace:PALMS.Settings.View.Windows">
 
     <DataTemplate DataType="{x:Type viewModel:SettingsViewModel}">
         <view:SettingsView/>
@@ -29,5 +31,9 @@
 
     <DataTemplate DataType="{x:Type viewModels:LinenViewModel}">
         <view1:LinenView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type windows:ReadTagWindowViewModel}">
+        <windows1:ReadTagWindow/>
     </DataTemplate>
 </ResourceDictionary>

@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using PALMS.Settings.ViewModel.AppSettings;
 using PALMS.Settings.ViewModel.ViewModels;
+using PALMS.Settings.ViewModel.Windows;
 using PALMS.ViewModels.Common;
 using PALMS.ViewModels.Common.Services;
 
@@ -24,6 +25,7 @@ namespace PALMS.Settings.ViewModel
             container.RegisterType<VendorDetailsViewModel>().SingleInstance();
             container.RegisterType<ClientViewModel>().SingleInstance();
             container.RegisterType<LinenViewModel>().SingleInstance();
+            container.RegisterType<ReadTagWindowViewModel>().SingleInstance();
         }
     }
 }

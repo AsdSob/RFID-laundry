@@ -7,6 +7,7 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using PALMS.Data.Objects.ClientModel;
 using PALMS.Settings.ViewModel.EntityViewModels;
+using PALMS.Settings.ViewModel.Windows;
 using PALMS.ViewModels.Common;
 using PALMS.ViewModels.Common.Services;
 
@@ -17,6 +18,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private readonly IDispatcher _dispatcher;
         private readonly IDataService _dataService;
         private readonly IDialogService _dialogService;
+        private readonly IResolver _resolver;
 
         private ClientLinenEntityViewModel _selectedLinen;
         private ObservableCollection<ClientLinenEntityViewModel> _clientLinens;
@@ -91,6 +93,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         public RelayCommand AddClientLinenCommand { get; }
         public RelayCommand DeleteClientLinenCommand { get; }
         public RelayCommand SaveCommand { get; }
+        public RelayCommand GetRfidTagCommand { get; }
 
         public async void GetData()
         {
@@ -122,11 +125,12 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         }
 
-        public LinenViewModel(IDispatcher dispatcher, IDataService dataService, IDialogService dialogService)
+        public LinenViewModel(IDispatcher dispatcher, IDataService dataService, IDialogService dialogService, IResolver resolver)
         {
             _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
             _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
+            _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver));
 
             GetData();
 
@@ -137,6 +141,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             DeleteClientLinenCommand = new RelayCommand(RemoveClientLinen, () => SelectedLinen != null);
 
             SaveCommand = new RelayCommand(Save);
+            GetRfidTagCommand = new RelayCommand(GetRfidTag, () => SelectedLinen != null);
 
 
             PropertyChanged += OnPropertyChanged;
@@ -169,6 +174,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
             if (e.PropertyName == nameof(SelectedLinen))
             {
                 DeleteClientLinenCommand.RaiseCanExecuteChanged();
+
+                GetRfidTagCommand.RaiseCanExecuteChanged();
             }
 
         }
@@ -200,6 +207,21 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private bool HasChanges()
         {
             return ClientLinens.Any(x => x.HasChanges()) || MasterLinens.Any(x => x.HasChanges());
+        }
+
+        private async void GetRfidTag()
+        {
+            if(SelectedLinen == null)return;
+
+            var readTag = _resolver.Resolve<ReadTagWindowViewModel>();
+
+            await readTag.InitializeAsync();
+            var showDialog = _dialogService.ShowDialog(readTag);
+            if (!showDialog) return;
+
+            var tag = readTag.GetSelectedTag();
+
+            SelectedLinen.Tag = tag;
         }
 
         private ObservableCollection<DepartmentEntityViewModel> SortDepartment()

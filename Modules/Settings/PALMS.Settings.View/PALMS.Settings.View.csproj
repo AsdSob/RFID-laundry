@@ -96,6 +96,9 @@
     <Compile Include="View\LinenView.xaml.cs">
       <DependentUpon>LinenView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\ReadTagWindow.xaml.cs">
+      <DependentUpon>ReadTagWindow.xaml</DependentUpon>
+    </Compile>
     <Page Include="AppSettings\AppSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -129,6 +132,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\LinenView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\ReadTagWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -216,8 +223,6 @@
     <Resource Include="Icons\tracking_32.png" />
     <Resource Include="Icons\tracking_64.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Windows\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

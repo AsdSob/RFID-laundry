@@ -1,0 +1,54 @@
+﻿<controls:CustomWindow x:Class="PALMS.Settings.View.Windows.ReadTagWindow"
+                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                       xmlns:windows="clr-namespace:PALMS.Settings.ViewModel.Windows;assembly=PALMS.Settings.ViewModel"
+                       xmlns:controls="clr-namespace:PALMS.View.Common.Controls;assembly=PALMS.View.Common"
+                       xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+                       xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                       d:DataContext="{d:DesignInstance windows:ReadTagWindowViewModel}"
+                       mc:Ignorable="d" 
+                       Height="Auto" Width="400">
+<Grid>
+    <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+    </Grid.ColumnDefinitions>
+
+    <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal">
+        <Button Margin = "5" Padding="20,2"  Content="Add" Command="{Binding StartReadCommand}"/>
+        <Button Margin = "5" Padding="20,2"  Content="Delete" Command="{Binding StopReadCommand}"/>
+        <Button Margin = "5" Padding="20,2"  Content="Save" Command="{Binding AddCommand}"/>
+        <Button Margin = "5" Padding="20,2"  Content="Save" Command="{Binding CloseCommand}"/>
+    </StackPanel>
+
+        <GroupBox Grid.Column="0" Grid.Row="1" Header="Antenna">
+            <StackPanel  Orientation="Horizontal">
+                <Button Margin = "5" Padding="20,2"  Content="1" Command="{Binding ShowAntennaTagCommand}" CommandParameter="1"/>
+                <Button Margin = "5" Padding="20,2"  Content="2" Command="{Binding ShowAntennaTagCommand}" CommandParameter="2"/>
+                <Button Margin = "5" Padding="20,2"  Content="3" Command="{Binding ShowAntennaTagCommand}" CommandParameter="3"/>
+                <Button Margin = "5" Padding="20,2"  Content="4" Command="{Binding ShowAntennaTagCommand}" CommandParameter="4"/>
+            </StackPanel>
+        </GroupBox>
+
+        <dxe:ListBoxEdit Grid.Row="2" Grid.Column="0" Margin="0,10"
+                     ItemsSource="{Binding Tags}"
+                     SelectedItem="{Binding SelectedTag}"
+                     HorizontalContentAlignment="Center"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+
+        <dxe:ListBoxEdit.ItemsPanel>
+            <ItemsPanelTemplate>
+                <StackPanel />
+            </ItemsPanelTemplate>
+        </dxe:ListBoxEdit.ItemsPanel>
+    </dxe:ListBoxEdit>
+
+    </Grid>
+</controls:CustomWindow>
