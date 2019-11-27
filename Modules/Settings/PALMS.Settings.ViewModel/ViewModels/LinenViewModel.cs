@@ -31,7 +31,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private DepartmentEntityViewModel _selectedDepartment;
         private ClientStaffEntityViewModel _selectedStaff;
 
-
+        
         public ClientStaffEntityViewModel SelectedStaff
         {
             get => _selectedStaff;
@@ -294,6 +294,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private void AddClientLinen()
         {
+            if( SelectedDepartment == null) return;
+
             var newLinen = new ClientLinenEntityViewModel()
             {
                DepartmentId = SelectedDepartment.Id,

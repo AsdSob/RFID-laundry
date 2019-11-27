@@ -96,6 +96,9 @@
     <Compile Include="View\LinenView.xaml.cs">
       <DependentUpon>LinenView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\AddNewLinenWindow.xaml.cs">
+      <DependentUpon>AddNewLinenWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\ReadTagWindow.xaml.cs">
       <DependentUpon>ReadTagWindow.xaml</DependentUpon>
     </Compile>
@@ -132,6 +135,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\LinenView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\AddNewLinenWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -111,6 +111,7 @@
     <Compile Include="SettingsViewModel.cs" />
     <Compile Include="TabsViewModel.cs" />
     <Compile Include="TabViewModel.cs" />
+    <Compile Include="Windows\AddNewLinenViewModel.cs" />
     <Compile Include="Windows\ReadTagWindowViewModel.cs" />
   </ItemGroup>
   <ItemGroup>

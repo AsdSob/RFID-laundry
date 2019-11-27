@@ -13,6 +13,7 @@ using Impinj.OctaneSdk;
 using PALMS.Data.Objects.ClientModel;
 using PALMS.Settings.ViewModel.Common;
 using PALMS.Settings.ViewModel.EntityViewModels;
+using PALMS.Settings.ViewModel.Windows;
 using PALMS.ViewModels.Common;
 using PALMS.ViewModels.Common.Services;
 
@@ -30,6 +31,9 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private readonly IDispatcher _dispatcher;
         private readonly IDataService _dataService;
         private readonly IDialogService _dialogService;
+        private readonly IResolver _resolverService;
+        public ManualResetEvent Mre { get; set; }
+
 
         #region parameters
 
@@ -190,11 +194,12 @@ namespace PALMS.Settings.ViewModel.ViewModels
             _dispatcher.RunInMainThread(() => ClientLinens = linens.ToObservableCollection());
         }
         
-        public VendorDetailsViewModel(IDispatcher dispatcher, IDataService dataService, IDialogService dialogService)
+        public VendorDetailsViewModel(IDispatcher dispatcher, IDataService dataService, IDialogService dialogService, IResolver resolver)
         {
             _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
             _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
+            _resolverService = resolver ?? throw new ArgumentNullException(nameof(resolver));
 
             SendToBelt1Command = new RelayCommand(ManualSendToBelt1);
             SendToBelt2Command = new RelayCommand(ManualSendToBelt2);
@@ -213,11 +218,12 @@ namespace PALMS.Settings.ViewModel.ViewModels
             Plc1Error = 99;
             Plc2Error = 99;
             Plc3Error = 99;
-
+            Mre = new ManualResetEvent(true);
             AddBeltItems();
 
             PropertyChanged += OnPropertyChanged;
         }
+
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -232,7 +238,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             {
                 if (PassingTag == null) 
                 {
-                    Task.Factory.StartNew(CheckClothReady);
+                    CheckCloth();
                 }
             }
         }
@@ -248,7 +254,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             Belt1.Start();
             Belt2.Start();
 
-            Task.Factory.StartNew(CheckClothReady);
+            CheckCloth();
         }
 
         public void StopConveyor()
@@ -325,29 +331,42 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private void ResetClothCount()
         {
             Plc1.ResetWaitHangNum();
-            CheckClothReady();
+            PassingTag = null;
+        }
+        
+ #region Plc1 Waiting and linen data
+
+        private void CheckCloth()
+        {
+            Task.Factory.StartNew(CheckClothReady);
         }
 
-        #region Plc1 Waiting and linen data
+        private void ShowDialogWaitingNumb()
+        {
+            _dispatcher.RunInMainThread(() =>
+            {
+                if (_dialogService.ShowWarnigDialog(
+                    "There are more then 1 hanger in belt sorting point\n Please remove all hangers and pass again " +
+                    "\n\n Press ok once all done"))
+                {
+                    Plc1.ResetWaitHangNum();
+                }
+
+                Mre.Set();
+            });
+
+        }
 
         private void CheckClothReady()
         {
-            //TODO: zapustit etot metod v otdelnom potoke i v postoyannom zapuske & _dialogService if i>1
-                
-            //var i = Plc1.GetWaitHangNum();
+            var i = Plc1.GetWaitHangNum();
 
-            //if (i > 1)
-            //{
-            //    if (_dialogService.ShowWarnigDialog(
-            //        "There are more then 1 hanger in belt sorting point\n Please remove all hangers and pass again \n\n Press ok once all done"))
-            //    {
-            //        ResetClothCount();
-            //    }
-            //    else
-            //    {
-            //        CheckClothReady();
-            //    }
-            //}
+            if (i > 1)
+            {
+                ShowDialogWaitingNumb();
+                Mre.Reset();
+                Mre.WaitOne();
+            }
 
             if (Plc1.GetClotheReady())
             {
@@ -356,11 +375,9 @@ namespace PALMS.Settings.ViewModel.ViewModels
             }
             else
             {
-                Thread.Sleep(300);
+                Thread.Sleep(400);
                 CheckClothReady();
             }
-
-
         }
 
         private bool CheckBeltSlot(int beltNumb, int slotNumb)
@@ -387,7 +404,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
                     return false;
             }
         }
-
         private void GetClothCount()
         {
             WaitingClothCount = Plc1.GetWaitHangNum();
@@ -395,12 +411,100 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         #endregion
 
+#region Rfid Reader
+
+        public void CheckLinenRfid()
+        {
+            _data.Clear();
+
+            _data = Impinj.GetTagsSorted(1000);
+            var tagReport = _data.FirstOrDefault(x => x.Key == 1).Value.Keys;
+
+            if (tagReport.Count > 1)
+            {
+                ShowDialogTagNumbMore();
+                Mre.Reset();
+                Mre.WaitOne();
+
+                CheckLinenRfid();
+            }
+
+            if (tagReport.Count == 0)
+            {
+                ShowDialogTagNumbZero();
+                Mre.Reset();
+                Mre.WaitOne();
+
+                CheckLinenRfid();
+            }
+
+            PassingTag = tagReport.FirstOrDefault();
+
+            CheckLinen();
+        }
+
+        private void CheckLinen()
+        {
+            var clientLinen = ClientLinens.FirstOrDefault(x => x.Tag == PassingTag);
+
+            //check tag in existing list of linen, if false give option to add item
+
+            if (clientLinen == null)
+            {
+                ShowDialogAddLinen();
+                Mre.Reset();
+                Mre.WaitOne();
+
+                CheckLinen();
+            }
+
+            HangingItem = new ConveyorItemViewModel(clientLinen);
+        }
+
+        public void ShowDialogAddLinen()
+        {
+            _dispatcher.RunInMainThread(() =>
+            {
+                if (_dialogService.ShowQuestionDialog("No linen with current Tag \n Want to add Linen?"))
+                {
+                    var addNew = _resolverService.Resolve<AddNewLinenViewModel>();
+
+                    addNew.InitializeAsync();
+                    var showDialog = _dialogService.ShowDialog(addNew);
+                    if (!showDialog) return;
+
+                    ClientLinens.AddRange(addNew.GetNewClient());
+                }
+
+                Mre.Set();
+            });
+        }
+
+        public void ShowDialogTagNumbMore()
+        {
+            _dispatcher.RunInMainThread(() =>
+            {
+                _dialogService.ShowWarnigDialog("More then 1 chip in Antenna 1");
+                Mre.Set();
+            });
+        }
+
+        public void ShowDialogTagNumbZero()
+        {
+            _dispatcher.RunInMainThread(() =>
+            {
+                _dialogService.ShowWarnigDialog("No Tag in linen");
+                Mre.Set();
+            });
+        }
+        #endregion
+
         #region Manual Mode
         private void ManualSendToBelt1()
         {
             if (String.IsNullOrEmpty(PassingTag))
             {
-                //_dialogService.ShowInfoDialog("No Linen");
+                _dialogService.ShowInfoDialog("No Linen");
                 return;
             }
 
@@ -414,7 +518,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 return;
             }
 
-            //_dialogService.ShowInfoDialog("Selected slot is not empty");
+            _dialogService.ShowInfoDialog("Selected slot is not empty");
         }
 
         private void ManualSendToBelt2()
@@ -541,45 +645,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 }
             }
         }
-        #endregion
-
-
-        #region Rfid Reader
-
-        public void CheckLinenRfid()
-        {
-            _data.Clear();
-
-            _data = Impinj.GetTagsSorted(1000);
-            var tagReport = _data.FirstOrDefault(x => x.Key == 1).Value.Keys;
-
-            //if (tagReport.Count > 1)
-            //{
-            //    if (_dialogService.ShowWarnigDialog("More then 1 chip in Antenna 1")) ;
-            //    CheckLinenRfid();
-            //}
-
-            PassingTag = tagReport.FirstOrDefault();
-            
-            //Check for RFID availability
-            var clientLinen = ClientLinens.FirstOrDefault(x => x.Tag == tagReport.FirstOrDefault());
-
-            HangingItem = new ConveyorItemViewModel(clientLinen);
-            ////check tag in existing list of linen, if false give option to add item
-            //if (clientLinen == null)
-            //{
-            //    if (_dialogService.ShowQuestionDialog("Rfid Tag doesnt exist in DB. \n Would you like to add new Item?")
-            //    )
-            //    {
-            //        //TODO: Show new window to add new Linen
-            //    }
-            //}
-            //else
-            //{
-            //    PassingTag = clientLinen;
-            //}
-        }
-
         #endregion
 
         #region Packing Uniform
