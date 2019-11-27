@@ -32,7 +32,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private readonly IDataService _dataService;
         private readonly IDialogService _dialogService;
         private readonly IResolver _resolverService;
-        public ManualResetEvent Mre { get; set; }
+        public ManualResetEvent Plc1Thread { get; set; }
+        public ManualResetEvent RfidThread { get; set; }
 
 
         #region parameters
@@ -218,7 +219,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
             Plc1Error = 99;
             Plc2Error = 99;
             Plc3Error = 99;
-            Mre = new ManualResetEvent(true);
+            Plc1Thread = new ManualResetEvent(true);
+            RfidThread = new ManualResetEvent(true);
             AddBeltItems();
 
             PropertyChanged += OnPropertyChanged;
@@ -234,13 +236,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
                     Task.Factory.StartNew(RunAutoMode);
                 }
             }
-            if (e.PropertyName == nameof(PassingTag))
-            {
-                if (PassingTag == null) 
-                {
-                    CheckCloth();
-                }
-            }
         }
 
         private ObservableCollection<ConveyorItemViewModel> SortBeltItems(int beltNumb)
@@ -248,13 +243,14 @@ namespace PALMS.Settings.ViewModel.ViewModels
             return BeltItems?.Where(x => x.BeltNumber == beltNumb)?.ToObservableCollection();
         }
 
+        #region Conveyor Start
         public void StartConveyor()
         {
             Plc1.Start();
             Belt1.Start();
             Belt2.Start();
 
-            CheckCloth();
+            Task.Factory.StartNew(CheckCloth);
         }
 
         public void StopConveyor()
@@ -314,7 +310,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 {
                     BeltNumber = 1,
                     SlotNumber = i,
-                    IsEmpty =  true,
+                    IsEmpty = true,
                 });
             }
 
@@ -328,33 +324,28 @@ namespace PALMS.Settings.ViewModel.ViewModels
             }
         }
 
+        #endregion
+
+
         private void ResetClothCount()
         {
             Plc1.ResetWaitHangNum();
             PassingTag = null;
         }
         
- #region Plc1 Waiting and linen data
+#region Plc1 Waiting 
 
         private void CheckCloth()
         {
-            Task.Factory.StartNew(CheckClothReady);
-        }
-
-        private void ShowDialogWaitingNumb()
-        {
-            _dispatcher.RunInMainThread(() =>
+            while (true)
             {
-                if (_dialogService.ShowWarnigDialog(
-                    "There are more then 1 hanger in belt sorting point\n Please remove all hangers and pass again " +
-                    "\n\n Press ok once all done"))
+                if (Plc1.GetClotheReady())
                 {
-                    Plc1.ResetWaitHangNum();
+                    CheckClothReady();
                 }
 
-                Mre.Set();
-            });
-
+                Thread.Sleep(1000);
+            }
         }
 
         private void CheckClothReady()
@@ -364,46 +355,36 @@ namespace PALMS.Settings.ViewModel.ViewModels
             if (i > 1)
             {
                 ShowDialogWaitingNumb();
-                Mre.Reset();
-                Mre.WaitOne();
             }
 
             if (Plc1.GetClotheReady())
             {
                 // проверить и вызвать метод считывателя. 
                 CheckLinenRfid();
-            }
-            else
-            {
-                Thread.Sleep(400);
-                CheckClothReady();
+                //PassingTag = DateTime.Now.ToString();
             }
         }
 
-        private bool CheckBeltSlot(int beltNumb, int slotNumb)
+        private void ShowDialogWaitingNumb()
         {
-            switch (beltNumb)
+            _dispatcher.RunInMainThread(() =>
             {
-                case 1:
-                    return Belt1Items.FirstOrDefault(x => x.SlotNumber == slotNumb).IsEmpty;
-                case 2:
-                    return Belt2Items.FirstOrDefault(x => x.SlotNumber == slotNumb).IsEmpty;
-                default:
-                    return false;
-            }
+                Plc1Thread.Reset();
+
+                if (_dialogService.ShowWarnigDialog(
+                    "There are more then 1 hanger in belt sorting point\n Please remove all hangers and pass again " +
+                    "\n\n Press ok once all done"))
+                {
+                    ResetClothCount();
+                }
+
+                Plc1Thread.Set();
+            });
+
+            
+            Plc1Thread.WaitOne();
         }
-        private bool CheckBeltFull(int beltNumb)
-        {
-            switch (beltNumb)
-            {
-                case 1:
-                    return Belt1Items.Any(x => x.IsEmpty);
-                case 2:
-                    return Belt1Items.Any(x => x.IsEmpty);
-                default:
-                    return false;
-            }
-        }
+
         private void GetClothCount()
         {
             WaitingClothCount = Plc1.GetWaitHangNum();
@@ -423,8 +404,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
             if (tagReport.Count > 1)
             {
                 ShowDialogTagNumbMore();
-                Mre.Reset();
-                Mre.WaitOne();
+                RfidThread.Reset();
+                RfidThread.WaitOne();
 
                 CheckLinenRfid();
             }
@@ -432,8 +413,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
             if (tagReport.Count == 0)
             {
                 ShowDialogTagNumbZero();
-                Mre.Reset();
-                Mre.WaitOne();
+                RfidThread.Reset();
+                RfidThread.WaitOne();
 
                 CheckLinenRfid();
             }
@@ -445,15 +426,15 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private void CheckLinen()
         {
-            var clientLinen = ClientLinens.FirstOrDefault(x => x.Tag == PassingTag);
+            var clientLinen = ClientLinens?.FirstOrDefault(x => x.Tag == PassingTag);
 
             //check tag in existing list of linen, if false give option to add item
 
             if (clientLinen == null)
             {
                 ShowDialogAddLinen();
-                Mre.Reset();
-                Mre.WaitOne();
+                RfidThread.Reset();
+                RfidThread.WaitOne();
 
                 CheckLinen();
             }
@@ -476,7 +457,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
                     ClientLinens.AddRange(addNew.GetNewClient());
                 }
 
-                Mre.Set();
+                RfidThread.Set();
             });
         }
 
@@ -485,7 +466,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             _dispatcher.RunInMainThread(() =>
             {
                 _dialogService.ShowWarnigDialog("More then 1 chip in Antenna 1");
-                Mre.Set();
+                RfidThread.Set();
             });
         }
 
@@ -494,12 +475,12 @@ namespace PALMS.Settings.ViewModel.ViewModels
             _dispatcher.RunInMainThread(() =>
             {
                 _dialogService.ShowWarnigDialog("No Tag in linen");
-                Mre.Set();
+                RfidThread.Set();
             });
         }
         #endregion
 
-        #region Manual Mode
+#region Manual Mode
         private void ManualSendToBelt1()
         {
             if (String.IsNullOrEmpty(PassingTag))
@@ -512,7 +493,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
             //перед отправкой проверить на заполненость линии и слота
 
-            if (CheckBeltSlot(beltNumb, SetBelt1SlotNumb))
+            if (Belt1Items[SetBelt1SlotNumb].IsEmpty)
             {
                 SendToBelt(1, SetBelt1SlotNumb);
                 return;
@@ -607,7 +588,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
             IsAutoMode = !IsAutoMode;
         }
 
-        //TODO: zapusk v otdelnom potoke i otkluchenie po komande
         private void RunAutoMode()
         {
             while (IsAutoMode)
@@ -619,11 +599,11 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 var currentSlot = 0;
 
                 //Belt 1 проверка слота
-                if (CheckBeltFull(1))
+                if (Belt1Items.Any(x=> x.IsEmpty))
                 {
                     currentSlot = Belt1.GetNowPoint();
 
-                    while (!CheckBeltSlot(1, currentSlot))
+                    while (Belt1Items[currentSlot].IsEmpty == false)
                     {
                         currentSlot++;
                         if (currentSlot > 600) currentSlot = 1;
@@ -632,11 +612,11 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 }
 
                 //Belt 2 проверка слота
-                else if (CheckBeltFull(2))
+                else if (Belt2Items.Any(x => x.IsEmpty))
                 {
                     currentSlot = Belt2.GetNowPoint();
 
-                    while (!CheckBeltSlot(2, currentSlot))
+                    while (Belt2Items[currentSlot].IsEmpty == false)
                     {
                         currentSlot++;
                         if (currentSlot > 780) currentSlot = 1;
@@ -647,7 +627,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         }
         #endregion
 
-        #region Packing Uniform
+#region Packing Uniform
 
         private void TakeClothBelt1()
         {
