@@ -17,6 +17,11 @@ namespace PALMS.Settings.ViewModel.Common
         {
             try
             {
+                if (Reader.IsConnected)
+                {
+                    Reader.Disconnect();
+                }
+
                 Reader.Connect("192.168.250.55");
                 Reader.Stop();
 

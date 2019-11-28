@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModels="clr-namespace:PALMS.Settings.ViewModel.ViewModels;assembly=PALMS.Settings.ViewModel"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300"
              d:DataContext="{d:DesignInstance viewModels:VendorDetailsViewModel}">
@@ -135,14 +136,28 @@
 
                 <Label Grid.Column="0" Grid.Row="0" Content="Id"/>
                 <Label Grid.Column="0" Grid.Row="1" Content="Linen"/>
-                <Label Grid.Column="0" Grid.Row="2" Content="-Passing Tag-"/>
+                <Label Grid.Column="0" Grid.Row="2" Content="-Tag-"/>
                 <Label Grid.Column="0" Grid.Row="3" Content="Staff"/>
 
-                <Label Grid.Column="1" Grid.Row="0" Content="{Binding WaitingLinen.Id}"/>
-                <Label Grid.Column="1" Grid.Row="1" Content="{Binding WaitingLinen.OriginalObject.MasterLinen.Name}"/>
-                <Label Grid.Column="1" Grid.Row="2" Content="{Binding WaitingLinen.Tag}"/>
-                <Label Grid.Column="1" Grid.Row="3" Content="{Binding WaitingLinen.StaffId}"/>
+                <dxe:ComboBoxEdit Grid.Row="1"
+                                  Grid.Column="1" 
+                                  DisplayMember="Name"
+                                  ValueMember="Id"
+                                  IsTextEditable="False"
+                                  AllowCollectionView="False"
+                                  EditValue="{Binding WaitingLinen.MasterLinenId, UpdateSourceTrigger=PropertyChanged}"
+                                  ItemsSource="{Binding MasterLinens}"/>
 
+                <Label Grid.Column="1" Grid.Row="2" Content="{Binding WaitingLinen.Tag}"/>
+
+                <dxe:ComboBoxEdit Grid.Row="3"
+                                  Grid.Column="1" 
+                                  DisplayMember="Name"
+                                  ValueMember="Id"
+                                  IsTextEditable="False"
+                                  AllowCollectionView="False"
+                                  EditValue="{Binding WaitingLinen.StaffId, UpdateSourceTrigger=PropertyChanged}"
+                                  ItemsSource="{Binding Staff}"/>
             </Grid>
         </GroupBox>
 
@@ -165,14 +180,31 @@
                 <Label Grid.Column="0" Grid.Row="0" Content="Belt No"/>
                 <Label Grid.Column="0" Grid.Row="1" Content="Belt Slot"/>
                 <Label Grid.Column="0" Grid.Row="2" Content="Linen"/>
-                <Label Grid.Column="0" Grid.Row="3" Content="-Passing Tag-"/>
+                <Label Grid.Column="0" Grid.Row="3" Content="-Tag-"/>
                 <Label Grid.Column="0" Grid.Row="4" Content="Staff"/>
 
                 <Label Grid.Column="1" Grid.Row="0" Content="{Binding HangingLinen.BeltNumber}"/>
                 <Label Grid.Column="1" Grid.Row="1" Content="{Binding HangingLinen.SlotNumber}"/>
-                <Label Grid.Column="1" Grid.Row="2" Content="{Binding HangingLinen.OriginalObject.OriginalObject.MasterLinen.Name}"/>
+
+                <dxe:ComboBoxEdit Grid.Row="2"
+                                  Grid.Column="1" 
+                                  DisplayMember="Name"
+                                  ValueMember="Id"
+                                  IsTextEditable="False"
+                                  AllowCollectionView="False"
+                                  EditValue="{Binding WaitingLinen.MasterLinenId, UpdateSourceTrigger=PropertyChanged}"
+                                  ItemsSource="{Binding MasterLinens}"/>
+
                 <Label Grid.Column="1" Grid.Row="3" Content="{Binding HangingLinen.RfidTag}"/>
-                <Label Grid.Column="1" Grid.Row="4" Content="{Binding HangingLinen.OriginalObject.OriginalObject.StaffId}"/>
+                
+                <dxe:ComboBoxEdit Grid.Row="4"
+                                  Grid.Column="1" 
+                                  DisplayMember="Name"
+                                  ValueMember="Id"
+                                  IsTextEditable="False"
+                                  AllowCollectionView="False"
+                                  EditValue="{Binding WaitingLinen.StaffId, UpdateSourceTrigger=PropertyChanged}"
+                                  ItemsSource="{Binding Staff}"/>
 
             </Grid>
         </GroupBox>

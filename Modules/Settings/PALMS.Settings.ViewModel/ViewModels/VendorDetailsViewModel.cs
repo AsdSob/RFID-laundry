@@ -60,8 +60,19 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private bool _itemReadyToPass;
         private ClientLinenEntityViewModel _waitingLinen;
         private ConveyorItemViewModel _hangingLinen;
+        private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
+        private ObservableCollection<ClientStaffEntityViewModel> _staff;
 
-
+        public ObservableCollection<ClientStaffEntityViewModel> Staff
+        {
+            get => _staff;
+            set => Set(() => Staff, ref _staff, value);
+        }
+        public ObservableCollection<MasterLinenEntityViewModel> MasterLinens
+        {
+            get => _masterLinens;
+            set => Set(() => MasterLinens, ref _masterLinens, value);
+        }
         public ClientLinenEntityViewModel WaitingLinen
         {
             get => _waitingLinen;
@@ -189,9 +200,17 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         public async Task InitializeAsync()
         {
-            var linen = await _dataService.GetAsync<ClientLinen>(x=> x.MasterLinen);
+            var linen = await _dataService.GetAsync<ClientLinen>();
             var linens = linen.Select(x => new ClientLinenEntityViewModel(x));
             _dispatcher.RunInMainThread(() => ClientLinens = linens.ToObservableCollection());
+
+            var master = await _dataService.GetAsync<MasterLinen>();
+            var masters = master.Select(x => new MasterLinenEntityViewModel(x));
+            _dispatcher.RunInMainThread(() => MasterLinens = masters.ToObservableCollection());
+
+            var staff = await _dataService.GetAsync<ClientStaff>();
+            var staffs = staff.Select(x => new ClientStaffEntityViewModel(x));
+            _dispatcher.RunInMainThread(() => Staff = staffs.ToObservableCollection());
 
             HangingLinen = null;
             WaitingLinen = null;
@@ -452,13 +471,21 @@ namespace PALMS.Settings.ViewModel.ViewModels
                     var showDialog = _dialogService.ShowDialog(addNew);
                     if (!showDialog) return;
 
-                    ClientLinens.AddRange(addNew.GetNewClient());
+                    UpdateClientLinen();
                 }
 
                 RfidThread.Set();
             });
 
             Plc1Thread.WaitOne();
+        }
+
+        private async void UpdateClientLinen()
+        {
+            ClientLinens = new ObservableCollection<ClientLinenEntityViewModel>();
+            var linen = await _dataService.GetAsync<ClientLinen>();
+            var linens = linen.Select(x => new ClientLinenEntityViewModel(x));
+            _dispatcher.RunInMainThread(() => ClientLinens = linens.ToObservableCollection());
         }
 
         public void ShowDialogTagNumbMore()
@@ -554,7 +581,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         #endregion
 
-        #region Manual/Auto Mode
+#region Manual/Auto Mode
 
         private void ManualSendToBelt1()
         {
