@@ -71,59 +71,8 @@
 
         </GroupBox>
 
-        <!-- Rfid Antenna 1 -->
-        <GroupBox Grid.Row="2" Grid.Column="0" Header="Linen in start" >
-            <Grid Margin="10,0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <!--<Label Grid.Column="0" Grid.Row="0" Content="Client"/>
-                <Label Grid.Column="0" Grid.Row="1" Content="Department"/>
-                <Label Grid.Column="0" Grid.Row="2" Content="Staff Id/Name"/>
-                <Label Grid.Column="0" Grid.Row="3" Content="Linen"/>
-                <Label Grid.Column="0" Grid.Row="4" Content="Tag Id"/>-->
-
-                <Label Grid.Column="0" Grid.Row="0" Content="-Passing Tag-"/>
-
-                <Label Grid.Column="0" Grid.Row="1" Content="Belt No"/>
-                <Label Grid.Column="0" Grid.Row="2" Content="Slot No"/>
-                <Label Grid.Column="0" Grid.Row="3" Content="Tag Id"/>
-
-                <!--<Label Grid.Column="1" Grid.Row="0" Content="{Binding }"/>-->
-                <!--<Label Grid.Column="1" Grid.Row="1" Content="{Binding }"/>-->
-                <!--<Label Grid.Column="1" Grid.Row="2" Content="{Binding }"/>-->
-                <!--<Label Grid.Column="1" Grid.Row="3" Content="{Binding }"/>-->
-
-                <Label Grid.Column="1" Grid.Row="0" Content="{Binding PassingTag}"/>
-
-                <Label Grid.Column="1" Grid.Row="1" Content="{Binding HangingItem.BeltNumber}"/>
-                <Label Grid.Column="1" Grid.Row="2" Content="{Binding HangingItem.SlotNumber}"/>
-                <Label Grid.Column="1" Grid.Row="3" Content="{Binding HangingItem.RfidTag}"/>
-
-            </Grid>
-        </GroupBox>
-
-        <!-- Waiting Linen -->
-        <GroupBox Grid.Column="0" Grid.Row="3" Header="Waiting Linen">
-            <StackPanel Orientation="Horizontal">
-                <Button Margin = "5" Padding="10,2"  Content="{Binding WaitingClothCount}" Command="{Binding GetClothCountCommand}"/>
-                <Button Margin = "5" Padding="10,2"  Content="Reset" Command="{Binding ResetClothCountCommand}"/>
-            </StackPanel>
-        </GroupBox>
-
-
         <!--Command-->
-        <GroupBox  Grid.Column="0" Grid.Row="4">
+        <GroupBox  Grid.Column="0" Grid.Row="2">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -160,6 +109,74 @@
             </Grid>
         </GroupBox>
 
+        <!-- Waiting Linen -->
+        <GroupBox Grid.Column="0" Grid.Row="3" Header="Waiting Linen">
+            <StackPanel Orientation="Horizontal">
+                <Button Margin = "5" Padding="10,2"  Content="{Binding WaitingClothCount}" Command="{Binding GetClothCountCommand}"/>
+                <Button Margin = "5" Padding="10,2"  Content="Reset" Command="{Binding ResetClothCountCommand}"/>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Waiting Linen - Rfid Antenna 1 -->
+        <GroupBox Grid.Row="4" Grid.Column="0" Header="Linen in start" >
+            <Grid Margin="10,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Column="0" Grid.Row="0" Content="Id"/>
+                <Label Grid.Column="0" Grid.Row="1" Content="Linen"/>
+                <Label Grid.Column="0" Grid.Row="2" Content="-Passing Tag-"/>
+                <Label Grid.Column="0" Grid.Row="3" Content="Staff"/>
+
+                <Label Grid.Column="1" Grid.Row="0" Content="{Binding WaitingLinen.Id}"/>
+                <Label Grid.Column="1" Grid.Row="1" Content="{Binding WaitingLinen.OriginalObject.MasterLinen.Name}"/>
+                <Label Grid.Column="1" Grid.Row="2" Content="{Binding WaitingLinen.Tag}"/>
+                <Label Grid.Column="1" Grid.Row="3" Content="{Binding WaitingLinen.StaffId}"/>
+
+            </Grid>
+        </GroupBox>
+
+        <!-- Hanging Linen -->
+        <GroupBox Grid.Row="5" Grid.Column="0" Header="Hanging Linen" >
+            <Grid Margin="10,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Column="0" Grid.Row="0" Content="Belt No"/>
+                <Label Grid.Column="0" Grid.Row="1" Content="Belt Slot"/>
+                <Label Grid.Column="0" Grid.Row="2" Content="Linen"/>
+                <Label Grid.Column="0" Grid.Row="3" Content="-Passing Tag-"/>
+                <Label Grid.Column="0" Grid.Row="4" Content="Staff"/>
+
+                <Label Grid.Column="1" Grid.Row="0" Content="{Binding HangingLinen.BeltNumber}"/>
+                <Label Grid.Column="1" Grid.Row="1" Content="{Binding HangingLinen.SlotNumber}"/>
+                <Label Grid.Column="1" Grid.Row="2" Content="{Binding HangingLinen.OriginalObject.OriginalObject.MasterLinen.Name}"/>
+                <Label Grid.Column="1" Grid.Row="3" Content="{Binding HangingLinen.RfidTag}"/>
+                <Label Grid.Column="1" Grid.Row="4" Content="{Binding HangingLinen.OriginalObject.OriginalObject.StaffId}"/>
+
+            </Grid>
+        </GroupBox>
+
         <!--Belt 1 Items-->
         <GroupBox Grid.Column="1" Grid.Row="1" Grid.RowSpan="5" Header="Belt 1" Padding="10">
             <DataGrid AutoGenerateColumns="False"
@@ -179,6 +196,7 @@
                     <DataGridTextColumn Width="50" Header="Slot" Binding="{Binding SlotNumber}" />
                     <DataGridTextColumn Header="Empty" Binding="{Binding IsEmpty}" />
                     <DataGridTextColumn Header="Tag" Binding="{Binding RfidTag}" />
+                    <DataGridTextColumn Header="Linen" Binding="{Binding OriginalObject.OriginalObject.MasterLinen.Name}" />
                 </DataGrid.Columns>
 
             </DataGrid>

@@ -89,7 +89,7 @@ namespace PALMS.Settings.ViewModel.Common
             return Reader.IsConnected;
         }
 
-        public ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>> GetTagsSorted(int readTime)
+        public ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>> GetSortedTags(int readTime)
         {
             Connect();
 

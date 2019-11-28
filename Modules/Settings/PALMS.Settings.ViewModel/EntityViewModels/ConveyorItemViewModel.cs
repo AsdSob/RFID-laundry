@@ -46,13 +46,20 @@ namespace PALMS.Settings.ViewModel.EntityViewModels
 
         public ConveyorItemViewModel(ClientLinenEntityViewModel entity)
         {
-            OriginalObject = entity;
+            Update(entity);
             PropertyChanged += OnPropertyChanged;
         }
 
         public ConveyorItemViewModel()
         {
             PropertyChanged += OnPropertyChanged;
+        }
+
+        public void Update(ClientLinenEntityViewModel entity)
+        {
+            OriginalObject = entity;
+
+            RfidTag = OriginalObject.Tag;
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
