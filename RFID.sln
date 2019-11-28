@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2027
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PALMS.WPFClient", "PALMS.WPFClient\PALMS.WPFClient.csproj", "{D41A8E6F-5CE9-4BDA-85DF-4CF7CED9DCD3}"
 EndProject
@@ -24,6 +24,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PALMS.Settings.View", "Modules\Settings\PALMS.Settings.View\PALMS.Settings.View.csproj", "{044B24DE-186B-4D28-B83F-F63BEE4F5AFB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PALMS.Settings.ViewModel", "Modules\Settings\PALMS.Settings.ViewModel\PALMS.Settings.ViewModel.csproj", "{24C0B14B-4995-4102-83A8-348A23B400B7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RFID Test", "RFID Test\RFID Test.csproj", "{66B37480-0C28-44E1-8185-FF6DD20774D5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{24C0B14B-4995-4102-83A8-348A23B400B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24C0B14B-4995-4102-83A8-348A23B400B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24C0B14B-4995-4102-83A8-348A23B400B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66B37480-0C28-44E1-8185-FF6DD20774D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66B37480-0C28-44E1-8185-FF6DD20774D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66B37480-0C28-44E1-8185-FF6DD20774D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66B37480-0C28-44E1-8185-FF6DD20774D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
