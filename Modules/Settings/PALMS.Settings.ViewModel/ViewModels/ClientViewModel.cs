@@ -241,12 +241,19 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private void AddDepartment()
         {
-            Departments.Add(new DepartmentEntityViewModel()
+            var dep = new DepartmentEntityViewModel()
             {
+                ParentId = 0,
                 ClientId = SelectedClient.Id,
-                DepartmentTypeId = 0,
-                
-            });
+            };
+            if (SelectedClient.IsNew)
+            {
+                dep.OriginalObject.Client = SelectedClient.OriginalObject;
+            }
+
+            dep.OriginalObject.Client = SelectedClient.OriginalObject;
+
+            Departments.Add(dep);
             RaisePropertyChanged(() => SortedDepartments);
         }
 
@@ -278,11 +285,16 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private void AddStaff()
         {
-            Staff.Add(new ClientStaffEntityViewModel()
+            var staff = new ClientStaffEntityViewModel()
             {
                 DepartmentId = SelectedDepartment.Id,
-                PackingValue = 10,
-            });
+            };
+            if (SelectedDepartment.IsNew)
+            {
+                staff.OriginalObject.Department = SelectedDepartment.OriginalObject;
+            }
+
+            Staff.Add(staff);
             RaisePropertyChanged(() => SortedStaff);
         }
 

@@ -306,6 +306,11 @@ namespace PALMS.Settings.ViewModel.ViewModels
             if (SelectedMasterLinen != null)
             {
                 newLinen.MasterLinenId = SelectedMasterLinen.Id;
+
+                if (SelectedMasterLinen.OriginalObject.IsNew)
+                {
+                    newLinen.OriginalObject.MasterLinen = SelectedMasterLinen.OriginalObject;
+                }
                 newLinen.PackingValue = SelectedMasterLinen.PackingValue;
             }
 
