@@ -31,6 +31,8 @@ namespace PALMS.Settings.ViewModel.Common
                 Console.WriteLine("Exception : Reader #1" + ee.Message, "error");
                 Console.WriteLine(ee.StackTrace);
             }
+            settings = new Impinj.OctaneSdk.Settings();
+
             settings = Reader.QueryDefaultSettings();
 
             settings.Report.IncludeAntennaPortNumber = true;

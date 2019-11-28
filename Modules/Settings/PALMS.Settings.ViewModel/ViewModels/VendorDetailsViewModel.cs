@@ -220,7 +220,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             Plc1Thread = new ManualResetEvent(true);
             RfidThread = new ManualResetEvent(true);
             AddBeltItems();
-
+            Impinj = new RfidCommon();
             PropertyChanged += OnPropertyChanged;
         }
 

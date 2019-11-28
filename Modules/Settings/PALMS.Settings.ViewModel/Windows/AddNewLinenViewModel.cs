@@ -173,6 +173,7 @@ namespace PALMS.Settings.ViewModel.Windows
 
             NewLinens = new List<ClientLinenEntityViewModel>();
             IsSelected = false;
+            Impinj = new RfidCommon();
 
             PropertyChanged += OnPropertyChanged;
         }

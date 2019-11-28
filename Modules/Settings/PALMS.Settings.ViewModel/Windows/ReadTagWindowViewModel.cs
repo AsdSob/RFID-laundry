@@ -63,7 +63,7 @@ namespace PALMS.Settings.ViewModel.Windows
         {
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
 
-            AddCommand = new RelayCommand(Add, () => SelectedTag != null);
+            AddCommand = new RelayCommand(Add);
             CloseCommand = new RelayCommand(Close);
 
             StartReadCommand = new RelayCommand(StartRead);
@@ -71,7 +71,7 @@ namespace PALMS.Settings.ViewModel.Windows
 
             ShowAntennaTagCommand = new RelayCommand<object>(SHowAntennaTags);
 
-
+            Impinj = new RfidCommon();
             IsSelected = false;
         }
 
