@@ -70,7 +70,8 @@ namespace PALMS.Settings.ViewModel.Windows
             StopReadCommand = new RelayCommand(StopRead);
 
             ShowAntennaTagCommand = new RelayCommand<object>(SHowAntennaTags);
-
+            SelectedTag = null;
+            Tags = new List<string>();
             Impinj = new RfidCommon();
             IsSelected = false;
         }

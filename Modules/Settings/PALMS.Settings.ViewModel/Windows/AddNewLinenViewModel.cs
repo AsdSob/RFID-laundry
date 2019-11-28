@@ -157,6 +157,7 @@ namespace PALMS.Settings.ViewModel.Windows
             SelectedClient = null;
             SelectedDepartment = null;
             SelectedStaff = null;
+            Tags = new List<string>();
         }
 
         public AddNewLinenViewModel(IDialogService dialogService, IDataService dataService, IDispatcher dispatcher)
@@ -164,6 +165,8 @@ namespace PALMS.Settings.ViewModel.Windows
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
             _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
+            
+            InitializeAsync();
 
             SaveCommand = new RelayCommand(Save);
             CloseCommand = new RelayCommand(Close);

@@ -123,6 +123,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             var linens = linen.Select(x => new ClientLinenEntityViewModel(x));
             _dispatcher.RunInMainThread(() => ClientLinens = linens.ToObservableCollection());
 
+            SelectedClient = null;
         }
 
         public LinenViewModel(IDispatcher dispatcher, IDataService dataService, IDialogService dialogService, IResolver resolver)

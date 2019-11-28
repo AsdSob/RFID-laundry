@@ -192,6 +192,11 @@ namespace PALMS.Settings.ViewModel.ViewModels
             var linen = await _dataService.GetAsync<ClientLinen>(x=> x.MasterLinen);
             var linens = linen.Select(x => new ClientLinenEntityViewModel(x));
             _dispatcher.RunInMainThread(() => ClientLinens = linens.ToObservableCollection());
+
+            HangingLinen = null;
+            WaitingLinen = null;
+            ItemReadyToPass = false;
+            _data = new ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>>();
         }
         
         public VendorDetailsViewModel(IDispatcher dispatcher, IDataService dataService, IDialogService dialogService, IResolver resolver)

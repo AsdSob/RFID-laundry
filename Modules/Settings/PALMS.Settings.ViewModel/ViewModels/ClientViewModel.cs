@@ -98,6 +98,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
             _dispatcher.RunInMainThread(() => Staff = staffs.ToObservableCollection());
 
             Cities = EnumExtentions.GetValues<Cities>();
+
+            SelectedClient = null;
         }
 
         public ClientViewModel(IDispatcher dispatcher, IDataService dataService, IDialogService dialogService)
