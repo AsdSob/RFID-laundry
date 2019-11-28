@@ -85,15 +85,10 @@ namespace PALMS.Settings.ViewModel.Common
             Reader.Stop();
         }
 
-        public bool Connect()
-        {
-            Connection();
-            return Reader.IsConnected;
-        }
 
         public ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>> GetSortedTags(int readTime)
         {
-            Connect();
+            Connection();
 
             Start();
             Reader.TagsReported += DisplayTag;
@@ -108,7 +103,7 @@ namespace PALMS.Settings.ViewModel.Common
 
         public void StartRead()
         {
-            Connect();
+            Connection();
 
             Start();
             Reader.TagsReported += DisplayTag;

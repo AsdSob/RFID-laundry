@@ -9,15 +9,15 @@
                        xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
                        d:DataContext="{d:DesignInstance windows:AddNewLinenViewModel}"
                        mc:Ignorable="d" 
-                       Height="Auto" Width="600">
+                       Height="Auto" Width="700">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*"/>
-            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="2.5*"/>
+            <ColumnDefinition Width="4*"/>
         </Grid.ColumnDefinitions>
 
 
@@ -76,9 +76,9 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal">
-                        <Button Margin = "5" Padding="20,2"  Content="Add" Command="{Binding StartReadCommand}"/>
-                        <Button Margin = "5" Padding="20,2"  Content="Delete" Command="{Binding StopReadCommand}"/>
-                        <Button Margin = "5" Padding="20,2"  Content="Save" Command="{Binding AddTagCommand}"/>
+                        <Button Margin = "5" Padding="20,2"  Content="Start" Command="{Binding StartReadCommand}"/>
+                        <Button Margin = "5" Padding="20,2"  Content="Stop" Command="{Binding StopReadCommand}"/>
+                        <Button Margin = "5" Padding="20,2"  Content="Add" Command="{Binding AddTagCommand}"/>
                     </StackPanel>
 
                     <GroupBox Grid.Column="0" Grid.Row="1" Header="Antenna">

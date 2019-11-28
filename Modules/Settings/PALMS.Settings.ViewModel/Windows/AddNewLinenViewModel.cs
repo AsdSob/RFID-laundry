@@ -242,7 +242,7 @@ namespace PALMS.Settings.ViewModel.Windows
 
         private void StartRead()
         {
-            RunningTask = Task.Factory.StartNew(Impinj.StartRead);
+            Task.Factory.StartNew(Impinj.StartRead);
         }
 
         private void StopRead()
