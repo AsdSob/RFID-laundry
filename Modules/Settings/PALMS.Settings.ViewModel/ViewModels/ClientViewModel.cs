@@ -157,7 +157,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
             if(Clients.Any(x=> x.HasChanges()))
             {
-                var clients = Clients.Where(x => x.HasChanges());
+                var clients = Clients.Where(x => x.HasChanges()).ToList();
 
                 clients.ForEach(x=> x.AcceptChanges());
 
@@ -166,7 +166,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
             if (Departments.Any(x => x.HasChanges()))
             {
-                var departments = Departments.Where(x => x.HasChanges());
+                var departments = Departments.Where(x => x.HasChanges()).ToList();
 
                 departments.ForEach(x => x.AcceptChanges());
 
@@ -175,7 +175,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
             if (Staff.Any(x => x.HasChanges()))
             {
-                var staff = Staff.Where(x => x.HasChanges()).ToList();
+                var staff = Staff.Where(x => x.HasChanges()).ToList().ToList();
 
                 staff.ForEach(x => x.AcceptChanges());
 

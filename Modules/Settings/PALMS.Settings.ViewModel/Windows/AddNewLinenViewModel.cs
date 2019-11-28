@@ -272,7 +272,7 @@ namespace PALMS.Settings.ViewModel.Windows
             {
                 if (_dialogService.ShowQuestionDialog("Do you want to save changes?"))
                 {
-                    var linens = SortedLinens.Where(x => x.HasChanges());
+                    var linens = SortedLinens.Where(x => x.HasChanges()).ToList();
 
                     foreach (var linen in linens)
                     {

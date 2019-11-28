@@ -188,7 +188,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
             if (MasterLinens.Any(x => x.HasChanges()))
             {
-                var masterLinen = MasterLinens.Where(x => x.HasChanges());
+                var masterLinen = MasterLinens.Where(x => x.HasChanges()).ToList();
 
                 masterLinen.ForEach(x => x.AcceptChanges());
 
@@ -197,7 +197,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
             if (ClientLinens.Any(x => x.HasChanges()))
             {
-                var linens = ClientLinens.Where(x => x.HasChanges());
+                var linens = ClientLinens.Where(x => x.HasChanges()).ToList();
 
                 linens.ForEach(x => x.AcceptChanges());
 
