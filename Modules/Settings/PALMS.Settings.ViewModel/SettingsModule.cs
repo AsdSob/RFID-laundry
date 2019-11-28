@@ -26,6 +26,7 @@ namespace PALMS.Settings.ViewModel
             container.RegisterType<ClientViewModel>().SingleInstance();
             container.RegisterType<LinenViewModel>().SingleInstance();
             container.RegisterType<ReadTagWindowViewModel>().SingleInstance();
+            container.RegisterType<AddNewLinenViewModel>().SingleInstance();
         }
     }
 }

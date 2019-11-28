@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using PALMS.Data.Objects.ClientModel;
 using PALMS.Settings.ViewModel.Common;
 using PALMS.Settings.ViewModel.EntityViewModels;
 using PALMS.ViewModels.Common;
@@ -19,6 +20,7 @@ namespace PALMS.Settings.ViewModel.Windows
     {
         private readonly IDialogService _dialogService;
         private readonly IDataService _dataService;
+        private readonly IDispatcher _dispatcher;
         public Action<bool> CloseAction { get; set; }
         private bool IsSelected { get; set; }
         private ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>> _data =
@@ -127,12 +129,37 @@ namespace PALMS.Settings.ViewModel.Windows
         public async Task InitializeAsync()
         {
             IsSelected = false;
+
+            Clients = new ObservableCollection<ClientEntityViewModel>();
+            Departments = new ObservableCollection<DepartmentEntityViewModel>();
+            Staff = new ObservableCollection<ClientStaffEntityViewModel>();
+
+            var client = await _dataService.GetAsync<Client>();
+            var clients = client.Select(x => new ClientEntityViewModel(x));
+            _dispatcher.RunInMainThread(() => Clients = clients.ToObservableCollection());
+
+            var department = await _dataService.GetAsync<Department>();
+            var departments = department.Select(x => new DepartmentEntityViewModel(x));
+            _dispatcher.RunInMainThread(() => Departments = departments.ToObservableCollection());
+
+            var master = await _dataService.GetAsync<MasterLinen>();
+            var masters = master.Select(x => new MasterLinenEntityViewModel(x));
+            _dispatcher.RunInMainThread(() => MasterLinens = masters.ToObservableCollection());
+
+            var staff = await _dataService.GetAsync<ClientStaff>();
+            var staffs = staff.Select(x => new ClientStaffEntityViewModel(x));
+            _dispatcher.RunInMainThread(() => Staff = staffs.ToObservableCollection());
+
+            var linen = await _dataService.GetAsync<ClientLinen>();
+            var linens = linen.Select(x => new ClientLinenEntityViewModel(x));
+            _dispatcher.RunInMainThread(() => ClientLinens = linens.ToObservableCollection());
         }
 
-        public AddNewLinenViewModel(IDialogService dialogService, IDataService dataService)
+        public AddNewLinenViewModel(IDialogService dialogService, IDataService dataService, IDispatcher dispatcher)
         {
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
+            _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
 
             SaveCommand = new RelayCommand(Save);
             CloseCommand = new RelayCommand(Close);
@@ -178,12 +205,12 @@ namespace PALMS.Settings.ViewModel.Windows
 
             if (SelectedStaff == null)
             {
-                linen = ClientLinens.Where(x => x.DepartmentId == SelectedDepartment.Id).ToObservableCollection();
+                linen = ClientLinens?.Where(x => x.DepartmentId == SelectedDepartment?.Id).ToObservableCollection();
 
             }
             else
             {
-                linen = ClientLinens.Where(x => x.StaffId == SelectedStaff.Id).ToObservableCollection();
+                linen = ClientLinens?.Where(x => x.StaffId == SelectedStaff?.Id).ToObservableCollection();
             }
 
             return linen;
@@ -209,8 +236,7 @@ namespace PALMS.Settings.ViewModel.Windows
         {
             var antenna = int.Parse(antennaNumb.ToString());
 
-
-            Tags = (List<string>)_data.Where(x => x.Key == antenna).GetEnumerator().Current.Value.Keys;
+            Tags = _data[antenna].Keys.ToList();
         }
 
         private void StartRead()

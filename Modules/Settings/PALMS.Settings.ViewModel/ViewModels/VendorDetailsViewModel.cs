@@ -324,8 +324,14 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private void ResetClothCount()
         {
-            Plc1.ResetWaitHangNum();
-            ItemReadyToPass = false;
+            //Plc1.ResetWaitHangNum();
+            //ItemReadyToPass = false;
+
+            var addNew = _resolverService.Resolve<AddNewLinenViewModel>();
+
+            addNew.InitializeAsync();
+            var showDialog = _dialogService.ShowDialog(addNew);
+            if (!showDialog) return;
         }
 
         #endregion

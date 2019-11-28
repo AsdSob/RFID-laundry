@@ -45,6 +45,7 @@
                 <dxe:ComboBoxEdit x:Name="Department"
                                   DisplayMember="Name"
                                   ValueMember="Id"
+                                  ShowEditorButtons="True"
                                   IsTextEditable="False"
                                   NullText="Select Department"
                                   ItemsSource="{Binding SortedDepartments}"
@@ -56,7 +57,9 @@
                 <dxe:ComboBoxEdit x:Name="Staff"
                                   DisplayMember="Name"
                                   ValueMember="Id"
+                                  ShowEditorButtons="True"
                                   AllowDefaultButton="True"
+                                  NullValueButtonPlacement="EditBox"
                                   IsTextEditable="False"
                                   NullText="Select Staff"
                                   ItemsSource="{Binding SortedStaff}"
@@ -145,7 +148,7 @@
             </Grid>
         </GroupBox>
 
-        <!-- Client Linen -->
+        <!-- Master Linen -->
 
         <GroupBox Grid.Row="1" Grid.Column="2" Header="Master Linen">
 

@@ -9,21 +9,20 @@
                        xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
                        d:DataContext="{d:DesignInstance windows:AddNewLinenViewModel}"
                        mc:Ignorable="d" 
-                       Height="Auto" Width="400">
+                       Height="Auto" Width="600">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="5*"/>
         </Grid.ColumnDefinitions>
 
 
         <Grid Grid.Row="1" Grid.Column="0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -65,7 +64,7 @@
             </GroupBox>
 
             <!-- RFID-->
-            <GroupBox Grid.Row="3" Grid.Column="0">
+            <GroupBox Grid.Row="3" Grid.Column="0" Header="RFID">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -84,10 +83,10 @@
 
                     <GroupBox Grid.Column="0" Grid.Row="1" Header="Antenna">
                         <StackPanel  Orientation="Horizontal">
-                            <Button Margin = "5" Padding="20,2"  Content="1" Command="{Binding ShowAntennaTagCommand}" CommandParameter="1"/>
-                            <Button Margin = "5" Padding="20,2"  Content="2" Command="{Binding ShowAntennaTagCommand}" CommandParameter="2"/>
-                            <Button Margin = "5" Padding="20,2"  Content="3" Command="{Binding ShowAntennaTagCommand}" CommandParameter="3"/>
-                            <Button Margin = "5" Padding="20,2"  Content="4" Command="{Binding ShowAntennaTagCommand}" CommandParameter="4"/>
+                            <Button Margin = "5" Padding="15,2"  Content="1" Command="{Binding ShowAntennaTagCommand}" CommandParameter="1"/>
+                            <Button Margin = "5" Padding="15,2"  Content="2" Command="{Binding ShowAntennaTagCommand}" CommandParameter="2"/>
+                            <Button Margin = "5" Padding="15,2"  Content="3" Command="{Binding ShowAntennaTagCommand}" CommandParameter="3"/>
+                            <Button Margin = "5" Padding="15,2"  Content="4" Command="{Binding ShowAntennaTagCommand}" CommandParameter="4"/>
                         </StackPanel>
                     </GroupBox>
 

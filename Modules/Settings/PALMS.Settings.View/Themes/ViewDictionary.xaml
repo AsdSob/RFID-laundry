@@ -36,4 +36,8 @@
     <DataTemplate DataType="{x:Type windows:ReadTagWindowViewModel}">
         <windows1:ReadTagWindow/>
     </DataTemplate>
+
+    <DataTemplate DataType="{x:Type windows:AddNewLinenViewModel}">
+        <windows1:AddNewLinenWindow/>
+    </DataTemplate>
 </ResourceDictionary>

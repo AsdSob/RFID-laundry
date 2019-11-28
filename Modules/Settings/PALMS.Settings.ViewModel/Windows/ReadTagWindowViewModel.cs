@@ -78,8 +78,7 @@ namespace PALMS.Settings.ViewModel.Windows
         public void SHowAntennaTags(object antennaNumb)
         {
             var antenna = int.Parse(antennaNumb.ToString());
-            var i = _data[antenna].Keys;
-            Tags = i.ToList();
+            Tags = _data[antenna].Keys.ToList();
         }
 
         private void StartRead()

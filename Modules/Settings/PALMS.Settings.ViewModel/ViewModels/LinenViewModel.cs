@@ -86,7 +86,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         public ObservableCollection<DepartmentEntityViewModel> SortedDepartments => SortDepartment();
         public ObservableCollection<ClientStaffEntityViewModel> SortedStaff => SortStaff();
         public ObservableCollection<ClientLinenEntityViewModel> SortedLinens => SortClientLinen();
-        public ObservableCollection<MasterLinenEntityViewModel> SortedMasterLinens => SortMasterLinen();
+        public ObservableCollection<MasterLinenEntityViewModel> SortedMasterLinens => MasterLinens;
 
         public RelayCommand AddMasterLinenCommand { get; }
         public RelayCommand DeleteMasterLinenCommand { get; }
@@ -162,8 +162,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
             if (e.PropertyName == nameof(SelectedStaff))
             {
-                RaisePropertyChanged(() => SortedMasterLinens);
                 RaisePropertyChanged(() => SortedLinens);
+                RaisePropertyChanged(() => SortedMasterLinens);
             }
 
             if (e.PropertyName == nameof(SelectedMasterLinen))
@@ -313,6 +313,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             ClientLinens.Add(newLinen);
 
             RaisePropertyChanged(() => SortedLinens);
+            RaisePropertyChanged(()=> MasterLinens);
         }
 
         private void RemoveClientLinen()
