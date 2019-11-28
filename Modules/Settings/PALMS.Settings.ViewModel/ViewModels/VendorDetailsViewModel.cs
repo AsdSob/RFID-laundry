@@ -421,7 +421,15 @@ namespace PALMS.Settings.ViewModel.ViewModels
             _data.Clear();
 
             _data = Impinj.GetSortedTags(1000);
-            var tagReport = _data.FirstOrDefault(x => x.Key == 1).Value.Keys;
+
+            if(_data.Count == 0)
+            {
+                ShowDialogTagNumbZero();
+                CheckLinenRfid();
+            }
+
+            var data = _data.FirstOrDefault(x => x.Key == 1).Value;
+            var tagReport = data.Keys.ToList();
 
             if (tagReport.Count > 1)
             {
@@ -447,8 +455,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
             if (clientLinen == null)
             {
                 ShowDialogAddLinen();
-                RfidThread.Reset();
-                RfidThread.WaitOne();
 
                 CheckLinen(tag);
             }
@@ -472,12 +478,11 @@ namespace PALMS.Settings.ViewModel.ViewModels
                     if (!showDialog) return;
 
                     UpdateClientLinen();
-                }
-
+                };
                 RfidThread.Set();
             });
+            RfidThread.WaitOne();
 
-            Plc1Thread.WaitOne();
         }
 
         private async void UpdateClientLinen()
