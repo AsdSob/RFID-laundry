@@ -153,6 +153,10 @@ namespace PALMS.Settings.ViewModel.Windows
             var linen = await _dataService.GetAsync<ClientLinen>();
             var linens = linen.Select(x => new ClientLinenEntityViewModel(x));
             _dispatcher.RunInMainThread(() => ClientLinens = linens.ToObservableCollection());
+
+            SelectedClient = null;
+            SelectedDepartment = null;
+            SelectedStaff = null;
         }
 
         public AddNewLinenViewModel(IDialogService dialogService, IDataService dataService, IDispatcher dispatcher)

@@ -31,8 +31,13 @@ namespace PALMS.Settings.ViewModel.Common
                 Console.WriteLine("Exception : Reader #1" + ee.Message, "error");
                 Console.WriteLine(ee.StackTrace);
             }
-            settings = new Impinj.OctaneSdk.Settings();
 
+            SetSettings();
+            return Reader.IsConnected;
+        }
+
+        private void SetSettings()
+        {
             settings = Reader.QueryDefaultSettings();
 
             settings.Report.IncludeAntennaPortNumber = true;
@@ -57,10 +62,7 @@ namespace PALMS.Settings.ViewModel.Common
             Antenna();
 
             Reader.ApplySettings(settings);
-
-            return Reader.IsConnected;
         }
-
 
         public void Antenna()
         {
@@ -88,17 +90,12 @@ namespace PALMS.Settings.ViewModel.Common
 
         public ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>> GetSortedTags(int readTime)
         {
-            Connection();
-
-            Start();
-            Reader.TagsReported += DisplayTag;
+            StartRead();
 
             Thread.Sleep(readTime);
 
-            Reader.TagsReported -= DisplayTag;
-            Stop();
-
-            return _data;
+            var data = StopRead();
+            return data;
         }
 
         public void StartRead()
@@ -113,6 +110,7 @@ namespace PALMS.Settings.ViewModel.Common
         {
             Reader.TagsReported -= DisplayTag;
             Stop();
+            Reader.Disconnect();
             return _data;
         }
 

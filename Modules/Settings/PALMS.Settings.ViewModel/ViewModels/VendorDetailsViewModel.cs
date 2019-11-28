@@ -209,6 +209,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
             AutoModeCommand = new RelayCommand(AutoMode);
             ResetClothCountCommand = new RelayCommand(ResetClothCount);
 
+            InitializeAsync();
+
             Plc1Ip = "192.168.250.1";
             Plc2Ip = "192.168.250.2";
             Plc3Ip = "192.168.250.3";
