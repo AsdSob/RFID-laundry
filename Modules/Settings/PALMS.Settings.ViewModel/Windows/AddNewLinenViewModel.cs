@@ -24,8 +24,8 @@ namespace PALMS.Settings.ViewModel.Windows
         public Action<bool> CloseAction { get; set; }
         private bool IsSelected { get; set; }
 
-        private List<string> _tags;
-        private string _selectedTag;
+        private ObservableCollection<Tuple<int, string>> _tags;
+        private Tuple<int, string> _selectedTag;
         private RfidCommon _impinj;
         private Task _runningTask;
         private ObservableCollection<ClientEntityViewModel> _clients;
@@ -99,12 +99,12 @@ namespace PALMS.Settings.ViewModel.Windows
             get => _impinj;
             set => Set(() => Impinj, ref _impinj, value);
         }
-        public string SelectedTag
+        public Tuple<int, string> SelectedTag
         {
             get => _selectedTag;
             set => Set(() => SelectedTag, ref _selectedTag, value);
         }
-        public List<string> Tags
+        public ObservableCollection<Tuple<int, string>> Tags
         {
             get => _tags;
             set => Set(() => Tags, ref _tags, value);
@@ -155,7 +155,7 @@ namespace PALMS.Settings.ViewModel.Windows
             SelectedClient = null;
             SelectedDepartment = null;
             SelectedStaff = null;
-            Tags = new List<string>();
+            Tags = new ObservableCollection<Tuple<int, string>>();
         }
 
         public AddNewLinenViewModel(IDialogService dialogService, IDataService dataService, IDispatcher dispatcher)
@@ -242,7 +242,8 @@ namespace PALMS.Settings.ViewModel.Windows
         {
             var antenna = int.Parse(antennaNumb.ToString());
 
-            Tags.AddRange( Impinj.GetAntennaTags(antenna));
+            Tags = Impinj.GetSortedData().ToObservableCollection();
+
         }
 
         private void StartRead()
@@ -260,7 +261,7 @@ namespace PALMS.Settings.ViewModel.Windows
             if(SelectedLinen == null)return;
             if(SelectedTag == null) return;
 
-            SelectedLinen.Tag = SelectedTag;
+            SelectedLinen.Tag = SelectedTag.Item2;
         }
 
 
