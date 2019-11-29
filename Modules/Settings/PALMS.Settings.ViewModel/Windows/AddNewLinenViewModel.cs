@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using Impinj.OctaneSdk;
 using PALMS.Data.Objects.ClientModel;
 using PALMS.Settings.ViewModel.Common;
 using PALMS.Settings.ViewModel.EntityViewModels;
@@ -25,8 +24,8 @@ namespace PALMS.Settings.ViewModel.Windows
         public Action<bool> CloseAction { get; set; }
         private bool IsSelected { get; set; }
 
-        private AsyncObservableCollection<Tuple<ushort, string>> _tags;
-        private Tuple<ushort, string> _selectedTag;
+        private ObservableCollection<Tuple<int, string>> _tags;
+        private Tuple<int, string> _selectedTag;
         private RfidCommon _impinj;
         private Task _runningTask;
         private ObservableCollection<ClientEntityViewModel> _clients;
@@ -100,12 +99,12 @@ namespace PALMS.Settings.ViewModel.Windows
             get => _impinj;
             set => Set(() => Impinj, ref _impinj, value);
         }
-        public Tuple<ushort, string> SelectedTag
+        public Tuple<int, string> SelectedTag
         {
             get => _selectedTag;
             set => Set(() => SelectedTag, ref _selectedTag, value);
         }
-        public AsyncObservableCollection<Tuple<ushort, string>> Tags
+        public ObservableCollection<Tuple<int, string>> Tags
         {
             get => _tags;
             set => Set(() => Tags, ref _tags, value);
@@ -122,6 +121,7 @@ namespace PALMS.Settings.ViewModel.Windows
         public RelayCommand StopReadCommand { get; }
         public RelayCommand AddLinenCommand { get; }
         public RelayCommand RemoveCommand { get; }
+        public RelayCommand<object> ShowAntennaTagCommand { get; }
 
 
         public async Task InitializeAsync()
@@ -155,7 +155,7 @@ namespace PALMS.Settings.ViewModel.Windows
             SelectedClient = null;
             SelectedDepartment = null;
             SelectedStaff = null;
-            Tags = new ObservableCollection<Tuple<ushort, string>>();
+            Tags = new ObservableCollection<Tuple<int, string>>();
         }
 
         public AddNewLinenViewModel(IDialogService dialogService, IDataService dataService, IDispatcher dispatcher)
@@ -174,6 +174,7 @@ namespace PALMS.Settings.ViewModel.Windows
             StartReadCommand = new RelayCommand(StartRead);
             StopReadCommand = new RelayCommand(StopRead);
             AddTagCommand = new RelayCommand(AddTag);
+            ShowAntennaTagCommand = new RelayCommand<object>(SHowAntennaTags);
 
             NewLinens = new List<ClientLinenEntityViewModel>();
             IsSelected = false;
@@ -237,33 +238,22 @@ namespace PALMS.Settings.ViewModel.Windows
             RaisePropertyChanged(() => SortedLinens);
         }
 
-        public async void SHowAntennaTags(ImpinjReader reader, TagReport report)
+        public void SHowAntennaTags(object antennaNumb)
         {
-            foreach (var tag in report.Tags)
-            {
-                if(Tags.Any(x=> Equals(x.Item2, tag.Epc.ToString()) && Equals(x.Item1, tag.AntennaPortNumber)))
-                {
-                    continue;
-                }
+            var antenna = int.Parse(antennaNumb.ToString());
 
-                Tags.Add(new Tuple<ushort, string>(tag.AntennaPortNumber, tag.Epc.ToString()));
-            }
+            Tags = Impinj.GetSortedData().ToObservableCollection();
+
         }
 
         private void StartRead()
         {
             Task.Factory.StartNew(Impinj.StartRead);
-            Tags.Clear();
-
-            Impinj.Reader.TagsReported += SHowAntennaTags;
         }
 
         private void StopRead()
         {
             Impinj.StopRead();
-
-            Impinj.Reader.TagsReported += SHowAntennaTags;
-
         }
 
         private void AddTag()
