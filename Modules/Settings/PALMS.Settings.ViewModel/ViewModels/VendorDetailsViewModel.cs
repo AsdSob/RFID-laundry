@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -252,8 +253,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
             AddBeltItems();
             Impinj = new RfidCommon();
             PropertyChanged += OnPropertyChanged;
-        }
 
+        }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -421,21 +422,17 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
             Tags = Impinj.GetAntennaTags(1).ToObservableCollection();
 
-            if(Tags.Count == 0)
+            if (Tags.Count == 0)
             {
                 ShowDialogTagNumbZero();
+
                 CheckLinenRfid();
             }
 
             if (Tags.Count > 1)
             {
                 ShowDialogTagNumbMore();
-                CheckLinenRfid();
-            }
 
-            if (Tags.Count == 0)
-            {
-                ShowDialogTagNumbZero();
                 CheckLinenRfid();
             }
 
@@ -475,6 +472,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
                     UpdateClientLinen();
                 };
+
                 RfidThread.Set();
             });
             RfidThread.WaitOne();
