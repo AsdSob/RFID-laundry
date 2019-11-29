@@ -111,9 +111,9 @@ namespace PALMS.Settings.ViewModel.Windows
             get => _tags;
             set => Set(() => Tags, ref _tags, value);
         }
-        
-        public ObservableCollection<DepartmentEntityViewModel> SortedDepartments => Departments?.Where(x=> x.ClientId == SelectedClient?.Id).ToObservableCollection();
-        public ObservableCollection<ClientStaffEntityViewModel> SortedStaff => Staff?.Where(x=> x.DepartmentId == SelectedDepartment?.Id).ToObservableCollection();
+
+        public ObservableCollection<DepartmentEntityViewModel> SortedDepartments => Departments?.Where(x => x.ClientId == SelectedClient?.Id).ToObservableCollection();
+        public ObservableCollection<ClientStaffEntityViewModel> SortedStaff => Staff?.Where(x => x.DepartmentId == SelectedDepartment?.Id).ToObservableCollection();
         public ObservableCollection<ClientLinenEntityViewModel> SortedLinens => SortLinen();
 
         public RelayCommand SaveCommand { get; }
@@ -165,7 +165,7 @@ namespace PALMS.Settings.ViewModel.Windows
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
             _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
-            
+
             InitializeAsync();
 
             SaveCommand = new RelayCommand(Save);
@@ -243,6 +243,12 @@ namespace PALMS.Settings.ViewModel.Windows
         public void SHowAntennaTags(object antennaNumb)
         {
             var antenna = int.Parse(antennaNumb.ToString());
+
+            if(_data.Count == 0 || _data[antenna].Keys.Count == 0)
+            {
+                _dialogService.ShowInfoDialog($"No tag in antenna{antennaNumb}");
+                return;
+            }
 
             Tags = _data[antenna].Keys.ToList();
         }

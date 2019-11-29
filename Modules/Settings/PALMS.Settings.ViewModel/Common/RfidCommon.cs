@@ -81,7 +81,7 @@ namespace PALMS.Settings.ViewModel.Common
             {
                 settings.Antennas.GetAntenna(i).IsEnabled = true;
                 settings.Antennas.GetAntenna(i).TxPowerInDbm = Convert.ToDouble("15");
-                settings.Antennas.GetAntenna(i).RxSensitivityInDbm = Convert.ToDouble("-70");
+                settings.Antennas.GetAntenna(i).RxSensitivityInDbm = Convert.ToDouble("-80");
             }
         }
 
