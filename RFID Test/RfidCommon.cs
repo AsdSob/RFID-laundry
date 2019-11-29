@@ -57,7 +57,7 @@ namespace RFID_Test
             settings.Report.IncludePcBits = true;
             settings.Report.IncludeSeenCount = true;
 
-            settings.ReaderMode = ReaderMode.MaxThroughput;//.AutoSetDenseReader;
+            settings.ReaderMode = ReaderMode.AutoSetDenseReaderDeepScan;//.AutoSetDenseReader;
             settings.SearchMode = SearchMode.DualTarget;//.DualTarget;
             settings.Session = 1;
             settings.TagPopulationEstimate = Convert.ToUInt16(200);

@@ -420,7 +420,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         {
             _data.Clear();
 
-            _data = Impinj.GetSortedTags(1000);
+            _data = Impinj.GetSortedTags(2500);
 
             if(_data.Count == 0)
             {

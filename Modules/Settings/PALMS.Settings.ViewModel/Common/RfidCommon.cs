@@ -57,7 +57,10 @@ namespace PALMS.Settings.ViewModel.Common
             settings.Report.IncludePcBits = true;
             settings.Report.IncludeSeenCount = true;
 
-            settings.ReaderMode = ReaderMode.MaxThroughput;//.AutoSetDenseReader;
+
+            ///ReaderMode.AutoSetDenseReaderDeepScan | Rx = -70 | Tx = 15/20
+            ///ReaderMode.MaxThrouput | Rx = -80 | Tx = 15
+            settings.ReaderMode = ReaderMode.AutoSetDenseReaderDeepScan;//.AutoSetDenseReader;
             settings.SearchMode = SearchMode.DualTarget;//.DualTarget;
             settings.Session = 1;
             settings.TagPopulationEstimate = Convert.ToUInt16(200);
