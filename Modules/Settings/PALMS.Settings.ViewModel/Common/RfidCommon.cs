@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Impinj.OctaneSdk;
 
@@ -85,42 +87,86 @@ namespace PALMS.Settings.ViewModel.Common
             }
         }
 
-        public void Start()
+        public void StartRead()
         {
+            Connection();
+
             Reader.Start();
+            Reader.TagsReported += DisplayTag;
         }
 
-        public void Stop()
+        public void StopRead()
         {
+            Reader.TagsReported -= DisplayTag;
             Reader.Stop();
+            Reader.Disconnect();
         }
 
-
-        public ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>> GetSortedTags(int readTime)
+        public void ReadDuringTime(int readTime)
         {
             StartRead();
 
             Thread.Sleep(readTime);
 
-            var data = StopRead();
-            return data;
+            StopRead();
         }
 
-        public void StartRead()
-        {
-            Connection();
 
-            Start();
-            Reader.TagsReported += DisplayTag;
-        }
 
-        public ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>> StopRead()
+        public ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>> GetFullData()
         {
-            Reader.TagsReported -= DisplayTag;
-            Stop();
-            Reader.Disconnect();
+            if (_data.Count == 0)
+            {
+                return null;
+            }
             return _data;
         }
+
+        public List<Tuple<int,string>> GetSortedData()
+        {
+            var data = GetFullData();
+            var tags = new List<Tuple<int,string>>();
+
+            foreach (var antenna in data)
+            {
+                tags.AddRange(antenna.Value.Select(tag => new Tuple<int, string>(antenna.Key, tag.Key)));
+            }
+
+            return tags;
+        }
+
+        public List<string> GetAntennasTags()
+        {
+            var data = GetFullData();
+            var tags = new List<string>();
+
+            foreach (var antenna in data)
+            {
+                foreach (var tag in antenna.Value)
+                {
+                    if (tags.Any(x => x == tag.Key))
+                    {
+                        continue;
+                    }
+                    tags.Add(tag.Key);
+                }
+            }
+
+            return tags;
+        }
+
+        public List<string> GetAntennaTags(int antNumb)
+        {
+            var data = GetFullData();
+            var tags = new List<string>();
+
+            var antenna = data.FirstOrDefault(x => x.Key == antNumb).Value;
+
+            tags.AddRange(antenna.Select(x=> x.Key));
+
+            return tags;
+        }
+
 
         private void DisplayTag(ImpinjReader reader, TagReport report)
         {

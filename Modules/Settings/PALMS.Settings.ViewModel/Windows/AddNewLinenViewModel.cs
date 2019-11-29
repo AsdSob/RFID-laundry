@@ -23,8 +23,6 @@ namespace PALMS.Settings.ViewModel.Windows
         private readonly IDispatcher _dispatcher;
         public Action<bool> CloseAction { get; set; }
         private bool IsSelected { get; set; }
-        private ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>> _data =
-            new ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>>();
 
         private List<string> _tags;
         private string _selectedTag;
@@ -244,13 +242,7 @@ namespace PALMS.Settings.ViewModel.Windows
         {
             var antenna = int.Parse(antennaNumb.ToString());
 
-            if(_data.Count == 0 || _data[antenna].Keys.Count == 0)
-            {
-                _dialogService.ShowInfoDialog($"No tag in antenna{antennaNumb}");
-                return;
-            }
-
-            Tags = _data[antenna].Keys.ToList();
+            Tags.AddRange( Impinj.GetAntennaTags(antenna));
         }
 
         private void StartRead()
@@ -260,7 +252,7 @@ namespace PALMS.Settings.ViewModel.Windows
 
         private void StopRead()
         {
-            _data = Impinj.StopRead();
+            Impinj.StopRead();
         }
 
         private void AddTag()

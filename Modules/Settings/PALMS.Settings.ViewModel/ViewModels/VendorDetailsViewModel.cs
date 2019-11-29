@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using PALMS.Data.Objects.ClientModel;
@@ -37,9 +38,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         #region parameters
 
-        private ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>> _data =
-            new ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>>();
-
         private int _plc1Error, _plc2Error, _plc3Error;
         private FinsTcp _plc1;
         private FinsTcp _belt1;
@@ -62,7 +60,13 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private ConveyorItemViewModel _hangingLinen;
         private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
         private ObservableCollection<ClientStaffEntityViewModel> _staff;
+        private ObservableCollection<string> _tags;
 
+        public ObservableCollection<string> Tags
+        {
+            get => _tags;
+            set => Set(() => Tags, ref _tags, value);
+        }
         public ObservableCollection<ClientStaffEntityViewModel> Staff
         {
             get => _staff;
@@ -215,7 +219,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             HangingLinen = null;
             WaitingLinen = null;
             ItemReadyToPass = false;
-            _data = new ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>>();
+            Tags = new ObservableCollection<string>();
         }
         
         public VendorDetailsViewModel(IDispatcher dispatcher, IDataService dataService, IDialogService dialogService, IResolver resolver)
@@ -412,32 +416,29 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         public void CheckLinenRfid()
         {
-            _data.Clear();
+            Tags.Clear();
+            Impinj.ReadDuringTime(2500);
+            Tags = Impinj.GetAntennaTags(1).ToObservableCollection();
 
-            _data = Impinj.GetSortedTags(2500);
-
-            if(_data.Count == 0)
+            if(Tags.Count == 0)
             {
                 ShowDialogTagNumbZero();
                 CheckLinenRfid();
             }
 
-            var data = _data.FirstOrDefault(x => x.Key == 1).Value;
-            var tagReport = data.Keys.ToList();
-
-            if (tagReport.Count > 1)
+            if (Tags.Count > 1)
             {
                 ShowDialogTagNumbMore();
                 CheckLinenRfid();
             }
 
-            if (tagReport.Count == 0)
+            if (Tags.Count == 0)
             {
                 ShowDialogTagNumbZero();
                 CheckLinenRfid();
             }
 
-            CheckLinen(tagReport.FirstOrDefault());
+            CheckLinen(Tags.FirstOrDefault());
         }
 
         private void CheckLinen(string tag)
