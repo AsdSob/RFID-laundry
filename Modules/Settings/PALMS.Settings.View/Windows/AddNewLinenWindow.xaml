@@ -83,37 +83,27 @@
 
                     <GroupBox Grid.Column="0" Grid.Row="1" Header="Tags">
 
-                        <dxg:GridControl ItemsSource="{Binding Tags}"
-                                         SelectedItem="{Binding SelectedTag}" >
+                        <DataGrid AutoGenerateColumns="False"
+                                  Height="NaN"
+                                  ItemsSource="{Binding Tags}"
+                                  SelectedItem="{Binding SelectedTag}"
+                                  VerticalScrollBarVisibility="Visible"
+                                  Width="400"
+                                  AllowDrop="True" 
+                                  HorizontalAlignment="Stretch"
+                                  EnableRowVirtualization="True" 
+                                  IsReadOnly="True" 
+                                  IsTextSearchCaseSensitive="False"
+                        >
 
-                            <dxg:GridControl.View>
-                                <dxg:TableView AutoWidth="True"
-                                   ShowSearchPanelMode="Always"
-                                   ShowSearchPanelFindButton="True"
-                                   SearchPanelFindMode="Always"
-                                   ShowTotalSummary="True"
-                                   VerticalScrollbarVisibility="Auto"
-                                   EnableImmediatePosting="True"
-                                   AllowEditing="True" 
-                                   AllowGrouping="False"
-                                   ShowGroupPanel="False"
-                                   >
-                                </dxg:TableView>
-                            </dxg:GridControl.View>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Antenna" Binding="{Binding Path=Item1}" />
+                                <DataGridTextColumn Header="Tag" Binding="{Binding Path=Item2}" />
+                            </DataGrid.Columns>
 
-                            <dxg:GridControl.Columns>
-
-                                <dxg:GridColumn FieldName="Item1" Header="Antenna" Width="50" AllowEditing="False" />
-
-                                <dxg:GridColumn FieldName="Item2" Header="Tag" Width="Auto" />
-
-                            </dxg:GridControl.Columns>
-                        </dxg:GridControl>
+                        </DataGrid>
 
                     </GroupBox>
-
-
-
 
                 </Grid>
             </GroupBox>
