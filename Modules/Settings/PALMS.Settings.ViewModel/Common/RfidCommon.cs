@@ -82,8 +82,8 @@ namespace PALMS.Settings.ViewModel.Common
             for (ushort i = 1; i <= j; i++)
             {
                 settings.Antennas.GetAntenna(i).IsEnabled = true;
-                settings.Antennas.GetAntenna(i).TxPowerInDbm = Convert.ToDouble("15");
-                settings.Antennas.GetAntenna(i).RxSensitivityInDbm = Convert.ToDouble("-80");
+                settings.Antennas.GetAntenna(i).TxPowerInDbm = Convert.ToDouble("20");
+                settings.Antennas.GetAntenna(i).RxSensitivityInDbm = Convert.ToDouble("-70");
             }
         }
 
@@ -157,6 +157,11 @@ namespace PALMS.Settings.ViewModel.Common
             var tags = new List<string>();
 
             var antenna = data.FirstOrDefault(x => x.Key == antNumb).Value;
+
+            if(antenna == null || antenna.Count == 0)
+            {
+                return tags;
+            }
 
             tags.AddRange(antenna?.Select(x=> x.Key));
 
