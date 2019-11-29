@@ -62,6 +62,7 @@ namespace RFID_Test
         public static void StartShowTags()
         {
             Setchik = 0;
+            Impinj.Reader.Start();
             Impinj.Reader.TagsReported += ShowTags;
             Console.WriteLine("---Started---");
         }
@@ -69,23 +70,25 @@ namespace RFID_Test
         public static void StopShowTags()
         {
             Impinj.Reader.TagsReported -= ShowTags;
+            Impinj.Reader.Stop();
             Console.WriteLine("---Stopped---");
         }
 
         public static void ShowTags(ImpinjReader reader, TagReport report)
         {
-            Setchik++;
+            
             foreach (var tag in report.Tags.OrderBy(x=> x.AntennaPortNumber))
             {
-                Console.WriteLine($"EPC== {tag.Epc} |||||== {tag.TagSeenCount}");
+                Setchik++;
+                Console.WriteLine($"EPC== {tag.Epc} |||||== {Setchik}");
             }
         }
 
         public static void TXSet(double power)
         {
-            for (int i = 1; i <= 4; i++)
+            for (ushort i = 1; i <= 4; i++)
             {
-                Impinj.settings.Antennas[i].TxPowerInDbm = power;
+                Impinj.settings.Antennas.GetAntenna(i).TxPowerInDbm = Convert.ToDouble(power);
             }
 
             Impinj.Reader.ApplySettings(Impinj.settings);
@@ -93,9 +96,9 @@ namespace RFID_Test
 
         public static void RXSet(double power)
         {
-            for (int i = 1; i <= 4; i++)
+            for (ushort i = 1; i <= 4; i++)
             {
-                Impinj.settings.Antennas[i].RxSensitivityInDbm = power;
+                Impinj.settings.Antennas.GetAntenna(i).RxSensitivityInDbm = power;
             }
 
             Impinj.Reader.ApplySettings(Impinj.settings);
