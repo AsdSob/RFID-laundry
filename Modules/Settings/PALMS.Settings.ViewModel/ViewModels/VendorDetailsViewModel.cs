@@ -418,6 +418,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         {
             Tags.Clear();
             Impinj.ReadDuringTime(2500);
+
             Tags = Impinj.GetAntennaTags(1).ToObservableCollection();
 
             if(Tags.Count == 0)

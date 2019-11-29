@@ -115,10 +115,6 @@ namespace PALMS.Settings.ViewModel.Common
 
         public ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>> GetFullData()
         {
-            if (_data.Count == 0)
-            {
-                return null;
-            }
             return _data;
         }
 
@@ -162,7 +158,7 @@ namespace PALMS.Settings.ViewModel.Common
 
             var antenna = data.FirstOrDefault(x => x.Key == antNumb).Value;
 
-            tags.AddRange(antenna.Select(x=> x.Key));
+            tags.AddRange(antenna?.Select(x=> x.Key));
 
             return tags;
         }
