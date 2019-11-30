@@ -56,7 +56,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private RfidCommon _impinj;
         private string _clothToTakeOut;
         private ObservableCollection<ClientLinenEntityViewModel> _clientLinens;
-        private bool _itemReadyToPass;
+        private bool _isItemReadyToPass;
         private ClientLinenEntityViewModel _waitingLinen;
         private ConveyorItemViewModel _hangingLinen;
         private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
@@ -83,10 +83,10 @@ namespace PALMS.Settings.ViewModel.ViewModels
             get => _waitingLinen;
             set => Set(() => WaitingLinen, ref _waitingLinen, value);
         }
-        public bool ItemReadyToPass
+        public bool IsItemReadyToPass
         {
-            get => _itemReadyToPass;
-            set => Set(() => ItemReadyToPass, ref _itemReadyToPass, value);
+            get => _isItemReadyToPass;
+            set => Set(() => IsItemReadyToPass, ref _isItemReadyToPass, value);
         }
         public ObservableCollection<ClientLinenEntityViewModel> ClientLinens
         {
@@ -264,6 +264,14 @@ namespace PALMS.Settings.ViewModel.ViewModels
                     Task.Factory.StartNew(RunAutoMode);
                 }
             }
+
+            if (e.PropertyName == nameof(IsItemReadyToPass))
+            {
+                if (!IsItemReadyToPass)
+                {
+                    Task.Factory.StartNew(CheckCloth);
+                }
+            }
         }
 
         private ObservableCollection<ConveyorItemViewModel> SortBeltItems(int beltNumb)
@@ -355,7 +363,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private void ResetClothCount()
         {
             Plc1.ResetWaitHangNum();
-            ItemReadyToPass = false;
+            IsItemReadyToPass = false;
         }
 
         #endregion
@@ -364,19 +372,12 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private void CheckCloth()
         {
-            while (true)
+            while (!Plc1.GetClotheReady())
             {
-                if (ItemReadyToPass)
-                {
-                    Thread.Sleep(1000);
-                    continue;
-                }
-                if (Plc1.GetClotheReady())
-                {
-                    CheckClothReady();
-                    Thread.Sleep(2000);
-                }
+                Thread.Sleep(1500);
             }
+
+            CheckClothReady();
         }
 
         private void CheckClothReady()
@@ -429,7 +430,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             }
 
             WaitingLinen = clientLinen;
-            ItemReadyToPass = true;
+            IsItemReadyToPass = true;
         }
 
         private async void UpdateClientLinen()
@@ -530,6 +531,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
             Plc1.Sorting(beltNumb);
 
+            IsItemReadyToPass = false;
+
             HangToBeltSlot(belt, slotNumb);
 
             HangingLinen = new ConveyorItemViewModel();
@@ -582,9 +585,9 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private void ManualSendToBelt1()
         {
-            if (ItemReadyToPass == false)
+            if (IsItemReadyToPass == false)
             {
-                _dialogService.ShowInfoDialog("No Linen");
+                _dialogService.ShowInfoDialog("Linen is not ready");
                 return;
             }
 
@@ -612,7 +615,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         {
             while (IsAutoMode)
             {
-                if (!ItemReadyToPass)
+                if (!IsItemReadyToPass)
                 {
                     Thread.Sleep(500); continue;
                 }
