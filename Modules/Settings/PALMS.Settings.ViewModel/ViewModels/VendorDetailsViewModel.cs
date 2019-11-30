@@ -217,9 +217,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
             var staffs = staff.Select(x => new ClientStaffEntityViewModel(x));
             _dispatcher.RunInMainThread(() => Staff = staffs.ToObservableCollection());
 
-            HangingLinen = null;
-            WaitingLinen = null;
-            ItemReadyToPass = false;
+            HangingLinen = new ConveyorItemViewModel();
+            WaitingLinen = new ClientLinenEntityViewModel();
             Tags = new ObservableCollection<string>();
         }
         
@@ -375,6 +374,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 if (Plc1.GetClotheReady())
                 {
                     CheckClothReady();
+                    Thread.Sleep(2000);
                 }
             }
         }
@@ -392,34 +392,10 @@ namespace PALMS.Settings.ViewModel.ViewModels
             CheckLinenRfid();
         }
 
-        private void ShowDialogWaitingNumb()
-        {
-            _dispatcher.RunInMainThread(() =>
-            {
-                Plc1Thread.Reset();
-
-                if (_dialogService.ShowWarnigDialog(
-                    "There are more then 1 hanger in belt sorting point\n Please remove all hangers and pass again " +
-                    "\n\n Press ok once all done"))
-                {
-                    ResetClothCount();
-                }
-
-                Plc1Thread.Set();
-            });
-
-            Plc1Thread.WaitOne();
-        }
-
-        #endregion
-
-#region Rfid Reader
-
         public void CheckLinenRfid()
         {
-            Tags.Clear();
+            Tags = new AsyncObservableCollection<string>();
             Impinj.ReadDuringTime(2500);
-
             Tags = Impinj.GetAntennaTags(1).ToObservableCollection();
 
             if (Tags.Count == 0)
@@ -456,7 +432,38 @@ namespace PALMS.Settings.ViewModel.ViewModels
             ItemReadyToPass = true;
         }
 
-        public void ShowDialogAddLinen()
+        private async void UpdateClientLinen()
+        {
+            ClientLinens = new ObservableCollection<ClientLinenEntityViewModel>();
+            var linen = await _dataService.GetAsync<ClientLinen>();
+            var linens = linen.Select(x => new ClientLinenEntityViewModel(x));
+            _dispatcher.RunInMainThread(() => ClientLinens = linens.ToObservableCollection());
+        }
+
+        #endregion
+
+#region Waiting ShowDialogs
+
+        private void ShowDialogWaitingNumb()
+        {
+            _dispatcher.RunInMainThread(() =>
+            {
+                Plc1Thread.Reset();
+
+                if (_dialogService.ShowWarnigDialog(
+                    "There are more then 1 hanger in belt sorting point\n Please remove all hangers and pass again " +
+                    "\n\n Press ok once all done"))
+                {
+                    ResetClothCount();
+                }
+
+                Plc1Thread.Set();
+            });
+
+            Plc1Thread.WaitOne();
+        }
+
+        private void ShowDialogAddLinen()
         {
             _dispatcher.RunInMainThread(() =>
             {
@@ -479,15 +486,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         }
 
-        private async void UpdateClientLinen()
-        {
-            ClientLinens = new ObservableCollection<ClientLinenEntityViewModel>();
-            var linen = await _dataService.GetAsync<ClientLinen>();
-            var linens = linen.Select(x => new ClientLinenEntityViewModel(x));
-            _dispatcher.RunInMainThread(() => ClientLinens = linens.ToObservableCollection());
-        }
-
-        public void ShowDialogTagNumbMore()
+        private void ShowDialogTagNumbMore()
         {
             _dispatcher.RunInMainThread(() =>
             {
@@ -501,7 +500,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             RfidThread.WaitOne();
         }
 
-        public void ShowDialogTagNumbZero()
+        private void ShowDialogTagNumbZero()
         {
             _dispatcher.RunInMainThread(() =>
             {
@@ -533,7 +532,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
             HangToBeltSlot(belt, slotNumb);
 
-            HangingLinen = null;
+            HangingLinen = new ConveyorItemViewModel();
         }
 
         private void HangToBeltSlot(FinsTcp belt, int slotNumb)
@@ -574,8 +573,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
             HangingLinen = beltItem;
 
-            WaitingLinen = null;
-            ItemReadyToPass = false;
+            WaitingLinen = new ClientLinenEntityViewModel();
         }
 
         #endregion
