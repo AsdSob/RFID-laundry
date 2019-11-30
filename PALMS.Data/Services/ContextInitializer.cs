@@ -9,7 +9,7 @@ namespace PALMS.Data.Services
         {
             AddClient(context);
             AddDepartment(context);
-            //AddStaff(context);
+            AddConveyorItem(context);
             AddMasterLinen(context);
 
             context.SaveChanges();
@@ -40,17 +40,28 @@ namespace PALMS.Data.Services
             });
         }
 
-        private void AddStaff(DataContext context)
+        private void AddConveyorItem(DataContext context)
         {
-            var staff = context.ClientStaves;
+            var staff = context.ConveyorItems;
 
-            staff.Add(new ClientStaff
+            for (var i = 1; i <= 600; i++)
             {
-                DepartmentId = 1,
-                Name = "Mr. One",
-                StaffId = "0011AA",
-                PackingValue = 10
-            });
+                staff.Add(new ConveyorItem
+                {
+                    BeltNumber = 1,
+                    SlotNumber = i,
+                });
+            }
+
+            for (var i = 1; i <= 776; i++)
+            {
+                staff.Add(new ConveyorItem()
+                {
+                    BeltNumber = 2,
+                    SlotNumber = i,
+                });
+            }
+
         }
 
         private void AddMasterLinen(DataContext context)

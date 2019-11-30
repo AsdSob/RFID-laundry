@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Activities.Statements;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -62,7 +63,13 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
         private ObservableCollection<ClientStaffEntityViewModel> _staff;
         private ObservableCollection<string> _tags;
+        private bool _isAutoPackMode;
 
+        public bool IsAutoPackMode
+        {
+            get => _isAutoPackMode;
+            set => Set(() => IsAutoPackMode, ref _isAutoPackMode, value);
+        }
         public ObservableCollection<string> Tags
         {
             get => _tags;
@@ -217,6 +224,10 @@ namespace PALMS.Settings.ViewModel.ViewModels
             var staffs = staff.Select(x => new ClientStaffEntityViewModel(x));
             _dispatcher.RunInMainThread(() => Staff = staffs.ToObservableCollection());
 
+            var conveyorItem = await _dataService.GetAsync<ConveyorItem>();
+            var conveyorItems = conveyorItem.Select(x => new ConveyorItemViewModel(x));
+            _dispatcher.RunInMainThread(() => BeltItems = conveyorItems.ToObservableCollection());
+
             HangingLinen = new ConveyorItemViewModel();
             WaitingLinen = new ClientLinenEntityViewModel();
             Tags = new ObservableCollection<string>();
@@ -249,7 +260,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
             Plc3Error = 99;
             Plc1Thread = new ManualResetEvent(true);
             RfidThread = new ManualResetEvent(true);
-            AddBeltItems();
             Impinj = new RfidCommon();
             PropertyChanged += OnPropertyChanged;
 
@@ -274,9 +284,40 @@ namespace PALMS.Settings.ViewModel.ViewModels
             }
         }
 
+        private void ItemOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (!(sender is ConveyorItemViewModel item)) return;
+
+            if (e.PropertyName == nameof(ConveyorItemViewModel.ClientLinenId))
+            {
+                SaveConveyorItem(sender as ConveyorItemViewModel);
+            }
+        }
+
+        private void UnSubscribeItem(ConveyorItemViewModel item)
+        {
+            item.PropertyChanged -= ItemOnPropertyChanged;
+        }
+
+        private void SubscribeItem(ConveyorItemViewModel item)
+        {
+            item.PropertyChanged += ItemOnPropertyChanged;
+        }
+
+        private async void SaveConveyorItem(ConveyorItemViewModel item)
+        {
+            if (item.HasChanges())
+            {
+                item.AcceptChanges();
+                await _dataService.AddOrUpdateAsync(item.OriginalObject);
+            }
+        }
+
         private ObservableCollection<ConveyorItemViewModel> SortBeltItems(int beltNumb)
         {
-            return BeltItems?.Where(x => x.BeltNumber == beltNumb)?.ToObservableCollection();
+            var beltItems = BeltItems.Where(x => !x.IsEmpty && x.BeltNumber == beltNumb).ToObservableCollection();
+
+            return beltItems;
         }
 
 #region Conveyor Start
@@ -316,11 +357,9 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
             Belt1.GetBasePoint();
             Belt1.GetHanginpoint();
-            Belt1.GetNowPoint();
 
             Belt2.GetBasePoint();
             Belt2.GetHanginpoint();
-            Belt2.GetNowPoint();
         }
 
         private string GetLocalIp()
@@ -334,30 +373,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 }
             }
             throw new Exception("No network adapters with an IPv4 address in the system!");
-        }
-
-        private void AddBeltItems()
-        {
-            BeltItems = new ObservableCollection<ConveyorItemViewModel>();
-
-            for (var i = 1; i <= 600; i++)
-            {
-                BeltItems.Add(new ConveyorItemViewModel()
-                {
-                    BeltNumber = 1,
-                    SlotNumber = i,
-                    IsEmpty = true,
-                });
-            }
-
-            for (var i = 1; i <= 780; i++)
-            {
-                BeltItems.Add(new ConveyorItemViewModel()
-                {
-                    BeltNumber = 2,
-                    SlotNumber = i,
-                });
-            }
         }
 
         private void ResetClothCount()
@@ -572,11 +587,14 @@ namespace PALMS.Settings.ViewModel.ViewModels
         {
             var beltItem = BeltItems.FirstOrDefault(x => x.BeltNumber == beltNumb && x.SlotNumber == slotNumb);
 
-            beltItem?.Update(WaitingLinen);
+            beltItem.ClientLinenId = WaitingLinen.Id;
 
-            HangingLinen = beltItem;
+            _dispatcher.RunInMainThread((() =>
+            {
+                HangingLinen = beltItem;
 
-            WaitingLinen = new ClientLinenEntityViewModel();
+                WaitingLinen = new ClientLinenEntityViewModel();
+            }));
         }
 
         #endregion
@@ -666,11 +684,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
             TakeCloth(Belt2, ClothToTakeOut);
         }
 
-        private void PackCloth()
-        {
-            Plc1.Packclothes();
-        }
-
         private void TakeCloth(FinsTcp belt, string linenList)
         {
             // Take out clothes
@@ -681,13 +694,22 @@ namespace PALMS.Settings.ViewModel.ViewModels
             {
                 Thread.Sleep(500);
             }
-            
+
+            PackCloth();
+            Thread.Sleep(2000);
         }
 
+        private void PackCloth()
+        {
+            Plc1.Packclothes();
+        }
 
         private void AutoPacking()
         {
-
+            while(IsAutoPackMode)
+            {
+                GetStaffList();
+            }
         }
 
         private void GetStaffList()

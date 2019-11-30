@@ -17,6 +17,7 @@ namespace PALMS.Data.Services
         public DbSet<ClientLinen> ClientLinens { get; set; }
         public DbSet<ClientStaff> ClientStaves { get; set; }
         public DbSet<MasterLinen> MasterLinens { get; set; }
+        public DbSet<ConveyorItem> ConveyorItems { get; set; }
 
 
         public DataContext(string connectionString) : base(connectionString)

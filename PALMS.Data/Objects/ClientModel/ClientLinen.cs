@@ -1,4 +1,5 @@
-﻿using PALMS.Data.Objects.EntityModel;
+﻿using System.Collections.Generic;
+using PALMS.Data.Objects.EntityModel;
 
 namespace PALMS.Data.Objects.ClientModel
 {
@@ -14,5 +15,8 @@ namespace PALMS.Data.Objects.ClientModel
         public virtual ClientStaff  ClientStaff{ get; set; }
         public virtual Department Department { get; set; }
         public virtual MasterLinen MasterLinen { get; set; }
+
+        public virtual ICollection<ConveyorItem> ConveyorItems { get; set; }
+
     }
 }

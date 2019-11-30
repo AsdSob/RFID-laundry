@@ -1,6 +1,6 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using GalaSoft.MvvmLight;
+using PALMS.Data.Objects.ClientModel;
 
 namespace PALMS.Settings.ViewModel.EntityViewModels
 {
@@ -10,18 +10,24 @@ namespace PALMS.Settings.ViewModel.EntityViewModels
         private bool _isEmpty;
         private int _slotNumber;
         private int _beltNumber;
-        private string _rfidTag;
-        private ClientLinenEntityViewModel _originalObject;
+        private ConveyorItem _originalObject;
+        private int _id;
+        private int? _clientLinenId;
 
-        public ClientLinenEntityViewModel OriginalObject
+        public int? ClientLinenId
+        {
+            get => _clientLinenId;
+            set => Set(() => ClientLinenId, ref _clientLinenId, value);
+        }
+        public int Id
+        {
+            get => _id;
+            set => Set(() => Id, ref _id, value);
+        }
+        public ConveyorItem OriginalObject
         {
             get => _originalObject;
             set => Set(() => OriginalObject, ref _originalObject, value);
-        }
-        public string RfidTag
-        {
-            get => _rfidTag;
-            set => Set(() => RfidTag, ref _rfidTag, value);
         }
         public int BeltNumber
         {
@@ -44,29 +50,53 @@ namespace PALMS.Settings.ViewModel.EntityViewModels
             set => Set(ref _isSelected, value);
         }
 
-        public ConveyorItemViewModel(ClientLinenEntityViewModel entity)
-        {
-            Update(entity);
-            PropertyChanged += OnPropertyChanged;
-        }
+        public bool IsNew => OriginalObject == null || OriginalObject.IsNew;
 
         public ConveyorItemViewModel()
         {
+            OriginalObject = new ConveyorItem();
             PropertyChanged += OnPropertyChanged;
+
         }
 
-        public void Update(ClientLinenEntityViewModel entity)
+        public ConveyorItemViewModel(ConveyorItem originalObject) : this()
         {
-            OriginalObject = entity;
-
-            RfidTag = OriginalObject.Tag;
+            Update(originalObject);
         }
+
+        public void Reset()
+        {
+            Update(OriginalObject);
+        }
+
+        private void Update(ConveyorItem originalObject)
+        {
+            OriginalObject = originalObject;
+
+            Id = OriginalObject.Id;
+            BeltNumber = OriginalObject.BeltNumber;
+            SlotNumber = OriginalObject.SlotNumber;
+            ClientLinenId = OriginalObject.ClientLinenId;
+        }
+
+        public void AcceptChanges()
+        {
+            if (OriginalObject == null) return;
+
+            OriginalObject.ClientLinenId = ClientLinenId;
+        }
+
+        public bool HasChanges() => OriginalObject == null ||
+                                    OriginalObject.IsNew ||
+                                    !Equals(ClientLinenId, OriginalObject.ClientLinenId);
+
+
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(RfidTag))
+            if (e.PropertyName == nameof(ClientLinenId))
             {
-                IsEmpty = String.IsNullOrWhiteSpace(RfidTag);
+                IsEmpty = ClientLinenId == null;
             }
 
         }

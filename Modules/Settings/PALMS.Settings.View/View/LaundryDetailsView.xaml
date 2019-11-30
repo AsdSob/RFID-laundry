@@ -226,7 +226,6 @@
                       >
 
                 <DataGrid.Columns>
-                    <DataGridCheckBoxColumn Width="50" IsReadOnly="False" Header="*" Binding="{Binding IsSelected}" />
                     <DataGridTextColumn Width="50" Header="Slot" Binding="{Binding SlotNumber}" />
                     <DataGridTextColumn Header="Empty" Binding="{Binding IsEmpty}" />
                     <DataGridTextColumn Header="Tag" Binding="{Binding RfidTag}" />
