@@ -264,6 +264,13 @@ namespace PALMS.Settings.ViewModel.ViewModels
                     Task.Factory.StartNew(RunAutoMode);
                 }
             }
+            if (e.PropertyName == nameof(ItemReadyToPass))
+            {
+                if (!ItemReadyToPass)
+                {
+                    Task.Factory.StartNew(CheckCloth);
+                }
+            }
         }
 
         private ObservableCollection<ConveyorItemViewModel> SortBeltItems(int beltNumb)
@@ -278,7 +285,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             Belt1.Start();
             Belt2.Start();
 
-            Task.Factory.StartNew(CheckCloth);
+            CheckCloth();
         }
 
         public void StopConveyor()
@@ -364,19 +371,10 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private void CheckCloth()
         {
-            while (true)
-            {
-                if (ItemReadyToPass)
-                {
-                    Thread.Sleep(1000);
-                    continue;
-                }
                 if (Plc1.GetClotheReady())
                 {
                     CheckClothReady();
-                    Thread.Sleep(2000);
                 }
-            }
         }
 
         private void CheckClothReady()
@@ -526,9 +524,9 @@ namespace PALMS.Settings.ViewModel.ViewModels
             else if (beltNumb == 2) belt = Belt2;
             if(belt == null) return;
 
+            Plc1.Sorting(beltNumb);
             SetHangingItem(beltNumb, slotNumb);
 
-            Plc1.Sorting(beltNumb);
 
             HangToBeltSlot(belt, slotNumb);
 
