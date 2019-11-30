@@ -232,6 +232,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
             var conveyorItems = conveyorItem.Select(x => new ConveyorItemViewModel(x));
             _dispatcher.RunInMainThread(() => BeltItems = conveyorItems.ToObservableCollection());
 
+            BeltItems.ForEach(SubscribeItem);
+
             HangingLinen = new ConveyorItemViewModel();
             WaitingLinen = new ClientLinenEntityViewModel();
             Tags = new ObservableCollection<string>();
@@ -308,6 +310,9 @@ namespace PALMS.Settings.ViewModel.ViewModels
             {
                 SaveConveyorItem(sender as ConveyorItemViewModel);
             }
+
+            RaisePropertyChanged(()=> Belt1Items);
+            RaisePropertyChanged(()=> Belt2Items);
         }
 
         private void UnSubscribeItem(ConveyorItemViewModel item)
@@ -331,7 +336,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private ObservableCollection<ConveyorItemViewModel> SortBeltItems(int beltNumb)
         {
-            var beltItems = BeltItems.Where(x => !x.IsEmpty && x.BeltNumber == beltNumb).ToObservableCollection();
+            var beltItems = BeltItems?.Where(x => !x.IsEmpty && x.BeltNumber == beltNumb).ToObservableCollection();
 
             return beltItems;
         }
@@ -615,7 +620,31 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         #endregion
 
-#region Manual/Auto Mode
+#region Packing Methods
+
+        private void TakeCloth(FinsTcp belt, string linenList)
+        {
+            // Take out clothes
+            belt.TakeOutClothes(linenList);
+
+            //Working state of the clothes taking device
+            while (belt.GetTakeOutClothesState())
+            {
+                Thread.Sleep(1000);
+            }
+
+            PackCloth();
+            Thread.Sleep(2000);
+        }
+
+        private void PackCloth()
+        {
+            Plc1.Packclothes();
+        }
+
+        #endregion
+
+#region Hanging Manual/Auto Mode
 
         private void ManualSendToBelt1()
         {
@@ -637,7 +666,20 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private void ManualSendToBelt2()
         {
+            if (IsItemReadyToPass == false)
+            {
+                _dialogService.ShowInfoDialog("Linen is not ready");
+                return;
+            }
 
+            //перед отправкой проверить на заполненость линии и слота
+            if (Belt1Items[SetBelt1SlotNumb - 1].IsEmpty)
+            {
+                SendToBelt(2, SetBelt2SlotNumb);
+                return;
+            }
+
+            _dialogService.ShowInfoDialog("Selected slot is not empty");
         }
 
         private void AutoMode()
@@ -684,7 +726,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         }
         #endregion
 
-#region Packing Uniform
+#region Paking Manual/Auto Mode
 
         private void TakeClothBelt1()
         {
@@ -708,26 +750,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
             TakeCloth(Belt2, ClothToTakeOut);
         }
 
-        private void TakeCloth(FinsTcp belt, string linenList)
-        {
-            // Take out clothes
-            belt.TakeOutClothes(linenList);
-
-            //Working state of the clothes taking device
-            while (belt.GetTakeOutClothesState())
-            {
-                Thread.Sleep(500);
-            }
-
-            PackCloth();
-            Thread.Sleep(2000);
-        }
-
-        private void PackCloth()
-        {
-            Plc1.Packclothes();
-        }
-
         private void AutoPacking()
         {
             IsAutoPackMode = !IsAutoPackMode;
@@ -735,28 +757,34 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private void RunAutoPacking()
         {
-            while(IsAutoPackMode)
+            while (IsAutoPackMode)
             {
-                var staffId = (int) GetStaffList();
+                var staffId = (int)GetStaffList();
 
-                var linens = BeltItems.Where(x => x.StaffId == staffId).ToList();
+                var linens = BeltItems?.Where(x => x.StaffId == staffId).ToList();
 
-                var slotsBelt1 = GetUniformSlots(linens.Where(x => x.BeltNumber == 1).ToList());
-                var slotsBelt2 = GetUniformSlots(linens.Where(x => x.BeltNumber == 2).ToList());
+                if(linens == null || linens.Count == 0) break;
+
+                var slotsBelt1 = linens.Where(x => x.BeltNumber == 1).ToList();
+                var slotsBelt2 = linens.Where(x => x.BeltNumber == 2).ToList();
 
                 //TODO: запустить два метода линии 1 и 2 в паралельных потоках
 
-                if (!String.IsNullOrWhiteSpace(slotsBelt1))
+                if (slotsBelt1.Count != 0)
                 {
-                    TakeCloth(Belt1, slotsBelt1);
+                    var beltString = GetUniformSlots(slotsBelt1);
+                    TakeCloth(Belt1, beltString);
+
+                    RemoveBeltItems(slotsBelt1);
                 }
 
-                if (!String.IsNullOrWhiteSpace(slotsBelt1))
+                if (slotsBelt2.Count != 0)
                 {
-                    TakeCloth(Belt1, slotsBelt1);
+                    var beltString = GetUniformSlots(slotsBelt2);
+                    TakeCloth(Belt1, beltString);
+
+                    RemoveBeltItems(slotsBelt2);
                 }
-
-
             }
         }
 
@@ -778,7 +806,13 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
             return slotList;
         }
-        #endregion
 
+        private void RemoveBeltItems(List<ConveyorItemViewModel> beltItems)
+        {
+            beltItems.ForEach(x=> x.ClearConveyorItem());
+        }
+
+        #endregion
+        
     }
 }

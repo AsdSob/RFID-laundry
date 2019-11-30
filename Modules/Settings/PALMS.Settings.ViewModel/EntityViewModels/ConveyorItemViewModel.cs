@@ -103,6 +103,12 @@ namespace PALMS.Settings.ViewModel.EntityViewModels
                                     !Equals(ClientLinenId, OriginalObject.ClientLinenId);
 
 
+        public void ClearConveyorItem()
+        {
+            ClientLinenId = null;
+            StaffId = null;
+            ClientLinen = null;
+        }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -111,11 +117,10 @@ namespace PALMS.Settings.ViewModel.EntityViewModels
                 if (ClientLinenId != null)
                 {
                     ClientLinenId = ClientLinen.Id;
+                    StaffId = ClientLinen.StaffId;
                 }
 
                 IsEmpty = ClientLinenId == null;
-
-
             }
 
         }

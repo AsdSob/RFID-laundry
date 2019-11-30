@@ -105,7 +105,7 @@
                 <TextBox Grid.Column="1" Grid.Row="2" Margin="5" Text="{Binding SetBelt2SlotNumb}"/>
 
                 <Label Grid.Column="2" Grid.Row="1" Content="{Binding GetBelt1SlotNumb}"/>
-                <Label Grid.Column="2" Grid.Row="2" Content="{Binding GetBelt1SlotNumb}"/>
+                <Label Grid.Column="2" Grid.Row="2" Content="{Binding GetBelt2SlotNumb}"/>
 
                 <!-- Packing-->
 
@@ -113,11 +113,11 @@
         </GroupBox>
 
         <!-- Waiting Linen -->
-        <!--<GroupBox Grid.Column="0" Grid.Row="3" Header="Waiting Linen">
+        <GroupBox Grid.Column="0" Grid.Row="3" Header="Waiting Linen">
             <StackPanel Orientation="Horizontal">
                 <Button Margin = "5" Padding="10,2"  Content="Reset" Command="{Binding ResetClothCountCommand}"/>
             </StackPanel>
-        </GroupBox>-->
+        </GroupBox>
 
         <!--Packing Command-->
         <GroupBox  Grid.Column="0" Grid.Row="4">
