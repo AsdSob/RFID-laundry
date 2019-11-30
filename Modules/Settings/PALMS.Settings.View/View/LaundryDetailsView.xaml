@@ -183,17 +183,16 @@
                 <Label Grid.Column="0" Grid.Row="3" Content="-Tag-"/>
                 <Label Grid.Column="0" Grid.Row="4" Content="Staff"/>
 
-                <Label Grid.Column="1" Grid.Row="0" Content="{Binding Path=HangingLinen.BeltNumber}"/>
-                <Label Grid.Column="1" Grid.Row="1" Content="{Binding Path=HangingLinen.SlotNumber}"/>
+                <Label Grid.Column="1" Grid.Row="0" Content="{Binding HangingLinen.BeltNumber}"/>
+                <Label Grid.Column="1" Grid.Row="1" Content="{Binding HangingLinen.SlotNumber}"/>
 
                 <dxe:ComboBoxEdit Grid.Row="2"
                                   Grid.Column="1" 
                                   DisplayMember="Name"
                                   ValueMember="Id"
-                                  ShowEditorButtons="False"
                                   IsTextEditable="False"
                                   AllowCollectionView="False"
-                                  EditValue="{Binding HangingLinen.OriginalObject.MasterLinenId, UpdateSourceTrigger=PropertyChanged}"
+                                  EditValue="{Binding WaitingLinen.MasterLinenId, UpdateSourceTrigger=PropertyChanged}"
                                   ItemsSource="{Binding MasterLinens}"/>
 
                 <Label Grid.Column="1" Grid.Row="3" Content="{Binding HangingLinen.RfidTag}"/>
@@ -203,9 +202,8 @@
                                   DisplayMember="Name"
                                   ValueMember="Id"
                                   IsTextEditable="False"
-                                  ShowEditorButtons="False"
                                   AllowCollectionView="False"
-                                  EditValue="{Binding HangingLinen.OriginalObject.StaffId, UpdateSourceTrigger=PropertyChanged}"
+                                  EditValue="{Binding WaitingLinen.StaffId, UpdateSourceTrigger=PropertyChanged}"
                                   ItemsSource="{Binding Staff}"/>
 
             </Grid>
