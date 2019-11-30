@@ -90,6 +90,7 @@ namespace PALMS.Settings.ViewModel.Common
         public void StartRead()
         {
             Connection();
+            _data = new ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>>();
 
             Reader.Start();
             Reader.TagsReported += DisplayTag;

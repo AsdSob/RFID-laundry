@@ -113,13 +113,13 @@
         <!-- Waiting Linen -->
         <GroupBox Grid.Column="0" Grid.Row="3" Header="Waiting Linen">
             <StackPanel Orientation="Horizontal">
-                <Button Margin = "5" Padding="10,2"  Content="{Binding WaitingClothCount}" Command="{Binding GetClothCountCommand}"/>
+                <Button Margin = "5" Padding="10,2"  Content="{Binding IsItemReadyToPass}" />
                 <Button Margin = "5" Padding="10,2"  Content="Reset" Command="{Binding ResetClothCountCommand}"/>
             </StackPanel>
         </GroupBox>
 
         <!-- Waiting Linen - Rfid Antenna 1 -->
-        <GroupBox Grid.Row="4" Grid.Column="0" Header="Linen in start" >
+        <GroupBox Grid.Row="4" Grid.Column="0" Header="Waiting Linen" >
             <Grid Margin="10,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
