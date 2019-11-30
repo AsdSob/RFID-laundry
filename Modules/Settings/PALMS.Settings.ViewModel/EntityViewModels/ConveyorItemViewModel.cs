@@ -13,7 +13,19 @@ namespace PALMS.Settings.ViewModel.EntityViewModels
         private ConveyorItem _originalObject;
         private int _id;
         private int? _clientLinenId;
+        private int? _staffId;
+        private ClientLinen _clientLinen;
 
+        public ClientLinen ClientLinen
+        {
+            get => _clientLinen;
+            set => Set(() => ClientLinen, ref _clientLinen, value);
+        }
+        public int? StaffId
+        {
+            get => _staffId;
+            set => Set(() => StaffId, ref _staffId, value);
+        }
         public int? ClientLinenId
         {
             get => _clientLinenId;
@@ -94,9 +106,16 @@ namespace PALMS.Settings.ViewModel.EntityViewModels
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(ClientLinenId))
+            if (e.PropertyName == nameof(ClientLinen))
             {
+                if (ClientLinenId != null)
+                {
+                    ClientLinenId = ClientLinen.Id;
+                }
+
                 IsEmpty = ClientLinenId == null;
+
+
             }
 
         }

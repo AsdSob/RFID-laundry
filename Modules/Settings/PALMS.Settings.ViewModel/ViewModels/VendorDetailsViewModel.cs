@@ -206,6 +206,10 @@ namespace PALMS.Settings.ViewModel.ViewModels
         public RelayCommand ResetClothCountCommand { get; }
         public RelayCommand SendToBelt1Command { get; }
         public RelayCommand SendToBelt2Command { get; }
+        public RelayCommand AutoPackModeCommand { get; }
+        public RelayCommand TakeClothBelt1Command { get; }
+        public RelayCommand TakeClothBelt2Command { get; }
+        public RelayCommand PackClothCommand { get; }
 
         #endregion
 
@@ -247,6 +251,10 @@ namespace PALMS.Settings.ViewModel.ViewModels
             StopConveyorCommand = new RelayCommand(StopConveyor);
             AutoModeCommand = new RelayCommand(AutoMode);
             ResetClothCountCommand = new RelayCommand(ResetClothCount);
+            AutoPackModeCommand = new RelayCommand(AutoPacking);
+            TakeClothBelt1Command = new RelayCommand(TakeClothBelt1);
+            TakeClothBelt2Command = new RelayCommand(TakeClothBelt2);
+            PackClothCommand = new RelayCommand(PackCloth);
 
             InitializeAsync();
 
@@ -272,6 +280,14 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 if (IsAutoMode)
                 {
                     Task.Factory.StartNew(RunAutoMode);
+                }
+            }
+
+            if (e.PropertyName == nameof(IsAutoPackMode))
+            {
+                if (IsAutoPackMode)
+                {
+                    Task.Factory.StartNew(RunAutoPacking);
                 }
             }
 
@@ -587,7 +603,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         {
             var beltItem = BeltItems.FirstOrDefault(x => x.BeltNumber == beltNumb && x.SlotNumber == slotNumb);
 
-            beltItem.ClientLinenId = WaitingLinen.Id;
+            beltItem.ClientLinen = WaitingLinen.OriginalObject;
 
             _dispatcher.RunInMainThread((() =>
             {
@@ -672,14 +688,22 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private void TakeClothBelt1()
         {
-            if (String.IsNullOrEmpty(ClothToTakeOut)) return;
+            if (String.IsNullOrEmpty(ClothToTakeOut))
+            {
+                _dialogService.ShowInfoDialog("Enter Packing number 1, 2, 3, 4, ");
+                return;
+            }
 
             TakeCloth(Belt1, ClothToTakeOut);
         }
 
         private void TakeClothBelt2()
         {
-            if (String.IsNullOrEmpty(ClothToTakeOut)) return;
+            if (String.IsNullOrEmpty(ClothToTakeOut))
+            {
+                _dialogService.ShowInfoDialog("Enter Packing number 1, 2, 3, 4, ");
+                return;
+            }
 
             TakeCloth(Belt2, ClothToTakeOut);
         }
@@ -706,24 +730,53 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private void AutoPacking()
         {
+            IsAutoPackMode = !IsAutoPackMode;
+        }
+
+        private void RunAutoPacking()
+        {
             while(IsAutoPackMode)
             {
-                GetStaffList();
+                var staffId = (int) GetStaffList();
+
+                var linens = BeltItems.Where(x => x.StaffId == staffId).ToList();
+
+                var slotsBelt1 = GetUniformSlots(linens.Where(x => x.BeltNumber == 1).ToList());
+                var slotsBelt2 = GetUniformSlots(linens.Where(x => x.BeltNumber == 2).ToList());
+
+                //TODO: запустить два метода линии 1 и 2 в паралельных потоках
+
+                if (!String.IsNullOrWhiteSpace(slotsBelt1))
+                {
+                    TakeCloth(Belt1, slotsBelt1);
+                }
+
+                if (!String.IsNullOrWhiteSpace(slotsBelt1))
+                {
+                    TakeCloth(Belt1, slotsBelt1);
+                }
+
+
             }
         }
 
-        private void GetStaffList()
+        private int? GetStaffList()
         {
+            var staffId = BeltItems?.FirstOrDefault().StaffId;
 
+            return staffId;
         }
 
-        private string GetStaffUniformSlots()
+        private string GetUniformSlots(List<ConveyorItemViewModel> linens)
         {
-            var list = "";
+            var slotList = "";
 
-            
+            foreach (var linen in linens)
+            {
+                slotList += $"{linen.SlotNumber}, ";
+            }
 
-            return list;
+            return slotList;
         }
         #endregion
 
