@@ -270,7 +270,7 @@
 
                 <DataGrid.Columns>
                     <DataGridTextColumn Width="50" Header="Slot" Binding="{Binding SlotNumber}" />
-                    <DataGridTextColumn Header="Empty" Binding="{Binding IsEmpty}" />
+                    <DataGridTextColumn Header="Empty" Binding="{Binding HasItem}" />
                     <DataGridTextColumn Header="Tag" Binding="{Binding RfidTag}" />
                     <DataGridTextColumn Header="Linen" Binding="{Binding OriginalObject.OriginalObject.MasterLinen.Name}" />
                 </DataGrid.Columns>

@@ -7,7 +7,7 @@ namespace PALMS.Settings.ViewModel.EntityViewModels
     public class ConveyorItemViewModel : ViewModelBase
     {
         private bool _isSelected;
-        private bool _isEmpty;
+        private bool _hasItem;
         private int _slotNumber;
         private int _beltNumber;
         private ConveyorItem _originalObject;
@@ -51,10 +51,10 @@ namespace PALMS.Settings.ViewModel.EntityViewModels
             get => _slotNumber;
             set => Set(ref _slotNumber, value);
         }
-        public bool IsEmpty
+        public bool HasItem
         {
-            get => _isEmpty;
-            set => Set(ref _isEmpty, value);
+            get => _hasItem;
+            set => Set(ref _hasItem, value);
         }
         public bool IsSelected
         {
@@ -114,13 +114,13 @@ namespace PALMS.Settings.ViewModel.EntityViewModels
         {
             if (e.PropertyName == nameof(ClientLinen))
             {
-                if (ClientLinenId != null)
+                if (ClientLinen != null)
                 {
                     ClientLinenId = ClientLinen.Id;
                     StaffId = ClientLinen.StaffId;
                 }
 
-                IsEmpty = ClientLinenId == null;
+                HasItem = ClientLinen != null;
             }
 
         }

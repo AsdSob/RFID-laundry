@@ -336,9 +336,9 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private ObservableCollection<ConveyorItemViewModel> SortBeltItems(int beltNumb)
         {
-            var beltItems = BeltItems?.Where(x => !x.IsEmpty && x.BeltNumber == beltNumb).ToObservableCollection();
-
-            return beltItems;
+            var beltItems = BeltItems?.Where(x => x.HasItem && x.BeltNumber == beltNumb).ToObservableCollection();
+            var ordered = beltItems?.OrderBy(x => x.SlotNumber).ToObservableCollection();
+            return ordered;
         }
 
 #region Conveyor Start
@@ -618,9 +618,43 @@ namespace PALMS.Settings.ViewModel.ViewModels
             }));
         }
 
+        private bool BeltSlotHasItem(int beltNumb, int slotNumb)
+        {
+            var first = BeltItems.FirstOrDefault(x => x.BeltNumber == beltNumb && x.SlotNumber == slotNumb);
+
+            return first != null && first.HasItem;
+        }
+
+        private bool BeltIsFull(int beltNumb)
+        {
+            var belt = GetBeltItems(beltNumb);
+
+            return belt.All(x => x.HasItem);
+        }
+
+        private ObservableCollection<ConveyorItemViewModel> GetBeltItems(int beltNumb)
+        {
+            var items = new ObservableCollection<ConveyorItemViewModel>();
+
+            items.AddRange(BeltItems.Where(x=> x.BeltNumber == beltNumb));
+
+            return items;
+        }
+
+        private ObservableCollection<ConveyorItemViewModel> GetBeltEmptyItems(int beltNumb)
+        {
+            var items = new ObservableCollection<ConveyorItemViewModel>();
+
+            items.AddRange(BeltItems.Where(x => x.BeltNumber == beltNumb && !x.HasItem));
+
+            var order = items.OrderBy(x => x.SlotNumber).ToObservableCollection();
+
+            return order;
+        }
+
         #endregion
 
-#region Packing Methods
+        #region Packing Methods
 
         private void TakeCloth(FinsTcp belt, string linenList)
         {
@@ -655,7 +689,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             }
 
             //перед отправкой проверить на заполненость линии и слота
-            if (Belt1Items[SetBelt1SlotNumb-1].IsEmpty)
+            if (!BeltSlotHasItem(1, SetBelt1SlotNumb))
             {
                 SendToBelt(1, SetBelt1SlotNumb);
                 return;
@@ -673,7 +707,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             }
 
             //перед отправкой проверить на заполненость линии и слота
-            if (Belt1Items[SetBelt1SlotNumb - 1].IsEmpty)
+            if (!BeltSlotHasItem(2, SetBelt2SlotNumb))
             {
                 SendToBelt(2, SetBelt2SlotNumb);
                 return;
@@ -695,33 +729,21 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 {
                     Thread.Sleep(500); continue;
                 }
-                var currentSlot = 0;
 
                 //Belt 1 проверка слота
-                if (Belt1Items.Any(x=> x.IsEmpty))
+                if (!BeltIsFull(1))
                 {
-                    currentSlot = Belt1.GetNowPoint();
+                    var beltEmptyItems = GetBeltEmptyItems(1);
 
-                    while (Belt1Items[currentSlot-1].IsEmpty == false)
+                    foreach (var beltItem in beltEmptyItems.OrderBy(x=> x.SlotNumber))
                     {
-                        currentSlot++;
-                        if (currentSlot > 600) currentSlot = 1;
+                        SendToBelt(1, beltItem.SlotNumber);
                     }
-                    SendToBelt(1, currentSlot);
+
                 }
 
-                //Belt 2 проверка слота
-                //else if (Belt2Items.Any(x => x.IsEmpty))
-                //{
-                //    currentSlot = Belt2.GetNowPoint();
+                //TODO: Belt 2 проверка слота
 
-                //    while (Belt2Items[currentSlot-1].IsEmpty == false)
-                //    {
-                //        currentSlot++;
-                //        if (currentSlot > 780) currentSlot = 1;
-                //    }
-                //    SendToBelt(2, currentSlot);
-                //}
             }
         }
         #endregion
@@ -759,11 +781,14 @@ namespace PALMS.Settings.ViewModel.ViewModels
         {
             while (IsAutoPackMode)
             {
-                var staffId = (int)GetStaffList();
+                var staffId = GetStaffList();
+
+                if (staffId == null) break;
+
 
                 var linens = BeltItems?.Where(x => x.StaffId == staffId).ToList();
 
-                if(linens == null || linens.Count == 0) break;
+                if(linens == null || linens.Count == 0) continue;
 
                 var slotsBelt1 = linens.Where(x => x.BeltNumber == 1).ToList();
                 var slotsBelt2 = linens.Where(x => x.BeltNumber == 2).ToList();
