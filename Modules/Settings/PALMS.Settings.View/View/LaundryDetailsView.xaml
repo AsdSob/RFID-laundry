@@ -262,16 +262,15 @@
                       AllowDrop="True" 
                       HorizontalAlignment="Stretch"
                       EnableRowVirtualization="True" 
-                      IsReadOnly="True" 
                       IsTextSearchCaseSensitive="False"
                       >
 
                 <DataGrid.Columns>
-                    <DataGridCheckBoxColumn Width="50" Header="Slot" Binding="{Binding IsSelected}" />
-                    <DataGridTextColumn Width="50" Header="Slot" Binding="{Binding SlotNumber}" />
-                    <DataGridTextColumn Header="Tag" Binding="{Binding StaffId}" />
-                    <DataGridTextColumn Header="Tag" Binding="{Binding ClientLinenId}" />
-                    <DataGridTextColumn Header="Tag" Binding="{Binding Tag}" />
+                    <DataGridCheckBoxColumn IsReadOnly="False" Width="50" Header="*" Binding="{Binding IsSelected}" />
+                    <DataGridTextColumn IsReadOnly="True" Width="50" Header="Slot" Binding="{Binding SlotNumber}" />
+                    <DataGridTextColumn IsReadOnly="True" Header="StaffId" Binding="{Binding StaffId}" />
+                    <DataGridTextColumn IsReadOnly="True" Header="LinenId" Binding="{Binding ClientLinenId}" />
+                    <DataGridTextColumn IsReadOnly="True" Header="Tag" Binding="{Binding Tag}" />
                 </DataGrid.Columns>
 
             </DataGrid>

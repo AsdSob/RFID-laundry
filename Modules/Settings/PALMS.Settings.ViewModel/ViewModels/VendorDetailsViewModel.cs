@@ -227,12 +227,13 @@ namespace PALMS.Settings.ViewModel.ViewModels
             var conveyorItems = conveyorItem.Select(x => new ConveyorItemViewModel(x));
             _dispatcher.RunInMainThread(() => BeltItems = conveyorItems.ToObservableCollection());
 
+            BeltItems.ForEach(SubscribeItem);
+
             foreach (var item in BeltItems.Where(x=>x.ClientLinenId != null))
             {
                 item.ClientLinen = ClientLinens.FirstOrDefault(x => x.Id == item.ClientLinenId);
             }
 
-            BeltItems.ForEach(SubscribeItem);
 
             HangingLinen = new ConveyorItemViewModel();
             WaitingLinen = new ClientLinenEntityViewModel();
@@ -278,11 +279,11 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(BeltItems))
-            {
-                RaisePropertyChanged(()=> Belt1Items);
-                RaisePropertyChanged(()=> Belt2Items);
-            }
+            //if (e.PropertyName == nameof(BeltItems))
+            //{
+            //    RaisePropertyChanged(()=> Belt1Items);
+            //    RaisePropertyChanged(()=> Belt2Items);
+            //}
 
             if (e.PropertyName == nameof(IsAutoMode))
             {
@@ -332,25 +333,19 @@ namespace PALMS.Settings.ViewModel.ViewModels
             item.PropertyChanged += ItemOnPropertyChanged;
         }
 
-        private async void SaveConveyorItem(ConveyorItemViewModel item)
+        private void SaveConveyorItem(ConveyorItemViewModel item)
         {
             if (item.HasChanges())
             {
                 item.AcceptChanges();
-                await _dataService.AddOrUpdateAsync(item.OriginalObject);
+                _dataService.AddOrUpdateAsync(item.OriginalObject);
             }
         }
 
         private void RemoveAllSlots()
         {
-            foreach (var beltItem in BeltItems.Where(x=> x.HasItem))
-            {
-                beltItem.ClearConveyorItem();
-            }
-
-            RaisePropertyChanged(()=>Belt1Items);
-            RaisePropertyChanged(()=>Belt2Items);
-
+            var items = BeltItems.Where(x => x.HasItem).ToList();
+            RemoveBeltItems(items);
         }
 
         private ObservableCollection<ConveyorItemViewModel> SortBeltItems(int beltNumb)
@@ -359,6 +354,43 @@ namespace PALMS.Settings.ViewModel.ViewModels
             var ordered = beltItems?.OrderBy(x => x.SlotNumber).ToObservableCollection();
             return ordered;
         }
+
+
+        private bool BeltSlotHasItem(int beltNumb, int slotNumb)
+        {
+            var first = BeltItems.FirstOrDefault(x => x.BeltNumber == beltNumb && x.SlotNumber == slotNumb);
+
+            return first != null && first.HasItem;
+        }
+
+        private bool BeltIsFull(int beltNumb)
+        {
+            var belt = GetBeltItems(beltNumb);
+
+            return belt.All(x => x.HasItem);
+        }
+
+        private ObservableCollection<ConveyorItemViewModel> GetBeltItems(int beltNumb)
+        {
+            var items = new ObservableCollection<ConveyorItemViewModel>();
+
+            items.AddRange(BeltItems.Where(x => x.BeltNumber == beltNumb));
+
+            return items;
+        }
+
+        private ObservableCollection<ConveyorItemViewModel> GetBeltEmptyItems(int beltNumb)
+        {
+            var items = new ObservableCollection<ConveyorItemViewModel>();
+
+            items.AddRange(BeltItems.Where(x => x.BeltNumber == beltNumb && !x.HasItem));
+
+            var order = items.OrderBy(x => x.SlotNumber).ToObservableCollection();
+
+            return order;
+        }
+
+
 
 #region Conveyor Start
         public void StartConveyor()
@@ -636,43 +668,9 @@ namespace PALMS.Settings.ViewModel.ViewModels
             }));
         }
 
-        private bool BeltSlotHasItem(int beltNumb, int slotNumb)
-        {
-            var first = BeltItems.FirstOrDefault(x => x.BeltNumber == beltNumb && x.SlotNumber == slotNumb);
-
-            return first != null && first.HasItem;
-        }
-
-        private bool BeltIsFull(int beltNumb)
-        {
-            var belt = GetBeltItems(beltNumb);
-
-            return belt.All(x => x.HasItem);
-        }
-
-        private ObservableCollection<ConveyorItemViewModel> GetBeltItems(int beltNumb)
-        {
-            var items = new ObservableCollection<ConveyorItemViewModel>();
-
-            items.AddRange(BeltItems.Where(x=> x.BeltNumber == beltNumb));
-
-            return items;
-        }
-
-        private ObservableCollection<ConveyorItemViewModel> GetBeltEmptyItems(int beltNumb)
-        {
-            var items = new ObservableCollection<ConveyorItemViewModel>();
-
-            items.AddRange(BeltItems.Where(x => x.BeltNumber == beltNumb && !x.HasItem));
-
-            var order = items.OrderBy(x => x.SlotNumber).ToObservableCollection();
-
-            return order;
-        }
-
         #endregion
 
-        #region Packing Methods
+#region Packing Methods
 
         private void TakeCloth(FinsTcp belt, string linenList)
         {
@@ -755,7 +753,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
                     var currentSlot = Belt1.GetNowPoint();
                     var beltEmptyItems = GetBeltEmptyItems(1);
 
-                    foreach (var beltItem in beltEmptyItems.OrderByDescending(x=> x.SlotNumber == currentSlot).ThenBy(x=>x.SlotNumber))
+                    foreach (var beltItem in beltEmptyItems.OrderByDescending(x=> x.SlotNumber == currentSlot).ThenBy(x=>x.SlotNumber < currentSlot))
                     {
                         if(!IsAutoMode) break;
 
@@ -785,8 +783,10 @@ namespace PALMS.Settings.ViewModel.ViewModels
             var stringList = "";
             foreach (var item in items)
             {
-                stringList += $"{item.SlotNumber},";
+                stringList += $"{item.SlotNumber}, ";
             }
+
+            stringList = stringList.Substring(0, stringList.Length - 2);
 
             TakeCloth(Belt1, stringList);
 
@@ -876,7 +876,11 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private void RemoveBeltItems(List<ConveyorItemViewModel> beltItems)
         {
-            beltItems.ForEach(x=> x.ClearConveyorItem());
+            foreach(var item in beltItems)
+            {
+                item.ClientLinen = null;
+                item.ClientLinenId = null;
+            }
 
             RaisePropertyChanged(() => Belt1Items);
             RaisePropertyChanged(() => Belt2Items);

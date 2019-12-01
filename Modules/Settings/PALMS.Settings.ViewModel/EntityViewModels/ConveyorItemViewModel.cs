@@ -109,13 +109,6 @@ namespace PALMS.Settings.ViewModel.EntityViewModels
                                     !Equals(ClientLinenId, OriginalObject.ClientLinenId);
 
 
-        public void ClearConveyorItem()
-        {
-            ClientLinenId = null;
-            StaffId = null;
-            Tag = null;
-        }
-
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(ClientLinenId))
@@ -125,8 +118,19 @@ namespace PALMS.Settings.ViewModel.EntityViewModels
 
             if (e.PropertyName == nameof(ClientLinen))
             {
-                StaffId = ClientLinen.StaffId;
-                Tag = ClientLinen.Tag;
+                if (ClientLinen == null)
+                {
+                    StaffId = null;
+                    Tag = null;
+                    ClientLinenId = null;
+                }
+                else
+                {
+                    StaffId = ClientLinen.StaffId;
+                    Tag = ClientLinen.Tag;
+                    ClientLinenId = ClientLinen.Id;
+
+                }
             }
 
         }
