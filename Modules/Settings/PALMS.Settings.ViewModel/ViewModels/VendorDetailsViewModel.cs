@@ -277,6 +277,12 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            if (e.PropertyName == nameof(BeltItems))
+            {
+                RaisePropertyChanged(()=> Belt1Items);
+                RaisePropertyChanged(()=> Belt2Items);
+            }
+
             if (e.PropertyName == nameof(IsAutoMode))
             {
                 if (IsAutoMode)
@@ -311,8 +317,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 SaveConveyorItem(sender as ConveyorItemViewModel);
             }
 
-            RaisePropertyChanged(()=> Belt1Items);
-            RaisePropertyChanged(()=> Belt2Items);
+            RaisePropertyChanged(() => Belt1Items);
+            RaisePropertyChanged(() => Belt2Items);
         }
 
         private void UnSubscribeItem(ConveyorItemViewModel item)

@@ -120,7 +120,7 @@ namespace PALMS.Settings.ViewModel.EntityViewModels
                     StaffId = ClientLinen.StaffId;
                 }
 
-                HasItem = ClientLinen != null;
+                HasItem = ClientLinenId != null;
             }
 
         }
