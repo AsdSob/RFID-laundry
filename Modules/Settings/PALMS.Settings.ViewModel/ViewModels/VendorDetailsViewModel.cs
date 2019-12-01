@@ -508,7 +508,10 @@ namespace PALMS.Settings.ViewModel.ViewModels
             {
                 if (ShowDialogAddLinen())
                 {
-                    await UpdateClientLinen();
+                    ClientLinens = new ObservableCollection<ClientLinenEntityViewModel>();
+                    var linen = await _dataService.GetAsync<ClientLinen>();
+                    var linens = linen.Select(x => new ClientLinenEntityViewModel(x));
+                    _dispatcher.RunInMainThread(() => ClientLinens = linens.ToObservableCollection());
                 }
 
                 CheckLinen(tag);
@@ -517,15 +520,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             WaitingLinen = clientLinen;
             IsItemReadyToPass = true;
         }
-
-        private async Task UpdateClientLinen()
-        {
-            ClientLinens = new ObservableCollection<ClientLinenEntityViewModel>();
-            var linen = await _dataService.GetAsync<ClientLinen>();
-            var linens = linen.Select(x => new ClientLinenEntityViewModel(x));
-            _dispatcher.RunInMainThread(() => ClientLinens = linens.ToObservableCollection());
-        }
-
+        
         #endregion
 
 #region Waiting ShowDialogs
