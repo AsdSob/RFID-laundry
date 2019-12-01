@@ -614,7 +614,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
         {
             var beltItem = BeltItems.FirstOrDefault(x => x.BeltNumber == beltNumb && x.SlotNumber == slotNumb);
 
-            beltItem.ClientLinen = WaitingLinen.OriginalObject;
+            beltItem.ClientLinenId = WaitingLinen.Id;
+            beltItem.StaffId = WaitingLinen.StaffId;
 
             _dispatcher.RunInMainThread((() =>
             {
