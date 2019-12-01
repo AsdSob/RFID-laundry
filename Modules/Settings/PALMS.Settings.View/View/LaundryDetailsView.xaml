@@ -154,6 +154,7 @@
         <GroupBox Grid.Column="0" Grid.Row="5" Header="Pack Linen">
             <StackPanel Orientation="Horizontal">
                 <Button Margin = "5" Padding="10,2"  Content="Reset" Command="{Binding PackClothCommand}"/>
+                <Button Margin = "5" Padding="10,2"  Content="Delete Slots" Command="{Binding RemoveAllSLotsCommand}"/>
             </StackPanel>
         </GroupBox>
 

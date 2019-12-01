@@ -204,6 +204,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         public RelayCommand TakeClothBelt1Command { get; }
         public RelayCommand TakeClothBelt2Command { get; }
         public RelayCommand PackClothCommand { get; }
+        public RelayCommand RemoveAllSLotsCommand { get; }
 
         #endregion
 
@@ -256,6 +257,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             TakeClothBelt1Command = new RelayCommand(TakeClothBelt1);
             TakeClothBelt2Command = new RelayCommand(TakeClothBelt2);
             PackClothCommand = new RelayCommand(PackCloth);
+            RemoveAllSLotsCommand = new RelayCommand(RemoveAllSlots);
 
             InitializeAsync();
 
@@ -337,6 +339,18 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 item.AcceptChanges();
                 await _dataService.AddOrUpdateAsync(item.OriginalObject);
             }
+        }
+
+        private void RemoveAllSlots()
+        {
+            foreach (var beltItem in BeltItems.Where(x=> x.HasItem))
+            {
+                beltItem.ClearConveyorItem();
+            }
+
+            RaisePropertyChanged(()=>Belt1Items);
+            RaisePropertyChanged(()=>Belt2Items);
+
         }
 
         private ObservableCollection<ConveyorItemViewModel> SortBeltItems(int beltNumb)
