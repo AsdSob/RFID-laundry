@@ -14,9 +14,15 @@ namespace PALMS.Settings.ViewModel.EntityViewModels
         private int _id;
         private int? _clientLinenId;
         private int? _staffId;
-        private ClientLinen _clientLinen;
+        private ClientLinenEntityViewModel _clientLinen;
+        private string _tag;
 
-        public ClientLinen ClientLinen
+        public string Tag
+        {
+            get => _tag;
+            set => Set(() => Tag, ref _tag, value);
+        }
+        public ClientLinenEntityViewModel ClientLinen
         {
             get => _clientLinen;
             set => Set(() => ClientLinen, ref _clientLinen, value);
@@ -107,14 +113,20 @@ namespace PALMS.Settings.ViewModel.EntityViewModels
         {
             ClientLinenId = null;
             StaffId = null;
+            Tag = null;
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(ClientLinenId))
             {
-
                 HasItem = ClientLinenId != null;
+            }
+
+            if (e.PropertyName == nameof(ClientLinen))
+            {
+                StaffId = ClientLinen.StaffId;
+                Tag = ClientLinen.Tag;
             }
 
         }
