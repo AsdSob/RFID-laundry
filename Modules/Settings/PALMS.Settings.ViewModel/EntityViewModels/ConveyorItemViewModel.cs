@@ -107,18 +107,12 @@ namespace PALMS.Settings.ViewModel.EntityViewModels
         {
             ClientLinenId = null;
             StaffId = null;
-            ClientLinen = null;
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(ClientLinen))
+            if (e.PropertyName == nameof(ClientLinenId))
             {
-                if (ClientLinen != null)
-                {
-                    ClientLinenId = ClientLinen.Id;
-                    StaffId = ClientLinen.StaffId;
-                }
 
                 HasItem = ClientLinenId != null;
             }
