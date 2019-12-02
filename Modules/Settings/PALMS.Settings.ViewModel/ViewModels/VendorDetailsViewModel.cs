@@ -459,12 +459,14 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private void SetHangingLinen(int beltNumb, int slotNumb)
         {
             var beltItem = BeltItems.FirstOrDefault(x => x.BeltNumber == beltNumb && x.SlotNumber == slotNumb);
-            
-            beltItem.ClientLinen = WaitingLinen;
+            _dispatcher.RunInMainThread((() =>
+            {
+                beltItem.ClientLinen = WaitingLinen;
 
-            IsItemPrepared = false;
+                IsItemPrepared = false;
 
-            WaitingLinen = new ClientLinenEntityViewModel();
+                WaitingLinen = new ClientLinenEntityViewModel();
+            }));
         }
 
         #endregion
@@ -504,7 +506,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
                 if (IsAutoMode)
                 {
-                    Plc1Thread.WaitOne();
+                    Plc1Thread.Reset();
                     Task.Factory.StartNew(RunAutoMode);
                     Plc1Thread.WaitOne();
                 }
