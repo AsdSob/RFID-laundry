@@ -31,8 +31,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private readonly IDialogService _dialogService;
         private readonly IResolver _resolverService;
         public ManualResetEvent Plc1Thread { get; set; }
-        public ManualResetEvent RfidThread { get; set; }
-
+        public ManualResetEvent DialogThread { get; set; }
 
         #region parameters
 
@@ -258,8 +257,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
             Plc1Error = 99;
             Plc2Error = 99;
             Plc3Error = 99;
-            Plc1Thread = new ManualResetEvent(true);
-            RfidThread = new ManualResetEvent(true);
+            Plc1Thread = new ManualResetEvent(false);
+            DialogThread = new ManualResetEvent(false);
             Impinj = new RfidCommon();
             PropertyChanged += OnPropertyChanged;
 
@@ -476,13 +475,21 @@ namespace PALMS.Settings.ViewModel.ViewModels
             {
                 Thread.Sleep(1000);
 
-                if(IsItemPrepared) continue;
+                if(IsItemPrepared) {continue;}
 
                 if (!Plc1.GetClotheReady()) continue;
 
-                if (!CheckClothWaitingNumb()) continue;
+                var waitingCount = Plc1.GetWaitHangNum();
+                if (waitingCount > 1)
+                {
+                    DialogThread.Reset();
+                    ShowDialogWaitingNumb();
+                    DialogThread.WaitOne();
+                    continue;
+                }
                     
                 var tag = CheckLinenRfid();
+
                 if (String.IsNullOrWhiteSpace(tag))
                     continue;
 
@@ -494,26 +501,11 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
                 if (IsAutoMode)
                 {
+                    Plc1Thread.WaitOne();
                     Task.Factory.StartNew(RunAutoMode);
+                    Plc1Thread.WaitOne();
                 }
             }
-        }
-
-        /// <summary>
-        /// проверка на наличие количество вешелок
-        /// </summary>
-        /// <returns></returns>
-        private bool CheckClothWaitingNumb()
-        {
-            var i = Plc1.GetWaitHangNum();
-
-            if (i > 1)
-            {
-                ShowDialogWaitingNumb();
-
-                return false;
-            }
-            return true;
         }
 
         /// <summary>
@@ -525,16 +517,23 @@ namespace PALMS.Settings.ViewModel.ViewModels
             Impinj.ReadDuringTime(2500);
             Tags = Impinj.GetAntennaTags(1).ToObservableCollection();
 
+            DialogThread.Reset();
+            DialogThread.WaitOne();
+
             if (Tags.Count == 0)
             {
+                DialogThread.Reset();
                 ShowDialogTagNumbZero();
+                DialogThread.WaitOne();
+
                 return null;
             }
 
             if (Tags.Count > 1)
             {
+                DialogThread.Reset();
                 ShowDialogTagNumbMore();
-
+                DialogThread.WaitOne();
                 return null;
             }
 
@@ -571,8 +570,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
         {
             _dispatcher.RunInMainThread(() =>
             {
-                Plc1Thread.Reset();
-
                 if (_dialogService.ShowWarnigDialog(
                     "There are more then 1 hanger in belt sorting point\n Please remove all hangers and pass again " +
                     "\n\n Press ok once all done"))
@@ -580,19 +577,17 @@ namespace PALMS.Settings.ViewModel.ViewModels
                     ResetClothCount();
                 }
 
-                Plc1Thread.Set();
+                DialogThread.Set();
             });
-
-            Plc1Thread.WaitOne();
         }
 
         private bool ShowDialogAddLinen()
         {
+            DialogThread.Reset();
+
             var linenAdded = false;
             _dispatcher.RunInMainThread(() =>
             {
-                RfidThread.Reset();
-
                 if (_dialogService.ShowQuestionDialog("No linen with current Tag \n Want to add Linen?"))
                 {
                     var addNew = _resolverService.Resolve<AddNewLinenViewModel>();
@@ -604,9 +599,10 @@ namespace PALMS.Settings.ViewModel.ViewModels
                     linenAdded = true;
                 };
 
-                RfidThread.Set();
+                DialogThread.Set();
             });
-            RfidThread.WaitOne();
+
+            DialogThread.WaitOne();
 
             return linenAdded;
         }
@@ -615,28 +611,21 @@ namespace PALMS.Settings.ViewModel.ViewModels
         {
             _dispatcher.RunInMainThread(() =>
             {
-                RfidThread.Reset();
-
                 _dialogService.ShowWarnigDialog("More then 1 chip in Antenna 1");
 
-                RfidThread.Set();
+                DialogThread.Set();
             });
 
-            RfidThread.WaitOne();
         }
 
         private void ShowDialogTagNumbZero()
         {
             _dispatcher.RunInMainThread(() =>
             {
-                RfidThread.Reset();
-
                 _dialogService.ShowWarnigDialog("No Tag in linen");
 
-                RfidThread.Set();
+                DialogThread.Set();
             });
-
-            RfidThread.WaitOne();
         }
         #endregion
 
@@ -657,6 +646,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             }
 
             Plc1.Sorting(beltNumb);
+            Plc1Thread.Set();
 
             SetHangingLinen(beltNumb, slotNumb);
 
@@ -768,6 +758,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             }
 
             //TODO: Belt 2 проверка слота
+
         }
 
         #endregion
