@@ -511,7 +511,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
                     ClientLinens = new ObservableCollection<ClientLinenEntityViewModel>();
                     var linen = await _dataService.GetAsync<ClientLinen>();
                     var linens = linen.Select(x => new ClientLinenEntityViewModel(x));
-                    _dispatcher.RunInMainThread(() => ClientLinens = linens.ToObservableCollection());
+                    ClientLinens = linens.ToObservableCollection();
                 }
 
                 CheckLinen(tag);
