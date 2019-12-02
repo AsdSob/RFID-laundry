@@ -53,7 +53,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private int _setBelt2SlotNumb;
         private RfidCommon _impinj;
         private ObservableCollection<ClientLinenEntityViewModel> _clientLinens;
-        private bool _isItemReadyToPass;
+        private bool _isItemIsPrepring;
         private ClientLinenEntityViewModel _waitingLinen;
         private ConveyorItemViewModel _hangingLinen;
         private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
@@ -86,10 +86,10 @@ namespace PALMS.Settings.ViewModel.ViewModels
             get => _waitingLinen;
             set => Set(() => WaitingLinen, ref _waitingLinen, value);
         }
-        public bool IsItemReadyToPass
+        public bool IsItemIsPrepring
         {
-            get => _isItemReadyToPass;
-            set => Set(() => IsItemReadyToPass, ref _isItemReadyToPass, value);
+            get => _isItemIsPrepring;
+            set => Set(() => IsItemIsPrepring, ref _isItemIsPrepring, value);
         }
         public ObservableCollection<ClientLinenEntityViewModel> ClientLinens
         {
@@ -280,7 +280,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             {
                 if (IsAutoMode)
                 {
-                    //Task.Factory.StartNew(RunAutoMode);
+                    Task.Factory.StartNew(RunAutoMode);
                 }
             }
 
@@ -288,13 +288,18 @@ namespace PALMS.Settings.ViewModel.ViewModels
             {
                 if (IsAutoPackMode)
                 {
+                    if (IsAutoMode)
+                    {
+                        _dialogService.ShowWarnigDialog("Auto Hanging Mode is ON!");
+                        return;
+                    }
                     Task.Factory.StartNew(RunAutoPacking);
                 }
             }
 
-            if (e.PropertyName == nameof(IsItemReadyToPass))
+            if (e.PropertyName == nameof(IsItemIsPrepring))
             {
-                if (!IsItemReadyToPass)
+                if (!IsItemIsPrepring)
                 {
                     Task.Factory.StartNew(CheckCloth);
                 }
@@ -439,7 +444,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private void ResetClothCount()
         {
             Plc1.ResetWaitHangNum();
-            IsItemReadyToPass = false;
+            IsItemIsPrepring = false;
         }
 
         #endregion
@@ -456,8 +461,9 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
                     break;
                 }
-
                 Thread.Sleep(1500);
+
+
             }
 
         }
@@ -518,7 +524,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             }
 
             WaitingLinen = clientLinen;
-            IsItemReadyToPass = true;
+            IsItemIsPrepring = true;
 
             if (IsAutoMode)
             {
@@ -635,7 +641,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             {
                 beltItem.ClientLinen = WaitingLinen;
                 HangingLinen = beltItem;
-                IsItemReadyToPass = false;
+                IsItemIsPrepring = false;
 
                 WaitingLinen = new ClientLinenEntityViewModel();
             }));
@@ -705,7 +711,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private bool CheckItemBelt(int beltNumb, int slotNumb)
         {
-            if (IsItemReadyToPass == false)
+            if (IsItemIsPrepring == false)
             {
                 _dialogService.ShowInfoDialog("Linen is not ready");
                 return false;
@@ -727,36 +733,34 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private void RunAutoMode()
         {
-            while (IsAutoMode)
+            while (!IsItemIsPrepring)
             {
-                if (!IsItemReadyToPass)
+                Thread.Sleep(500);
+            }
+
+            //Belt 1 проверка слота
+            if (!BeltIsFull(1))
+            {
+                var currentSlot = Belt1.GetNowPoint();
+                var beltEmptyItems = GetBeltEmptyItems(1);
+
+                foreach (var beltItem in beltEmptyItems.OrderByDescending(x => x.SlotNumber == currentSlot)
+                    .ThenBy(x => x.SlotNumber < currentSlot))
                 {
-                    Thread.Sleep(500); continue;
+                    if (!IsAutoMode) break;
+
+                    SendToBelt(1, beltItem.SlotNumber);
                 }
-
-                //Belt 1 проверка слота
-                if (!BeltIsFull(1))
-                {
-                    var currentSlot = Belt1.GetNowPoint();
-                    var beltEmptyItems = GetBeltEmptyItems(1);
-
-                    foreach (var beltItem in beltEmptyItems.OrderByDescending(x=> x.SlotNumber == currentSlot).ThenBy(x=>x.SlotNumber < currentSlot))
-                    {
-                        if(!IsAutoMode) break;
-
-                        SendToBelt(1, beltItem.SlotNumber);
-                    }
-
-                }
-
-                //TODO: Belt 2 проверка слота
 
             }
+
+            //TODO: Belt 2 проверка слота
         }
+
         #endregion
 
 
-#region Packing Methods
+        #region Packing Methods
 
         private void TakeCloth(FinsTcp belt, string linenList)
         {
