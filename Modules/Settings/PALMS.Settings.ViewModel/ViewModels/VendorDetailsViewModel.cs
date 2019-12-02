@@ -54,7 +54,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private ObservableCollection<ClientLinenEntityViewModel> _clientLinens;
         private bool _isItemPrepared;
         private ClientLinenEntityViewModel _waitingLinen;
-        private ConveyorItemViewModel _hangingLinen;
         private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
         private ObservableCollection<ClientStaffEntityViewModel> _staff;
         private ObservableCollection<string> _tags;
@@ -99,11 +98,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
         {
             get => _impinj;
             set => Set(() => Impinj, ref _impinj, value);
-        }
-        public ConveyorItemViewModel HangingLinen
-        {
-            get => _hangingLinen;
-            set => Set(() => HangingLinen, ref _hangingLinen, value);
         }
         public int SetBelt2SlotNumb
         {
@@ -230,8 +224,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 item.ClientLinen = ClientLinens.FirstOrDefault(x => x.Id == item.ClientLinenId);
             }
 
-
-            HangingLinen = new ConveyorItemViewModel();
             WaitingLinen = new ClientLinenEntityViewModel();
             Tags = new ObservableCollection<string>();
         }
@@ -465,15 +457,12 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private void SetHangingLinen(int beltNumb, int slotNumb)
         {
             var beltItem = BeltItems.FirstOrDefault(x => x.BeltNumber == beltNumb && x.SlotNumber == slotNumb);
+            
+            beltItem.ClientLinen = WaitingLinen;
 
-            _dispatcher.RunInMainThread((() =>
-            {
-                beltItem.ClientLinen = WaitingLinen;
-                HangingLinen = beltItem;
-                IsItemPrepared = false;
+            IsItemPrepared = false;
 
-                WaitingLinen = new ClientLinenEntityViewModel();
-            }));
+            WaitingLinen = new ClientLinenEntityViewModel();
         }
 
         #endregion
@@ -672,8 +661,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
             SetHangingLinen(beltNumb, slotNumb);
 
             HangToBeltSlot(belt, slotNumb);
-            
-            HangingLinen = new ConveyorItemViewModel();
         }
 
         private void HangToBeltSlot(FinsTcp belt, int slotNumb)

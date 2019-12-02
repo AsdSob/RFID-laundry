@@ -202,55 +202,6 @@
             </Grid>
         </GroupBox>
 
-        <!-- Hanging Linen -->
-        <GroupBox Grid.Row="7" Grid.Column="0" Header="Hanging Linen" >
-            <Grid Margin="10,0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <Label Grid.Column="0" Grid.Row="0" Content="Belt No"/>
-                <Label Grid.Column="0" Grid.Row="1" Content="Belt Slot"/>
-                <Label Grid.Column="0" Grid.Row="2" Content="Linen"/>
-                <Label Grid.Column="0" Grid.Row="3" Content="-Tag-"/>
-                <Label Grid.Column="0" Grid.Row="4" Content="Staff"/>
-
-                <Label Grid.Column="1" Grid.Row="0" Content="{Binding Path=HangingLinen.BeltNumber}"/>
-                <Label Grid.Column="1" Grid.Row="1" Content="{Binding Path=HangingLinen.SlotNumber}"/>
-
-                <dxe:ComboBoxEdit Grid.Row="2"
-                                  Grid.Column="1" 
-                                  DisplayMember="Name"
-                                  ValueMember="Id"
-                                  ShowEditorButtons="False"
-                                  IsTextEditable="False"
-                                  AllowCollectionView="False"
-                                  EditValue="{Binding HangingLinen.OriginalObject.MasterLinenId, UpdateSourceTrigger=PropertyChanged}"
-                                  ItemsSource="{Binding MasterLinens}"/>
-
-                <Label Grid.Column="1" Grid.Row="3" Content="{Binding HangingLinen.RfidTag}"/>
-                
-                <dxe:ComboBoxEdit Grid.Row="4"
-                                  Grid.Column="1" 
-                                  DisplayMember="Name"
-                                  ValueMember="Id"
-                                  IsTextEditable="False"
-                                  ShowEditorButtons="False"
-                                  AllowCollectionView="False"
-                                  EditValue="{Binding HangingLinen.OriginalObject.StaffId, UpdateSourceTrigger=PropertyChanged}"
-                                  ItemsSource="{Binding Staff}"/>
-
-            </Grid>
-        </GroupBox>
 
         <!--Belt 1 Items-->
         <GroupBox Grid.Column="1" Grid.Row="1" Grid.RowSpan="5" Header="Belt 1" Padding="10">
