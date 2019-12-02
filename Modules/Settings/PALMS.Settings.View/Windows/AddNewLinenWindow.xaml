@@ -9,11 +9,11 @@
                        xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
                        d:DataContext="{d:DesignInstance windows:AddNewLinenViewModel}"
                        mc:Ignorable="d" 
-                       Height="Auto" Width="700">
+                       Height="Auto" Width="800">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="3*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>

@@ -20,7 +20,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
 {
     public class VendorDetailsViewModel : ViewModelBase, ISettingsContent, IInitializationAsync
     {
-        public string Error { get; }
         public string Name => "PrimeInfo";
         public bool HasChanges()
         {
@@ -53,7 +52,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private int _setBelt2SlotNumb;
         private RfidCommon _impinj;
         private ObservableCollection<ClientLinenEntityViewModel> _clientLinens;
-        private bool _isItemIsPrepring;
+        private bool _isItemPrepared;
         private ClientLinenEntityViewModel _waitingLinen;
         private ConveyorItemViewModel _hangingLinen;
         private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
@@ -86,10 +85,10 @@ namespace PALMS.Settings.ViewModel.ViewModels
             get => _waitingLinen;
             set => Set(() => WaitingLinen, ref _waitingLinen, value);
         }
-        public bool IsItemIsPrepring
+        public bool IsItemPrepared
         {
-            get => _isItemIsPrepring;
-            set => Set(() => IsItemIsPrepring, ref _isItemIsPrepring, value);
+            get => _isItemPrepared;
+            set => Set(() => IsItemPrepared, ref _isItemPrepared, value);
         }
         public ObservableCollection<ClientLinenEntityViewModel> ClientLinens
         {
@@ -288,22 +287,17 @@ namespace PALMS.Settings.ViewModel.ViewModels
             {
                 if (IsAutoPackMode)
                 {
-                    if (IsAutoMode)
-                    {
-                        _dialogService.ShowWarnigDialog("Auto Hanging Mode is ON!");
-                        return;
-                    }
                     Task.Factory.StartNew(RunAutoPacking);
                 }
             }
 
-            if (e.PropertyName == nameof(IsItemIsPrepring))
-            {
-                if (!IsItemIsPrepring)
-                {
-                    Task.Factory.StartNew(CheckCloth);
-                }
-            }
+            //if (e.PropertyName == nameof(IsItemPrepared))
+            //{
+            //    if (!IsItemPrepared)
+            //    {
+            //        Task.Factory.StartNew(RunCircleCheckCloth);
+            //    }
+            //}
         }
 
         private void ItemOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -351,40 +345,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
             return ordered;
         }
 
-        private bool BeltSlotHasItem(int beltNumb, int slotNumb)
-        {
-            var first = BeltItems.FirstOrDefault(x => x.BeltNumber == beltNumb && x.SlotNumber == slotNumb);
-
-            return first != null && first.HasItem;
-        }
-
-        private bool BeltIsFull(int beltNumb)
-        {
-            var belt = GetBeltItems(beltNumb);
-
-            return belt.All(x => x.HasItem);
-        }
-
-        private ObservableCollection<ConveyorItemViewModel> GetBeltItems(int beltNumb)
-        {
-            var items = new ObservableCollection<ConveyorItemViewModel>();
-
-            items.AddRange(BeltItems.Where(x => x.BeltNumber == beltNumb));
-
-            return items;
-        }
-
-        private ObservableCollection<ConveyorItemViewModel> GetBeltEmptyItems(int beltNumb)
-        {
-            var items = new ObservableCollection<ConveyorItemViewModel>();
-
-            items.AddRange(BeltItems.Where(x => x.BeltNumber == beltNumb && !x.HasItem));
-
-            var order = items.OrderBy(x => x.SlotNumber).ToObservableCollection();
-
-            return order;
-        }
-
 
 #region Conveyor Start
         public void StartConveyor()
@@ -393,7 +353,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             Belt1.Start();
             Belt2.Start();
 
-            Task.Factory.StartNew(CheckCloth);
+            Task.Factory.StartNew(RunCircleCheckCloth);
         }
 
         public void StopConveyor()
@@ -441,47 +401,136 @@ namespace PALMS.Settings.ViewModel.ViewModels
             throw new Exception("No network adapters with an IPv4 address in the system!");
         }
 
+        #endregion
+
+
+#region Common Methods
+
         private void ResetClothCount()
         {
             Plc1.ResetWaitHangNum();
-            IsItemIsPrepring = false;
+            IsItemPrepared = false;
+        }
+
+        private bool IsSlotHasItem(int beltNumb, int slotNumb)
+        {
+            var first = BeltItems.FirstOrDefault(x => x.BeltNumber == beltNumb && x.SlotNumber == slotNumb);
+
+            return first != null && first.HasItem;
+        }
+
+        private bool IsBeltFull(int beltNumb)
+        {
+            var belt = GetBeltItems(beltNumb);
+
+            return belt.All(x => x.HasItem);
+        }
+
+        private ObservableCollection<ConveyorItemViewModel> GetBeltItems(int beltNumb)
+        {
+            var items = new ObservableCollection<ConveyorItemViewModel>();
+
+            items.AddRange(BeltItems.Where(x => x.BeltNumber == beltNumb));
+
+            return items;
+        }
+
+        private ObservableCollection<ConveyorItemViewModel> GetBeltEmptyItems(int beltNumb)
+        {
+            var items = new ObservableCollection<ConveyorItemViewModel>();
+
+            items.AddRange(BeltItems.Where(x => x.BeltNumber == beltNumb && !x.HasItem));
+
+            var order = items.OrderBy(x => x.SlotNumber).ToObservableCollection();
+
+            return order;
+        }
+
+        private async Task<bool> UpdateClientLinenEntity()
+        {
+            ClientLinens = new ObservableCollection<ClientLinenEntityViewModel>();
+            var linen = await _dataService.GetAsync<ClientLinen>();
+            var linens = linen.Select(x => new ClientLinenEntityViewModel(x));
+            ClientLinens = linens.ToObservableCollection();
+
+            return true;
+        }
+
+        private void SetWaitingLinen(ClientLinenEntityViewModel linen)
+        {
+            WaitingLinen = linen;
+            IsItemPrepared = true;
+        }
+
+        private void SetHangingLinen(int beltNumb, int slotNumb)
+        {
+            var beltItem = BeltItems.FirstOrDefault(x => x.BeltNumber == beltNumb && x.SlotNumber == slotNumb);
+
+            _dispatcher.RunInMainThread((() =>
+            {
+                beltItem.ClientLinen = WaitingLinen;
+                HangingLinen = beltItem;
+                IsItemPrepared = false;
+
+                WaitingLinen = new ClientLinenEntityViewModel();
+            }));
         }
 
         #endregion
 
+        
 #region Plc1 Waiting 
 
-        private void CheckCloth()
+        private void RunCircleCheckCloth()
         {
             while (true)
             {
-                if (Plc1.GetClotheReady())
+                Thread.Sleep(1000);
+
+                if(IsItemPrepared) continue;
+
+                if (!Plc1.GetClotheReady()) continue;
+
+                if (!CheckClothWaitingNumb()) continue;
+                    
+                var tag = CheckLinenRfid();
+                if (String.IsNullOrWhiteSpace(tag))
+                    continue;
+
+                var linen = CheckLinenByTag(tag);
+                if (linen == null)
+                    continue;
+
+                SetWaitingLinen(linen);
+
+                if (IsAutoMode)
                 {
-                    CheckClothWaitingNumb();
-
-                    break;
+                    Task.Factory.StartNew(RunAutoMode);
                 }
-                Thread.Sleep(1500);
-
-
             }
-
         }
 
-        private void CheckClothWaitingNumb()
+        /// <summary>
+        /// проверка на наличие количество вешелок
+        /// </summary>
+        /// <returns></returns>
+        private bool CheckClothWaitingNumb()
         {
             var i = Plc1.GetWaitHangNum();
 
             if (i > 1)
             {
                 ShowDialogWaitingNumb();
-            }
 
-            // проверить и вызвать метод считывателя. 
-            CheckLinenRfid();
+                return false;
+            }
+            return true;
         }
 
-        public void CheckLinenRfid()
+        /// <summary>
+        /// вызвать метод считывателя и проверика
+        /// </summary>
+        public string CheckLinenRfid()
         {
             Tags = new AsyncObservableCollection<string>();
             Impinj.ReadDuringTime(2500);
@@ -490,46 +539,39 @@ namespace PALMS.Settings.ViewModel.ViewModels
             if (Tags.Count == 0)
             {
                 ShowDialogTagNumbZero();
-
-                CheckLinenRfid();
+                return null;
             }
 
             if (Tags.Count > 1)
             {
                 ShowDialogTagNumbMore();
 
-                CheckLinenRfid();
+                return null;
             }
 
-            CheckLinen(Tags.FirstOrDefault());
+            return Tags.FirstOrDefault();
         }
 
-        private async void CheckLinen(string tag)
+        /// <summary>
+        /// метод проверяет наличия белья в списке. если бельё не найдено то вызывает окно для добавление нового белья
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <returns></returns>
+        private ClientLinenEntityViewModel CheckLinenByTag(string tag)
         {
             var clientLinen = ClientLinens?.FirstOrDefault(x => x.Tag == tag);
-
-            //check tag in existing list of linen, if false give option to add item
-
+            //check tag in existing in list of linen, if false give option to add item
+            
             if (clientLinen == null)
             {
                 if (ShowDialogAddLinen())
                 {
-                    ClientLinens = new ObservableCollection<ClientLinenEntityViewModel>();
-                    var linen = await _dataService.GetAsync<ClientLinen>();
-                    var linens = linen.Select(x => new ClientLinenEntityViewModel(x));
-                    ClientLinens = linens.ToObservableCollection();
+                   var finish = UpdateClientLinenEntity();
                 }
 
-                CheckLinen(tag);
+                CheckLinenByTag(tag);
             }
-
-            WaitingLinen = clientLinen;
-            IsItemIsPrepring = true;
-
-            if (IsAutoMode)
-            {
-                Task.Factory.StartNew(RunAutoMode);
-            }
+            return clientLinen;
         }
         
         #endregion
@@ -625,26 +667,13 @@ namespace PALMS.Settings.ViewModel.ViewModels
                     break;
             }
 
-            UpdateHangingItem(beltNumb, slotNumb);
-
             Plc1.Sorting(beltNumb);
+
+            SetHangingLinen(beltNumb, slotNumb);
+
             HangToBeltSlot(belt, slotNumb);
-
+            
             HangingLinen = new ConveyorItemViewModel();
-        }
-
-        private void UpdateHangingItem(int beltNumb, int slotNumb)
-        {
-            var beltItem = BeltItems.FirstOrDefault(x => x.BeltNumber == beltNumb && x.SlotNumber == slotNumb);
-
-            _dispatcher.RunInMainThread((() =>
-            {
-                beltItem.ClientLinen = WaitingLinen;
-                HangingLinen = beltItem;
-                IsItemIsPrepring = false;
-
-                WaitingLinen = new ClientLinenEntityViewModel();
-            }));
         }
 
         private void HangToBeltSlot(FinsTcp belt, int slotNumb)
@@ -694,64 +723,61 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private void ManualSendToBelt1()
         {
-            if (!CheckItemBelt(1, SetBelt1SlotNumb))
-                return;
-
-            SendToBelt(1, SetBelt1SlotNumb);
+            ManualSendToBelt(1, SetBelt1SlotNumb);
         }
 
         private void ManualSendToBelt2()
         {
-
-            if (!CheckItemBelt(1, SetBelt1SlotNumb))
-                return;
-
-            SendToBelt(2, SetBelt2SlotNumb);
+            ManualSendToBelt(1, SetBelt1SlotNumb);
         }
 
-        private bool CheckItemBelt(int beltNumb, int slotNumb)
+        private void ManualSendToBelt(int beltNumb, int slotNumb)
         {
-            if (IsItemIsPrepring == false)
+            if (IsItemPrepared == false)
             {
                 _dialogService.ShowInfoDialog("Linen is not ready");
-                return false;
+                return;
             }
 
-            if (BeltSlotHasItem(1, SetBelt1SlotNumb))
+            if (IsSlotHasItem(1, SetBelt1SlotNumb))
             {
                 _dialogService.ShowInfoDialog("Selected slot is not empty");
 
-                return false;
+                return;
             }
-            return true;
+
+            SendToBelt(beltNumb, slotNumb);
         }
 
         private void AutoMode()
         {
+            if (IsAutoPackMode)
+            {
+                _dialogService.ShowWarnigDialog("Auto Packing mode is ON!!");
+                return;
+            }
             IsAutoMode = !IsAutoMode;
         }
 
         private void RunAutoMode()
         {
-            while (!IsItemIsPrepring)
+            while (!IsItemPrepared)
             {
-                Thread.Sleep(500);
+                return;
             }
 
             //Belt 1 проверка слота
-            if (!BeltIsFull(1))
+            if (!IsBeltFull(1))
             {
                 var currentSlot = Belt1.GetNowPoint();
-                var beltEmptyItems = GetBeltEmptyItems(1);
 
-                foreach (var beltItem in beltEmptyItems.OrderByDescending(x => x.SlotNumber == currentSlot)
-                    .ThenBy(x => x.SlotNumber < currentSlot))
+                var slotsByOrder = GetBeltEmptyItems(1).OrderByDescending(x => x.SlotNumber == currentSlot)
+                    .ThenBy(x => x.SlotNumber < currentSlot).ToList();
+
+                foreach (var beltItem in slotsByOrder)
                 {
-                    if (!IsAutoMode) break;
-
                     SendToBelt(1, beltItem.SlotNumber);
                 }
-
             }
 
             //TODO: Belt 2 проверка слота
@@ -760,7 +786,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         #endregion
 
 
-        #region Packing Methods
+#region Packing Methods
 
         private void TakeCloth(FinsTcp belt, string linenList)
         {
@@ -773,7 +799,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 Thread.Sleep(1000);
             }
 
-            PackCloth();
+            //PackCloth();
             Thread.Sleep(2000);
         }
 
@@ -832,6 +858,12 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private void AutoPacking()
         {
+            if (IsAutoMode)
+            {
+                _dialogService.ShowWarnigDialog("Auto Hanging Mode is ON!");
+                return;
+            }
+
             IsAutoPackMode = !IsAutoPackMode;
         }
 
