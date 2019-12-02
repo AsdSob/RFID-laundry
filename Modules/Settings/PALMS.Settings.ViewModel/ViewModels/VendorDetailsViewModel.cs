@@ -32,6 +32,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private readonly IResolver _resolverService;
         public ManualResetEvent Plc1Thread { get; set; }
         public ManualResetEvent DialogThread { get; set; }
+        public ManualResetEvent UpdateLinenThread { get; set; }
 
         #region parameters
 
@@ -259,6 +260,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             Plc3Error = 99;
             Plc1Thread = new ManualResetEvent(false);
             DialogThread = new ManualResetEvent(false);
+            UpdateLinenThread = new ManualResetEvent(false);
             Impinj = new RfidCommon();
             PropertyChanged += OnPropertyChanged;
 
@@ -442,8 +444,9 @@ namespace PALMS.Settings.ViewModel.ViewModels
             ClientLinens = new ObservableCollection<ClientLinenEntityViewModel>();
             var linen = await _dataService.GetAsync<ClientLinen>();
             var linens = linen.Select(x => new ClientLinenEntityViewModel(x));
-            ClientLinens = linens.ToObservableCollection();
+            _dispatcher.RunInMainThread(()=> ClientLinens = linens.ToObservableCollection());
 
+            UpdateLinenThread.Set();
             return true;
         }
 
@@ -517,9 +520,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
             Impinj.ReadDuringTime(2500);
             Tags = Impinj.GetAntennaTags(1).ToObservableCollection();
 
-            DialogThread.Reset();
-            DialogThread.WaitOne();
-
             if (Tags.Count == 0)
             {
                 DialogThread.Reset();
@@ -552,10 +552,14 @@ namespace PALMS.Settings.ViewModel.ViewModels
             
             if (clientLinen == null)
             {
+                UpdateLinenThread.Reset();
+
                 if (ShowDialogAddLinen())
                 {
-                   var finish = UpdateClientLinenEntity();
+                   UpdateClientLinenEntity();
                 }
+
+                UpdateLinenThread.WaitOne();
 
                 CheckLinenByTag(tag);
             }
