@@ -650,7 +650,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
             }
 
             Plc1.Sorting(beltNumb);
-            Plc1Thread.Set();
 
             SetHangingLinen(beltNumb, slotNumb);
 
@@ -761,6 +760,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 }
             }
 
+            Plc1Thread.Set();
+
             //TODO: Belt 2 проверка слота
 
         }
@@ -768,7 +769,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         #endregion
 
 
-#region Packing Methods
+        #region Packing Methods
 
         private void TakeCloth(FinsTcp belt, string linenList)
         {
