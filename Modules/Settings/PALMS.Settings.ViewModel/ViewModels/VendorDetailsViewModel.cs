@@ -280,7 +280,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             {
                 if (IsAutoMode)
                 {
-                    Task.Factory.StartNew(RunAutoMode);
+                    //Task.Factory.StartNew(RunAutoMode);
                 }
             }
 
@@ -519,6 +519,11 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
             WaitingLinen = clientLinen;
             IsItemReadyToPass = true;
+
+            if (IsAutoMode)
+            {
+                Task.Factory.StartNew(RunAutoMode);
+            }
         }
         
         #endregion
