@@ -217,6 +217,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
             var conveyorItems = conveyorItem.Select(x => new ConveyorItemViewModel(x));
             _dispatcher.RunInMainThread(() => BeltItems = conveyorItems.ToObservableCollection());
 
+            BeltItems.ForEach(SubscribeItem);
+
             foreach (var item in BeltItems.Where(x=>x.ClientLinenId != null))
             {
                 var clientLinen = ClientLinens.FirstOrDefault(x => x.Id == item.ClientLinenId);
@@ -224,9 +226,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 item.Tag = clientLinen.Tag;
                 item.StaffId = clientLinen.StaffId;
             }
-
-            BeltItems.ForEach(SubscribeItem);
-
         }
 
         public VendorDetailsViewModel(IDispatcher dispatcher, IDataService dataService, IDialogService dialogService, IResolver resolver)
@@ -397,6 +396,9 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
             Belt2.GetBasePoint();
             Belt2.GetHanginpoint();
+
+            RaisePropertyChanged(() => Belt1Items);
+            RaisePropertyChanged(() => Belt2Items);
         }
 
         private string GetLocalIp()
@@ -425,6 +427,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private bool IsSlotHasItem(int beltNumb, int slotNumb)
         {
+            if (slotNumb == 0) return false;
+
             var first = BeltItems.FirstOrDefault(x => x.BeltNumber == beltNumb && x.SlotNumber == slotNumb);
 
             return first != null && first.HasItem;
@@ -446,15 +450,13 @@ namespace PALMS.Settings.ViewModel.ViewModels
             return items;
         }
 
-        private ObservableCollection<ConveyorItemViewModel> GetBeltEmptyItems(int beltNumb)
+        private ObservableCollection<ConveyorItemViewModel> GetBeltHangedItems()
         {
             var items = new ObservableCollection<ConveyorItemViewModel>();
 
-            items.AddRange(BeltItems.Where(x => x.BeltNumber == beltNumb && !x.HasItem));
+            items.AddRange(BeltItems.Where(x => x.HasItem));
 
-            var order = items.OrderBy(x => x.SlotNumber).ToObservableCollection();
-
-            return order;
+            return items;
         }
 
         private async Task<bool> UpdateClientLinenEntity()
@@ -669,9 +671,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
             Plc1.Sorting(beltNumb);
 
-            SetConveyorItemData(beltNumb, slotNumb);
-
             HangToBeltSlot(belt, slotNumb);
+            SetConveyorItemData(beltNumb, slotNumb);
         }
 
         private void HangToBeltSlot(FinsTcp belt, int slotNumb)
@@ -758,7 +759,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
                 //var slotsByOrder = GetBeltEmptyItems(1).OrderByDescending(x => x.SlotNumber == currentSlot)
                 //    .ThenBy(x => x.SlotNumber < currentSlot).ToList();
-
                 //foreach (var beltItem in slotsByOrder)
                 //{
                 //    SendToBelt(1, beltItem.SlotNumber);
@@ -769,15 +769,17 @@ namespace PALMS.Settings.ViewModel.ViewModels
                     if (IsSlotHasItem(1, currentSlot))
                     {
                         currentSlot++;
+                        if (currentSlot <= 0 || currentSlot >= 601)
+                        {
+                            currentSlot = 1;
+                        }
                         continue;
                     }
-
                     SendToBelt(1, currentSlot);
                     break;
                 }
+                Plc1Thread.Set();
             }
-
-            Plc1Thread.Set();
 
             //TODO: Belt 2 проверка слота
 
@@ -788,7 +790,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
 #region Packing Methods
 
-        private void TakeCloth(FinsTcp belt, string linenList)
+        private void TakeClothFromBelt(FinsTcp belt, string linenList)
         {
             // Take out clothes
             belt.TakeOutClothes(linenList);
@@ -830,7 +832,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
             stringList = stringList.Substring(0, stringList.Length - 2);
 
-            TakeCloth(Belt1, stringList);
+            TakeClothFromBelt(Belt1, stringList);
 
             RemoveBeltItems(items);
         }
@@ -851,7 +853,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 stringList += $"{item.SlotNumber},";
             }
 
-            TakeCloth(Belt2, stringList);
+            TakeClothFromBelt(Belt2, stringList);
 
             RemoveBeltItems(items);
         }
@@ -873,8 +875,11 @@ namespace PALMS.Settings.ViewModel.ViewModels
             {
                 var staffId = GetStaffList();
 
-                if (staffId == null) break;
-
+                if (staffId == null)
+                {
+                    IsAutoMode = false;
+                    break;
+                }
 
                 var linens = BeltItems?.Where(x => x.StaffId == staffId).ToList();
 
@@ -887,16 +892,16 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
                 if (slotsBelt1.Count != 0)
                 {
-                    var beltString = GetUniformSlots(slotsBelt1);
-                    TakeCloth(Belt1, beltString);
+                    var beltString = GetStringUniformSlots(slotsBelt1);
+                    TakeClothFromBelt(Belt1, beltString);
 
                     RemoveBeltItems(slotsBelt1);
                 }
 
                 if (slotsBelt2.Count != 0)
                 {
-                    var beltString = GetUniformSlots(slotsBelt2);
-                    TakeCloth(Belt1, beltString);
+                    var beltString = GetStringUniformSlots(slotsBelt2);
+                    TakeClothFromBelt(Belt1, beltString);
 
                     RemoveBeltItems(slotsBelt2);
                 }
@@ -905,12 +910,13 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private int? GetStaffList()
         {
-            var staffId = BeltItems?.FirstOrDefault().StaffId;
+            var staffId = GetBeltHangedItems().First(x=> x.StaffId != null).StaffId;
+            //var staffId = BeltItems?.FirstOrDefault().StaffId;
 
             return staffId;
         }
 
-        private string GetUniformSlots(List<ConveyorItemViewModel> linens)
+        private string GetStringUniformSlots(List<ConveyorItemViewModel> linens)
         {
             var slotList = "";
 
@@ -927,6 +933,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
             foreach(var item in beltItems)
             {
                 item.ClientLinenId = null;
+                item.StaffId = null;
+                item.Tag = null;
             }
 
             RaisePropertyChanged(() => Belt1Items);
