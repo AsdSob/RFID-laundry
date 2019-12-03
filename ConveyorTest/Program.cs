@@ -64,8 +64,8 @@ namespace ConveyorTest
             {
                 Console.WriteLine($"=======>  {i}=={DateTime.Now.TimeOfDay}");
 
-                Console.WriteLine($"GetClothInHook{Belt1.GetClotheInHook()}");
-                Console.Write($"Hang_In_State{Belt1.Hang_In_State()}");
+                Console.WriteLine($"GetTakeOutClothesState = {Belt1.GetTakeOutClothesState()}");
+                Console.Write($"DialState = {Belt1.DialState()}");
 
                 Console.WriteLine($"                <=======");
                 Thread.Sleep(1000);

@@ -496,9 +496,16 @@ namespace PALMS.Settings.ViewModel.ViewModels
         {
             while (true)
             {
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
 
-                if(IsItemPrepared) {continue;}
+                if (IsItemPrepared)
+                {
+                    if (IsAutoMode)
+                    {
+                        RunAutoMode();
+                    }
+                    continue;
+                }
 
                 if (!Plc1.GetClotheReady()) continue;
 
@@ -521,13 +528,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
                     continue;
 
                 SetWaitingLinen(linen.Id);
-
-                if (IsAutoMode)
-                {
-                    Plc1Thread.Reset();
-                    Task.Factory.StartNew(RunAutoMode);
-                    Plc1Thread.WaitOne();
-                }
             }
         }
 
@@ -747,22 +747,11 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private void RunAutoMode()
         {
-            while (!IsItemPrepared)
-            {
-                return;
-            }
-
             //Belt 1 проверка слота
             if (!IsBeltFull(1))
             {
                 var currentSlot = Belt1.GetNowPoint();
-
-                //var slotsByOrder = GetBeltEmptyItems(1).OrderByDescending(x => x.SlotNumber == currentSlot)
-                //    .ThenBy(x => x.SlotNumber < currentSlot).ToList();
-                //foreach (var beltItem in slotsByOrder)
-                //{
-                //    SendToBelt(1, beltItem.SlotNumber);
-                //}
+                //var slotsByOrder = GetBeltEmptyItems(1).OrderByDescending(x => x.SlotNumber == currentSlot).ThenBy(x => x.SlotNumber < currentSlot).ToList();
 
                 while (true)
                 {
@@ -778,7 +767,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
                     SendToBelt(1, currentSlot);
                     break;
                 }
-                Plc1Thread.Set();
             }
 
             //TODO: Belt 2 проверка слота
@@ -902,16 +890,21 @@ namespace PALMS.Settings.ViewModel.ViewModels
                     TakeClothFromBelt(Belt1, beltString);
                 }
 
+                Thread.Sleep(3000);
                 RemoveBeltItems(linens);
+                PackCloth();
 
             }
         }
 
         private int? GetStaffList()
         {
-            var staffId = GetBeltHangedItems().First(x=> x.StaffId != null).StaffId;
-            //var staffId = BeltItems?.FirstOrDefault().StaffId;
+            var beltItems = GetBeltHangedItems();
 
+            if (beltItems == null || beltItems.Count == 0)
+                return null;
+
+            var staffId = beltItems.First(x => x.StaffId != null).StaffId;
             return staffId;
         }
 
