@@ -894,17 +894,16 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 {
                     var beltString = GetStringUniformSlots(slotsBelt1);
                     TakeClothFromBelt(Belt1, beltString);
-
-                    RemoveBeltItems(slotsBelt1);
                 }
 
                 if (slotsBelt2.Count != 0)
                 {
                     var beltString = GetStringUniformSlots(slotsBelt2);
                     TakeClothFromBelt(Belt1, beltString);
-
-                    RemoveBeltItems(slotsBelt2);
                 }
+
+                RemoveBeltItems(linens);
+
             }
         }
 
@@ -924,6 +923,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
             {
                 slotList += $"{linen.SlotNumber}, ";
             }
+
+            slotList = slotList.Substring(0, slotList.Length - 2);
 
             return slotList;
         }
