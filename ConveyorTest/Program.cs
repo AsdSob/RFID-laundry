@@ -15,7 +15,8 @@ namespace ConveyorTest
 
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Console.WriteLine("Conveyor test start");
+            Connect();
             var isRunning = true;
 
             while (isRunning)
@@ -29,16 +30,10 @@ namespace ConveyorTest
                         break;
 
                     case ConsoleKey.Tab:
-                        Connect();
-                        break;
-
-                    case ConsoleKey.A:
                         ShowStatus();
                         break;
 
-                    case ConsoleKey.S:
-                        HangTest();
-                        break;
+
 
                 }
             }
@@ -49,9 +44,13 @@ namespace ConveyorTest
             Plc1 = new FinsTcp("192.168.250.119", "192.168.250.1", 9600);
             Belt1 = new FinsTcp("192.168.250.119", "192.168.250.2", 9600);
 
-            Thread.Sleep(1000);
             Console.WriteLine($"Plc1 = {Plc1.conn("192.168.250.119", "192.168.250.1", 9600)}"); 
-            Console.WriteLine($"Belt1 = {Belt1.conn("192.168.250.119", "192.168.250.2", 9600)}"); 
+            Console.WriteLine($"Belt1 = {Belt1.conn("192.168.250.119", "192.168.250.2", 9600)}");
+
+            Thread.Sleep(1000);
+
+            Plc1.Start();
+            Belt1.Start();
         }
 
         private static void ShowStatus()
@@ -61,11 +60,15 @@ namespace ConveyorTest
 
         private static void ShowAsync()
         {
-            while (true)
+            for (int i = 0; i < 1000; i++)
             {
-                Console.Write($"GetClothInHook{Belt1.GetClotheInHook()} --");
-                Console.WriteLine($"Hang_In_State{Belt1.Hang_In_State()}");
-                Thread.Sleep(500);
+                Console.WriteLine($"=======>  {i}=={DateTime.Now.TimeOfDay}");
+
+                Console.WriteLine($"GetClothInHook{Belt1.GetClotheInHook()}");
+                Console.Write($"Hang_In_State{Belt1.Hang_In_State()}");
+
+                Console.WriteLine($"                <=======");
+                Thread.Sleep(1000);
             }
         }
 

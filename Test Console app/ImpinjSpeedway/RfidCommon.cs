@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Threading;
 using Impinj.OctaneSdk;
 
-namespace RFID_Test
+namespace ImpinjSpeedway
 {
     public class RfidCommon
     {
@@ -154,3 +154,4 @@ namespace RFID_Test
 
     }
 }
+

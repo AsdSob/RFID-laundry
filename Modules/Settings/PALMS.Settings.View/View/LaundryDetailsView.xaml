@@ -116,6 +116,7 @@
         <GroupBox Grid.Column="0" Grid.Row="3" Header="Waiting Linen">
             <StackPanel Orientation="Horizontal">
                 <Button Margin = "5" Padding="10,2"  Content="Reset Waiting Count" Command="{Binding ResetClothCountCommand}"/>
+
             </StackPanel>
         </GroupBox>
 
@@ -153,7 +154,7 @@
          <!-- Packing Linen -->
         <GroupBox Grid.Column="0" Grid.Row="5" Header="Pack Linen">
             <StackPanel Orientation="Horizontal">
-                <Button Margin = "5" Padding="10,2"  Content="Reset" Command="{Binding PackClothCommand}"/>
+                <Button Margin = "5" Padding="10,2"  Content="Pack" Command="{Binding PackClothCommand}"/>
                 <Button Margin = "5" Padding="10,2"  Content="Delete Slots" Command="{Binding RemoveAllSLotsCommand}"/>
             </StackPanel>
         </GroupBox>
@@ -177,7 +178,7 @@
 
                 <Label Grid.Column="0" Grid.Row="0" Content="Linen Id"/>
 
-                <Label Grid.Column="1" Grid.Row="2" Content="{Binding WaitingLinenId}"/>
+                <Label Grid.Column="1" Grid.Row="0" Content="{Binding WaitingLinenId}"/>
 
             </Grid>
         </GroupBox>

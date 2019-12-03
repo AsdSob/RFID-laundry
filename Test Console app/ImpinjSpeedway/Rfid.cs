@@ -2,14 +2,13 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Impinj.OctaneSdk;
-using static System.ConsoleKey;
 
-namespace RFID_Test
+namespace ImpinjSpeedway
 {
-    class Program
+    public class Rfid
     {
         public static RfidCommon Impinj = new RfidCommon();
-        public static int  Setchik;
+        public static int Setchik;
 
         static void Main(string[] args)
         {
@@ -76,8 +75,8 @@ namespace RFID_Test
 
         public static void ShowTags(ImpinjReader reader, TagReport report)
         {
-            
-            foreach (var tag in report.Tags.OrderBy(x=> x.AntennaPortNumber))
+
+            foreach (var tag in report.Tags.OrderBy(x => x.AntennaPortNumber))
             {
                 Setchik++;
                 Console.WriteLine($"EPC== {tag.Epc} |||||== {Setchik}");
@@ -103,5 +102,6 @@ namespace RFID_Test
 
             Impinj.Reader.ApplySettings(Impinj.settings);
         }
+
     }
 }
