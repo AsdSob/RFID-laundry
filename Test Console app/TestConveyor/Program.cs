@@ -1,104 +1,78 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace TestConveyor
 {
     class Program
     {
-        public static ManualResetEvent Plc1Thread { get; set; }
-        public static ManualResetEvent Plc2Thread { get; set; }
+        private static FinsTcp Plc1, Belt1, Belt2;
 
         static void Main(string[] args)
         {
-            Plc1Thread = new ManualResetEvent(false);
-            Plc2Thread = new ManualResetEvent(false);
+            Console.WriteLine("Conveyor test start");
+            Connect();
+            var isRunning = true;
 
-            Console.WriteLine("Start!");
-
-            Console.ReadKey();
-
-            //Task.Factory.StartNew(StartThread1);
-            //Plc1Thread.WaitOne();
-
-            var listItems = new List<Tuple<int, string>>();
-
-
-            for (int i = 0; i < 10; i += 2)
+            while (isRunning)
             {
-                listItems.Add(new Tuple<int, string>(i, $"nomer string {i}"));
-                listItems.Add(new Tuple<int, string>(i + 1, $""));
+                var key = Console.ReadKey();
+
+                switch (key.Key)
+                {
+                    case ConsoleKey.Q:
+                        isRunning = false;
+                        break;
+
+                    case ConsoleKey.Tab:
+                        ShowStatus();
+                        break;
+
+
+
+                }
             }
-
-
-            foreach (var item in listItems)
-            {
-                Console.WriteLine(item.Item1 + "---" + item.Item2);
-            }
-
-            Console.ReadKey();
-
-            var listItem = listItems.First(x => String.IsNullOrWhiteSpace(x.Item2));
-            Console.WriteLine(listItem.Item1 + "!!!!" + listItem.Item2 + "!!");
-
-            //for (int i = 0; i < 10; i++)
-            //{
-            //    Console.WriteLine($"glavniy potok -{i}");
-            //    Thread.Sleep(500);
-
-            //    if (i == 4)
-            //    {
-            //        Plc2Thread.Reset();
-
-
-            //        Plc2Thread.WaitOne();
-            //    }
-            //}
-
-
-            Console.ReadKey();
-            Console.WriteLine("Finish!");
-            Console.ReadKey();
-
         }
 
+        private static void Connect()
+        {
+            Plc1 = new FinsTcp("192.168.250.119", "192.168.250.1", 9600);
+            Belt1 = new FinsTcp("192.168.250.119", "192.168.250.2", 9600);
 
-        //private static void StartThread1()
-        //{
-        //    Console.WriteLine("Thread 1 start");
+            Console.WriteLine($"Plc1 = {Plc1.conn("192.168.250.119", "192.168.250.1", 9600)}");
+            Console.WriteLine($"Belt1 = {Belt1.conn("192.168.250.119", "192.168.250.2", 9600)}");
 
-        //    for (int i = 0; i < 5; i++)
-        //    {
-        //        Console.WriteLine($"potok 1 -{i}");
-        //        Thread.Sleep(500);
+            Thread.Sleep(1000);
 
-        //        if (i == 2)
-        //        {
-        //            Task.Factory.StartNew(StartThread2);
-        //        }
+            Plc1.Start();
+            Belt1.Start();
+        }
 
-        //    }
+        private static void ShowStatus()
+        {
+            Task.Factory.StartNew(ShowAsync);
+        }
 
-        //    Plc1Thread.Set();
-        //}
+        private static void ShowAsync()
+        {
+            for (int i = 0; i < 1000; i++)
+            {
+                Console.WriteLine($"=======>  {i}=={DateTime.Now.TimeOfDay}");
 
-        //private static void StartThread2()
-        //{
-        //    Console.WriteLine("Thread 2 start");
+                Console.WriteLine($"Hang_In_State = {Belt1.Hang_In_State()}");
+                Console.WriteLine($"GetClotheInHook = {Belt1.GetClotheInHook()}");
+                Console.WriteLine($"                <=======");
+                Thread.Sleep(1000);
+            }
+        }
 
-        //    for (int i = 0; i < 20; i++)
-        //    {
-        //        Console.WriteLine($"-- 2 --{i}");
-        //        Thread.Sleep(500);
+        private static void HangTest()
+        {
+            var slot = Belt1.GetNowPoint();
+            Console.WriteLine("--Hanging Start--");
+            Belt1.Hang_In();
+            Console.WriteLine("--Hanging Stop--");
 
-        //        if (i == 15)
-        //        {
-        //            Plc2Thread.Set();
-        //        }
-        //    }
-
-
-        //}
+        }
     }
 }

@@ -243,8 +243,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
             AutoModeCommand = new RelayCommand(AutoMode);
             ResetClothCountCommand = new RelayCommand(ResetClothCount);
             AutoPackModeCommand = new RelayCommand(AutoPacking);
-            TakeClothBelt1Command = new RelayCommand(TakeClothBelt1);
-            TakeClothBelt2Command = new RelayCommand(TakeClothBelt2);
+            TakeClothBelt1Command = new RelayCommand(ManualTakeClothBelt1);
+            TakeClothBelt2Command = new RelayCommand(ManualTakeClothBelt2);
             PackClothCommand = new RelayCommand(PackCloth);
             RemoveAllSLotsCommand = new RelayCommand(RemoveAllSlots);
 
@@ -268,13 +268,13 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(IsAutoMode))
-            {
-                if (IsAutoMode)
-                {
-                    Task.Factory.StartNew(RunAutoMode);
-                }
-            }
+            //if (e.PropertyName == nameof(IsAutoMode))
+            //{
+            //    if (IsAutoMode)
+            //    {
+            //        Task.Factory.StartNew(RunAutoMode);
+            //    }
+            //}
 
             if (e.PropertyName == nameof(IsAutoPackMode))
             {
@@ -700,6 +700,11 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 Thread.Sleep(1000);
                 isHangWorking = belt.GetClotheInHook();
             }
+
+            while (belt.GetClotheInHook())
+            {
+                Thread.Sleep(500);
+            }
         }
 
         #endregion
@@ -770,7 +775,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
             }
 
             //TODO: Belt 2 проверка слота
-
         }
 
         #endregion
@@ -788,9 +792,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
             {
                 Thread.Sleep(1000);
             }
-
-            //PackCloth();
-            Thread.Sleep(2000);
         }
 
         private void PackCloth()
@@ -802,33 +803,22 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
 #region Paking Manual/Auto Mode
 
-        private void TakeClothBelt1()
+        private void ManualTakeClothBelt1()
         {
             var items = Belt1Items.Where(x => x.IsSelected).ToList();
 
-            if (items == null || items.Count == 0)
-            {
-                _dialogService.ShowInfoDialog("No linen was selected");
-                return;
-            }
-
-            var stringList = "";
-            foreach (var item in items)
-            {
-                stringList += $"{item.SlotNumber}, ";
-            }
-
-            stringList = stringList.Substring(0, stringList.Length - 2);
-
-            TakeClothFromBelt(Belt1, stringList);
-
-            RemoveBeltItems(items);
+            ManualTakeClothBelt(Belt1, items);
         }
 
-        private void TakeClothBelt2()
+        private void ManualTakeClothBelt2()
         {
             var items = Belt2Items.Where(x => x.IsSelected).ToList();
 
+            ManualTakeClothBelt(Belt2, items);
+        }
+
+        private void ManualTakeClothBelt(FinsTcp belt, List<ConveyorItemViewModel> items)
+        {
             if (items == null || items.Count == 0)
             {
                 _dialogService.ShowInfoDialog("No linen was selected");
@@ -841,9 +831,11 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 stringList += $"{item.SlotNumber},";
             }
 
-            TakeClothFromBelt(Belt2, stringList);
-
+            TakeClothFromBelt(belt, stringList);
             RemoveBeltItems(items);
+
+            Thread.Sleep(3000);
+            PackCloth();
         }
 
         private void AutoPacking()
