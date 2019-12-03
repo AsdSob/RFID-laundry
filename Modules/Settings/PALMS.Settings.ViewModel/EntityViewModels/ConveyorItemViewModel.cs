@@ -14,18 +14,12 @@ namespace PALMS.Settings.ViewModel.EntityViewModels
         private int _id;
         private int? _clientLinenId;
         private int? _staffId;
-        private ClientLinenEntityViewModel _clientLinen;
         private string _tag;
 
         public string Tag
         {
             get => _tag;
             set => Set(() => Tag, ref _tag, value);
-        }
-        public ClientLinenEntityViewModel ClientLinen
-        {
-            get => _clientLinen;
-            set => Set(() => ClientLinen, ref _clientLinen, value);
         }
         public int? StaffId
         {
@@ -115,24 +109,6 @@ namespace PALMS.Settings.ViewModel.EntityViewModels
             {
                 HasItem = ClientLinenId != null;
             }
-
-            if (e.PropertyName == nameof(ClientLinen))
-            {
-                if (ClientLinen == null)
-                {
-                    StaffId = null;
-                    Tag = null;
-                    ClientLinenId = null;
-                }
-                else
-                {
-                    StaffId = ClientLinen.StaffId;
-                    Tag = ClientLinen.Tag;
-                    ClientLinenId = ClientLinen.Id;
-
-                }
-            }
-
         }
     }
 }

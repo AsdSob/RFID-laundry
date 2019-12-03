@@ -53,7 +53,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private RfidCommon _impinj;
         private ObservableCollection<ClientLinenEntityViewModel> _clientLinens;
         private bool _isItemPrepared;
-        private ClientLinenEntityViewModel _waitingLinen;
+        private int? _waitingLinenId;
         private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
         private ObservableCollection<ClientStaffEntityViewModel> _staff;
         private ObservableCollection<string> _tags;
@@ -79,10 +79,10 @@ namespace PALMS.Settings.ViewModel.ViewModels
             get => _masterLinens;
             set => Set(() => MasterLinens, ref _masterLinens, value);
         }
-        public ClientLinenEntityViewModel WaitingLinen
+        public int? WaitingLinenId
         {
-            get => _waitingLinen;
-            set => Set(() => WaitingLinen, ref _waitingLinen, value);
+            get => _waitingLinenId;
+            set => Set(() => WaitingLinenId, ref _waitingLinenId, value);
         }
         public bool IsItemPrepared
         {
@@ -217,17 +217,18 @@ namespace PALMS.Settings.ViewModel.ViewModels
             var conveyorItems = conveyorItem.Select(x => new ConveyorItemViewModel(x));
             _dispatcher.RunInMainThread(() => BeltItems = conveyorItems.ToObservableCollection());
 
-            BeltItems.ForEach(SubscribeItem);
-
             foreach (var item in BeltItems.Where(x=>x.ClientLinenId != null))
             {
-                item.ClientLinen = ClientLinens.FirstOrDefault(x => x.Id == item.ClientLinenId);
+                var clientLinen = ClientLinens.FirstOrDefault(x => x.Id == item.ClientLinenId);
+
+                item.Tag = clientLinen.Tag;
+                item.StaffId = clientLinen.StaffId;
             }
 
-            WaitingLinen = new ClientLinenEntityViewModel();
-            Tags = new ObservableCollection<string>();
+            BeltItems.ForEach(SubscribeItem);
+
         }
-        
+
         public VendorDetailsViewModel(IDispatcher dispatcher, IDataService dataService, IDialogService dialogService, IResolver resolver)
         {
             _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
@@ -299,11 +300,28 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
             if (e.PropertyName == nameof(ConveyorItemViewModel.ClientLinenId))
             {
-                SaveConveyorItem(sender as ConveyorItemViewModel);
+                var beltItem = sender as ConveyorItemViewModel;
+
+                if (beltItem.ClientLinenId != null)
+                {
+                    var linen = ClientLinens.FirstOrDefault(x => x.Id == beltItem.ClientLinenId);
+
+                    beltItem.StaffId = linen.StaffId;
+                    beltItem.Tag = linen.Tag;
+                }
+                else
+                {
+                    beltItem.StaffId = null;
+                    beltItem.Tag = null;
+                }
+
+                SaveConveyorItem(beltItem);
+
+                RaisePropertyChanged(() => Belt1Items);
+                RaisePropertyChanged(() => Belt2Items);
             }
 
-            RaisePropertyChanged(() => Belt1Items);
-            RaisePropertyChanged(() => Belt2Items);
+
         }
 
         private void UnSubscribeItem(ConveyorItemViewModel item)
@@ -450,23 +468,21 @@ namespace PALMS.Settings.ViewModel.ViewModels
             return true;
         }
 
-        private void SetWaitingLinen(ClientLinenEntityViewModel linen)
+        private void SetWaitingLinen(int? linenId)
         {
-            WaitingLinen = linen;
+            WaitingLinenId = linenId;
             IsItemPrepared = true;
         }
 
-        private void SetHangingLinen(int beltNumb, int slotNumb)
+        private void SetConveyorItemData(int beltNumb, int slotNumb)
         {
             var beltItem = BeltItems.FirstOrDefault(x => x.BeltNumber == beltNumb && x.SlotNumber == slotNumb);
-            _dispatcher.RunInMainThread((() =>
-            {
-                beltItem.ClientLinen = WaitingLinen;
 
-                IsItemPrepared = false;
+            beltItem.ClientLinenId = WaitingLinenId;
 
-                WaitingLinen = new ClientLinenEntityViewModel();
-            }));
+            IsItemPrepared = false;
+
+            WaitingLinenId = null;
         }
 
         #endregion
@@ -502,7 +518,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 if (linen == null)
                     continue;
 
-                SetWaitingLinen(linen);
+                SetWaitingLinen(linen.Id);
 
                 if (IsAutoMode)
                 {
@@ -653,31 +669,24 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
             Plc1.Sorting(beltNumb);
 
-            SetHangingLinen(beltNumb, slotNumb);
+            SetConveyorItemData(beltNumb, slotNumb);
 
             HangToBeltSlot(belt, slotNumb);
         }
 
         private void HangToBeltSlot(FinsTcp belt, int slotNumb)
         {
-
-            //this.Hang_In();
-            //this.Delay(100);
-            //while (!this.Hang_In_State())
-            //    this.Delay(500);
-            //return 0;
-
             // Подготовка слота 
             if (belt.GetNowPoint() != slotNumb)
             {
                 belt.SetNowPoint(slotNumb);
-                Thread.Sleep(500);
+                Thread.Sleep(1000);
                 belt.GotoPoint();
 
                 // ожыдание окончание подготовки слота в линии
                 while (belt.DialState())
                 {
-                    Thread.Sleep(500);
+                    Thread.Sleep(1000);
                 }
             }
 
@@ -687,15 +696,9 @@ namespace PALMS.Settings.ViewModel.ViewModels
             while (!isHangWorking)
             {
                 belt.Hang_In();
-                Thread.Sleep(500);
+                Thread.Sleep(1000);
                 isHangWorking = belt.GetClotheInHook();
             }
-
-            // ожыдание окончание загрузки в слот
-            //while (belt.GetClotheInHook())
-            //{
-            //    Thread.Sleep(500);
-            //}
         }
 
         #endregion
@@ -753,12 +756,24 @@ namespace PALMS.Settings.ViewModel.ViewModels
             {
                 var currentSlot = Belt1.GetNowPoint();
 
-                var slotsByOrder = GetBeltEmptyItems(1).OrderByDescending(x => x.SlotNumber == currentSlot)
-                    .ThenBy(x => x.SlotNumber < currentSlot).ToList();
+                //var slotsByOrder = GetBeltEmptyItems(1).OrderByDescending(x => x.SlotNumber == currentSlot)
+                //    .ThenBy(x => x.SlotNumber < currentSlot).ToList();
 
-                foreach (var beltItem in slotsByOrder)
+                //foreach (var beltItem in slotsByOrder)
+                //{
+                //    SendToBelt(1, beltItem.SlotNumber);
+                //}
+
+                while (true)
                 {
-                    SendToBelt(1, beltItem.SlotNumber);
+                    if (IsSlotHasItem(1, currentSlot))
+                    {
+                        currentSlot++;
+                        continue;
+                    }
+
+                    SendToBelt(1, currentSlot);
+                    break;
                 }
             }
 
@@ -771,7 +786,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         #endregion
 
 
-        #region Packing Methods
+#region Packing Methods
 
         private void TakeCloth(FinsTcp belt, string linenList)
         {
@@ -911,7 +926,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
         {
             foreach(var item in beltItems)
             {
-                item.ClientLinen = null;
                 item.ClientLinenId = null;
             }
 

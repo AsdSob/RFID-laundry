@@ -175,30 +175,10 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <Label Grid.Column="0" Grid.Row="0" Content="Id"/>
-                <Label Grid.Column="0" Grid.Row="1" Content="Linen"/>
-                <Label Grid.Column="0" Grid.Row="2" Content="-Tag-"/>
-                <Label Grid.Column="0" Grid.Row="3" Content="Staff"/>
+                <Label Grid.Column="0" Grid.Row="0" Content="Linen Id"/>
 
-                <dxe:ComboBoxEdit Grid.Row="1"
-                                  Grid.Column="1" 
-                                  DisplayMember="Name"
-                                  ValueMember="Id"
-                                  IsTextEditable="False"
-                                  AllowCollectionView="False"
-                                  EditValue="{Binding WaitingLinen.MasterLinenId, UpdateSourceTrigger=PropertyChanged}"
-                                  ItemsSource="{Binding MasterLinens}"/>
+                <Label Grid.Column="1" Grid.Row="2" Content="{Binding WaitingLinenId}"/>
 
-                <Label Grid.Column="1" Grid.Row="2" Content="{Binding WaitingLinen.Tag}"/>
-
-                <dxe:ComboBoxEdit Grid.Row="3"
-                                  Grid.Column="1" 
-                                  DisplayMember="Name"
-                                  ValueMember="Id"
-                                  IsTextEditable="False"
-                                  AllowCollectionView="False"
-                                  EditValue="{Binding WaitingLinen.StaffId, UpdateSourceTrigger=PropertyChanged}"
-                                  ItemsSource="{Binding Staff}"/>
             </Grid>
         </GroupBox>
 
