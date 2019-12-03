@@ -701,10 +701,10 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 isHangWorking = belt.GetClotheInHook();
             }
 
-            while (belt.GetClotheInHook())
-            {
-                Thread.Sleep(500);
-            }
+            //while (belt.GetClotheInHook())
+            //{
+            //    Thread.Sleep(500);
+            //}
         }
 
         #endregion
@@ -788,9 +788,9 @@ namespace PALMS.Settings.ViewModel.ViewModels
             belt.TakeOutClothes(linenList);
 
             //Working state of the clothes taking device
-            while (belt.GetTakeOutClothesState())
+            while (!belt.GetTakeOutClothesState())
             {
-                Thread.Sleep(1000);
+                Thread.Sleep(15000);
             }
         }
 
@@ -825,16 +825,12 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 return;
             }
 
-            var stringList = "";
-            foreach (var item in items)
-            {
-                stringList += $"{item.SlotNumber},";
-            }
+            var stringList = GetStringUniformSlots(items);
 
             TakeClothFromBelt(belt, stringList);
             RemoveBeltItems(items);
 
-            Thread.Sleep(3000);
+            Thread.Sleep(6000);
             PackCloth();
         }
 
