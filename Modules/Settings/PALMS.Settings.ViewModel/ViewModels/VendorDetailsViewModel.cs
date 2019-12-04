@@ -669,19 +669,23 @@ namespace PALMS.Settings.ViewModel.ViewModels
                     break;
             }
 
-            ReleaseFromWaitingArea(beltNumb, slotNumb);
+            Plc1.Sorting(beltNumb);
             HangToBeltSlot(belt, slotNumb);
-        }
-
-        private void ReleaseFromWaitingArea(int beltNumb, int slotNumb)
-        {
-            if (slotNumb <= 0)
-                return;
 
             SetConveyorItemData(beltNumb, slotNumb);
 
-            Plc1.Sorting(beltNumb);
+            //ReleaseFromWaitingArea(beltNumb, slotNumb);
+
         }
+
+        //private void ReleaseFromWaitingArea(int beltNumb, int slotNumb)
+        //{
+        //    if (slotNumb <= 0)
+        //        return;
+        //    Plc1.Sorting(beltNumb);
+        //    SetConveyorItemData(beltNumb, slotNumb);
+
+        //}
 
         private void HangToBeltSlot(FinsTcp belt, int slotNumb)
         {
@@ -689,13 +693,13 @@ namespace PALMS.Settings.ViewModel.ViewModels
             if (belt.GetNowPoint() != slotNumb)
             {
                 belt.SetNowPoint(slotNumb);
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
                 belt.GotoPoint();
 
                 // ожыдание окончание подготовки слота в линии
                 while (belt.DialState())
                 {
-                    Thread.Sleep(1000);
+                    Thread.Sleep(500);
                 }
             }
 
@@ -705,13 +709,15 @@ namespace PALMS.Settings.ViewModel.ViewModels
             while (!isHangWorking)
             {
                 belt.Hang_In();
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
                 isHangWorking = belt.GetClotheInHook();
             }
 
-            //while (belt.GetClotheInHook())
+            //var getClothInHook = false;
+            //while (!getClothInHook)
             //{
-            //    Thread.Sleep(500);
+            //    Thread.Sleep(100);
+            //    getClothInHook = belt.GetClotheInHook();
             //}
         }
 
@@ -805,7 +811,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private void PackCloth (List<ConveyorItemViewModel> items)
         {
             RemoveBeltItems(items);
-            Thread.Sleep(12000);
+            //Thread.Sleep(2000);
             Plc1.Packclothes();
         }
 
@@ -865,7 +871,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
                 if (staffId == null)
                 {
-                    IsAutoMode = false;
+                    IsAutoPackMode = false;
                     break;
                 }
 
