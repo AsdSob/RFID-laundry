@@ -245,7 +245,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             AutoPackModeCommand = new RelayCommand(AutoPacking);
             TakeClothBelt1Command = new RelayCommand(ManualTakeClothBelt1);
             TakeClothBelt2Command = new RelayCommand(ManualTakeClothBelt2);
-            PackClothCommand = new RelayCommand(PackCloth);
+            PackClothCommand = new RelayCommand((PackClothHard));
             RemoveAllSLotsCommand = new RelayCommand(RemoveAllSlots);
 
             InitializeAsync();
@@ -669,10 +669,18 @@ namespace PALMS.Settings.ViewModel.ViewModels
                     break;
             }
 
-            Plc1.Sorting(beltNumb);
-
+            ReleaseFromWaitingArea(beltNumb, slotNumb);
             HangToBeltSlot(belt, slotNumb);
+        }
+
+        private void ReleaseFromWaitingArea(int beltNumb, int slotNumb)
+        {
+            if (slotNumb <= 0)
+                return;
+
             SetConveyorItemData(beltNumb, slotNumb);
+
+            Plc1.Sorting(beltNumb);
         }
 
         private void HangToBeltSlot(FinsTcp belt, int slotNumb)
@@ -794,7 +802,14 @@ namespace PALMS.Settings.ViewModel.ViewModels
             }
         }
 
-        private void PackCloth()
+        private void PackCloth (List<ConveyorItemViewModel> items)
+        {
+            RemoveBeltItems(items);
+            Thread.Sleep(12000);
+            Plc1.Packclothes();
+        }
+
+        private void PackClothHard()
         {
             Plc1.Packclothes();
         }
@@ -826,12 +841,9 @@ namespace PALMS.Settings.ViewModel.ViewModels
             }
 
             var stringList = GetStringUniformSlots(items);
-
             TakeClothFromBelt(belt, stringList);
-            RemoveBeltItems(items);
 
-            Thread.Sleep(6000);
-            PackCloth();
+            PackCloth(items);
         }
 
         private void AutoPacking()
@@ -878,10 +890,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
                     TakeClothFromBelt(Belt1, beltString);
                 }
 
-                Thread.Sleep(3000);
-                RemoveBeltItems(linens);
-                PackCloth();
-
+                PackCloth(linens);
             }
         }
 
