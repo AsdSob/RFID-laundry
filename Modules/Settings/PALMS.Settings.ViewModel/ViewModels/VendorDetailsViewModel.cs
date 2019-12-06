@@ -34,7 +34,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         public ManualResetEvent DialogThread { get; set; }
         public ManualResetEvent UpdateLinenThread { get; set; }
 
-        #region parameters
+#region parameters
 
         private int _plc1Error, _plc2Error, _plc3Error;
         private FinsTcp _plc1;
@@ -58,7 +58,25 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private ObservableCollection<ClientStaffEntityViewModel> _staff;
         private ObservableCollection<string> _tags;
         private bool _isAutoPackMode;
+        private ClientStaffEntityViewModel _selectedStaff;
+        private ObservableCollection<PackedLinenViewModel> _packedLinens;
+        private PackedLinenViewModel _selectedPackedLinen;
 
+        public PackedLinenViewModel SelectedPackedLinen
+        {
+            get => _selectedPackedLinen;
+            set => Set(() => SelectedPackedLinen, ref _selectedPackedLinen, value);
+        }
+        public ObservableCollection<PackedLinenViewModel> PackedLinens
+        {
+            get => _packedLinens;
+            set => Set(() => PackedLinens, ref _packedLinens, value);
+        }
+        public ClientStaffEntityViewModel SelectedStaff
+        {
+            get => _selectedStaff;
+            set => Set(() => SelectedStaff, ref _selectedStaff, value);
+        }
         public bool IsAutoPackMode
         {
             get => _isAutoPackMode;
@@ -182,6 +200,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         public ObservableCollection<ConveyorItemViewModel> Belt1Items => SortBeltItems(1);
         public ObservableCollection<ConveyorItemViewModel> Belt2Items => SortBeltItems(2);
+        public ObservableCollection<ClientStaffEntityViewModel> SortedStaff => SortStaff();
 
         public RelayCommand ConnectConveyorCommand { get; }
         public RelayCommand StartConveyorCommand { get; }
@@ -191,13 +210,13 @@ namespace PALMS.Settings.ViewModel.ViewModels
         public RelayCommand SendToBelt1Command { get; }
         public RelayCommand SendToBelt2Command { get; }
         public RelayCommand AutoPackModeCommand { get; }
-        public RelayCommand TakeClothBelt1Command { get; }
-        public RelayCommand TakeClothBelt2Command { get; }
+        public RelayCommand ManualPackCommand { get; }
         public RelayCommand PackClothCommand { get; }
         public RelayCommand RemoveAllSLotsCommand { get; }
+        public RelayCommand RemovePackedLinenCommand { get; }
+        public RelayCommand RemovePackedLinensCommand { get; }
 
         #endregion
-
 
         public async Task InitializeAsync()
         {
@@ -223,8 +242,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
             {
                 var clientLinen = ClientLinens.FirstOrDefault(x => x.Id == item.ClientLinenId);
 
-                item.Tag = clientLinen.Tag;
-                item.StaffId = clientLinen.StaffId;
+                item.Tag = clientLinen?.Tag;
+                item.StaffId = clientLinen?.StaffId;
             }
         }
 
@@ -243,10 +262,11 @@ namespace PALMS.Settings.ViewModel.ViewModels
             AutoModeCommand = new RelayCommand(AutoMode);
             ResetClothCountCommand = new RelayCommand(ResetClothCount);
             AutoPackModeCommand = new RelayCommand(AutoPacking);
-            TakeClothBelt1Command = new RelayCommand(ManualTakeClothBelt1);
-            TakeClothBelt2Command = new RelayCommand(ManualTakeClothBelt2);
+            ManualPackCommand = new RelayCommand(ManualTakeCloth);
             PackClothCommand = new RelayCommand((PackClothHard));
             RemoveAllSLotsCommand = new RelayCommand(RemoveAllSlots);
+            RemovePackedLinenCommand = new RelayCommand(RemovePackedLinen);
+            RemovePackedLinensCommand = new RelayCommand(RemovePackedLinens);
 
             InitializeAsync();
 
@@ -268,13 +288,10 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            //if (e.PropertyName == nameof(IsAutoMode))
-            //{
-            //    if (IsAutoMode)
-            //    {
-            //        Task.Factory.StartNew(RunAutoMode);
-            //    }
-            //}
+            if (e.PropertyName == nameof(SelectedStaff))
+            {
+                BeltItemsForPacking();
+            }
 
             if (e.PropertyName == nameof(IsAutoPackMode))
             {
@@ -283,19 +300,11 @@ namespace PALMS.Settings.ViewModel.ViewModels
                     Task.Factory.StartNew(RunAutoPacking);
                 }
             }
-
-            //if (e.PropertyName == nameof(IsItemPrepared))
-            //{
-            //    if (!IsItemPrepared)
-            //    {
-            //        Task.Factory.StartNew(RunCircleCheckCloth);
-            //    }
-            //}
         }
 
         private void ItemOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (!(sender is ConveyorItemViewModel item)) return;
+            if (!(sender is ConveyorItemViewModel)) return;
 
             if (e.PropertyName == nameof(ConveyorItemViewModel.ClientLinenId))
             {
@@ -305,8 +314,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 {
                     var linen = ClientLinens.FirstOrDefault(x => x.Id == beltItem.ClientLinenId);
 
-                    beltItem.StaffId = linen.StaffId;
-                    beltItem.Tag = linen.Tag;
+                    beltItem.StaffId = linen?.StaffId;
+                    beltItem.Tag = linen?.Tag;
                 }
                 else
                 {
@@ -318,9 +327,9 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
                 RaisePropertyChanged(() => Belt1Items);
                 RaisePropertyChanged(() => Belt2Items);
+
+                RaisePropertyChanged(() => SortedStaff);
             }
-
-
         }
 
         private void UnSubscribeItem(ConveyorItemViewModel item)
@@ -332,30 +341,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         {
             item.PropertyChanged += ItemOnPropertyChanged;
         }
-
-        private void SaveConveyorItem(ConveyorItemViewModel item)
-        {
-            if (item.HasChanges())
-            {
-                item.AcceptChanges();
-                _dataService.AddOrUpdateAsync(item.OriginalObject);
-            }
-        }
-
-        private void RemoveAllSlots()
-        {
-            var items = BeltItems.Where(x => x.HasItem).ToList();
-            RemoveBeltItems(items);
-        }
-
-        private ObservableCollection<ConveyorItemViewModel> SortBeltItems(int beltNumb)
-        {
-            var beltItems = BeltItems?.Where(x => x.HasItem && x.BeltNumber == beltNumb).ToObservableCollection();
-            var ordered = beltItems?.OrderBy(x => x.SlotNumber).ToObservableCollection();
-            return ordered;
-        }
-
-
+        
 #region Conveyor Start
         public void StartConveyor()
         {
@@ -417,7 +403,159 @@ namespace PALMS.Settings.ViewModel.ViewModels
         #endregion
 
 
+#region Data Methods
+
+        private void SaveConveyorItem(ConveyorItemViewModel item)
+        {
+            if (item.HasChanges())
+            {
+                item.AcceptChanges();
+                _dataService.AddOrUpdateAsync(item.OriginalObject);
+            }
+        }
+
+        private void SaveClientLinen(ClientLinenEntityViewModel item)
+        {
+            if (item.HasChanges())
+            {
+                item.AcceptChanges();
+                _dataService.AddOrUpdateAsync(item.OriginalObject);
+            }
+        }
+
+        private void RemoveAllSlots()
+        {
+            var items = BeltItems.Where(x => x.HasItem).ToList();
+            RemoveBeltItems(items);
+        }
+
+        private void RemovePackedLinen()
+        {
+            if(SelectedPackedLinen == null) return;
+
+            PackedLinens.Remove(SelectedPackedLinen);
+        }
+
+        private void RemovePackedLinens()
+        {
+            PackedLinens = new ObservableCollection<PackedLinenViewModel>();
+        }
+
+        private async void UpdateClientLinenEntity()
+        {
+            ClientLinens = new ObservableCollection<ClientLinenEntityViewModel>();
+            var linen = await _dataService.GetAsync<ClientLinen>();
+            var linens = linen.Select(x => new ClientLinenEntityViewModel(x));
+            _dispatcher.RunInMainThread(() => ClientLinens = linens.ToObservableCollection());
+
+            UpdateLinenThread.Set();
+        }
+
+        private void SetWaitingLinen(int? linenId)
+        {
+            WaitingLinenId = linenId;
+            IsItemPrepared = true;
+        }
+
+        private void SetConveyorItemData(int beltNumb, int slotNumb)
+        {
+            var beltItem = BeltItems.FirstOrDefault(x => x.BeltNumber == beltNumb && x.SlotNumber == slotNumb);
+
+            if (beltItem != null)
+
+                beltItem.ClientLinenId = WaitingLinenId;
+
+            IsItemPrepared = false;
+
+            WaitingLinenId = null;
+        }
+
+        #endregion
+
 #region Common Methods
+
+        private ObservableCollection<ConveyorItemViewModel> SortBeltItems(int beltNumb)
+        {
+            var beltItems = BeltItems?.Where(x => x.HasItem && x.BeltNumber == beltNumb).ToObservableCollection();
+            var ordered = beltItems?.OrderBy(x => x.SlotNumber).ToObservableCollection();
+            return ordered;
+        }
+
+        private ObservableCollection<ClientStaffEntityViewModel> SortStaff()
+        {
+            var items = new ObservableCollection<ClientStaffEntityViewModel>();
+
+            if (BeltItems == null || BeltItems.Count == 0) return items;
+
+            foreach (var beltItem in BeltItems?.Where(x=> x.StaffId != null))
+            {
+                if(SortedStaff.Any(x=> x.Id == beltItem.StaffId)) { continue;}
+
+                items.Add(Staff.FirstOrDefault(x=> x.Id == beltItem.StaffId));
+            }
+
+            return items;
+        }
+
+        private ObservableCollection<ConveyorItemViewModel> GetBeltItems(int beltNumb)
+        {
+            var items = new ObservableCollection<ConveyorItemViewModel>();
+
+            items.AddRange(BeltItems.Where(x => x.BeltNumber == beltNumb));
+
+            return items;
+        }
+
+        private ObservableCollection<ConveyorItemViewModel> GetBeltHangedItems()
+        {
+            var items = new ObservableCollection<ConveyorItemViewModel>();
+
+            items.AddRange(BeltItems.Where(x => x.HasItem));
+
+            return items;
+        }
+
+        private void AddPackedLinen(ConveyorItemViewModel conveyorItem)
+        {
+            if(conveyorItem == null)return;
+
+            var clientLinen = ClientLinens.FirstOrDefault(x => x.Id == conveyorItem.Id);
+            var masterLinen = MasterLinens?.FirstOrDefault(x => x.Id == clientLinen?.MasterLinenId);
+
+            var newPackedLinen = new PackedLinenViewModel()
+            {
+                OriginalObject = clientLinen?.OriginalObject,
+                Id = (int)clientLinen.Id,
+                Name = masterLinen.Name,
+                ParentId = clientLinen.StaffId,
+            };
+            PackedLinens.Add(newPackedLinen);
+
+
+            if (!PackedLinens.Any(x => x.Id == clientLinen.StaffId && x.ParentId == null))
+            {
+                var staff = Staff.FirstOrDefault(x => x.Id == clientLinen.StaffId);
+                var newPackedStaff = new PackedLinenViewModel()
+                {
+                    OriginalObject = staff?.OriginalObject,
+                    Id = staff.Id,
+                    Name = staff.Name,
+                    ParentId = null,
+                };
+                PackedLinens.Add(newPackedStaff);
+            }
+
+        }
+
+        private void BeltItemsForPacking()
+        {
+            BeltItems.ForEach(x=> x.IsSelected = false);
+
+            foreach (var beltItem in BeltItems.Where(x=> x.StaffId == SelectedStaff.Id))
+            {
+                beltItem.IsSelected = true;
+            }
+        }
 
         private void ResetClothCount()
         {
@@ -441,55 +579,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
             return belt.All(x => x.HasItem);
         }
 
-        private ObservableCollection<ConveyorItemViewModel> GetBeltItems(int beltNumb)
-        {
-            var items = new ObservableCollection<ConveyorItemViewModel>();
-
-            items.AddRange(BeltItems.Where(x => x.BeltNumber == beltNumb));
-
-            return items;
-        }
-
-        private ObservableCollection<ConveyorItemViewModel> GetBeltHangedItems()
-        {
-            var items = new ObservableCollection<ConveyorItemViewModel>();
-
-            items.AddRange(BeltItems.Where(x => x.HasItem));
-
-            return items;
-        }
-
-        private async Task<bool> UpdateClientLinenEntity()
-        {
-            ClientLinens = new ObservableCollection<ClientLinenEntityViewModel>();
-            var linen = await _dataService.GetAsync<ClientLinen>();
-            var linens = linen.Select(x => new ClientLinenEntityViewModel(x));
-            _dispatcher.RunInMainThread(()=> ClientLinens = linens.ToObservableCollection());
-
-            UpdateLinenThread.Set();
-            return true;
-        }
-
-        private void SetWaitingLinen(int? linenId)
-        {
-            WaitingLinenId = linenId;
-            IsItemPrepared = true;
-        }
-
-        private void SetConveyorItemData(int beltNumb, int slotNumb)
-        {
-            var beltItem = BeltItems.FirstOrDefault(x => x.BeltNumber == beltNumb && x.SlotNumber == slotNumb);
-
-            beltItem.ClientLinenId = WaitingLinenId;
-
-            IsItemPrepared = false;
-
-            WaitingLinenId = null;
-        }
-
         #endregion
 
-        
 #region Plc1 Waiting 
 
         private void RunCircleCheckCloth()
@@ -529,6 +620,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
                 SetWaitingLinen(linen.Id);
             }
+            // ReSharper disable once FunctionNeverReturns
         }
 
         /// <summary>
@@ -616,7 +708,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 {
                     var addNew = _resolverService.Resolve<AddNewLinenViewModel>();
 
-                    addNew.InitializeAsync();
+                    addNew?.InitializeAsync();
                     var showDialog = _dialogService.ShowDialog(addNew);
                     if (!showDialog) return;
 
@@ -675,7 +767,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
             SetConveyorItemData(beltNumb, slotNumb);
 
             //ReleaseFromWaitingArea(beltNumb, slotNumb);
-
         }
 
         //private void ReleaseFromWaitingArea(int beltNumb, int slotNumb)
@@ -684,7 +775,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
         //        return;
         //    Plc1.Sorting(beltNumb);
         //    SetConveyorItemData(beltNumb, slotNumb);
-
         //}
 
         private void HangToBeltSlot(FinsTcp belt, int slotNumb)
@@ -704,7 +794,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
             }
 
             // начала загрузки в слот
-
             var isHangWorking = false;
             while (!isHangWorking)
             {
@@ -713,12 +802,12 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 isHangWorking = belt.GetClotheInHook();
             }
 
-            //var getClothInHook = false;
-            //while (!getClothInHook)
-            //{
-            //    Thread.Sleep(100);
-            //    getClothInHook = belt.GetClotheInHook();
-            //}
+            var getClothInHook = false;
+            while (!getClothInHook)
+            {
+                Thread.Sleep(300);
+                getClothInHook = belt.GetClotheInHook();
+            }
         }
 
         #endregion
@@ -823,19 +912,14 @@ namespace PALMS.Settings.ViewModel.ViewModels
         #endregion
 
 #region Paking Manual/Auto Mode
-
-        private void ManualTakeClothBelt1()
+        
+        private void ManualTakeCloth()
         {
-            var items = Belt1Items.Where(x => x.IsSelected).ToList();
+            var items1 = Belt1Items.Where(x => x.IsSelected).ToList();
+            ManualTakeClothBelt(Belt1, items1);
 
-            ManualTakeClothBelt(Belt1, items);
-        }
-
-        private void ManualTakeClothBelt2()
-        {
-            var items = Belt2Items.Where(x => x.IsSelected).ToList();
-
-            ManualTakeClothBelt(Belt2, items);
+            var items2 = Belt2Items.Where(x => x.IsSelected).ToList();
+            ManualTakeClothBelt(Belt2, items2);
         }
 
         private void ManualTakeClothBelt(FinsTcp belt, List<ConveyorItemViewModel> items)

@@ -1,4 +1,6 @@
-﻿namespace PALMS.Settings.View.View
+﻿using System.Windows;
+
+namespace PALMS.Settings.View.View
 {
     /// <summary>
     /// Interaction logic for LaundryDetailsView.xaml
@@ -8,6 +10,12 @@
         public LaundryDetailsView()
         {
             InitializeComponent();
+        }
+
+
+        private void FrameworkElement_OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+
         }
     }
 }

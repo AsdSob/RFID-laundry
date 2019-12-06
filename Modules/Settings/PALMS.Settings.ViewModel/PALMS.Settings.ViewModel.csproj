@@ -97,6 +97,7 @@
     <Compile Include="EntityViewModels\ClientStaffEntityViewModel.cs" />
     <Compile Include="EntityViewModels\DepartmentEntityViewModel.cs" />
     <Compile Include="EntityViewModels\MasterLinenEntityViewModel.cs" />
+    <Compile Include="EntityViewModels\PackedLinenViewModel.cs" />
     <Compile Include="EntityViewModels\СlientEntityViewModel.cs" />
     <Compile Include="ISettingsContent.cs" />
     <Compile Include="EntityViewModels\ConveyorItemViewModel.cs" />
