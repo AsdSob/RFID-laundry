@@ -215,6 +215,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         public RelayCommand RemoveAllSLotsCommand { get; }
         public RelayCommand RemovePackedLinenCommand { get; }
         public RelayCommand RemovePackedLinensCommand { get; }
+        public RelayCommand GetStaffListCommand { get; }
 
         #endregion
 
@@ -267,6 +268,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             RemoveAllSLotsCommand = new RelayCommand(RemoveAllSlots);
             RemovePackedLinenCommand = new RelayCommand(RemovePackedLinen);
             RemovePackedLinensCommand = new RelayCommand(RemovePackedLinens);
+            GetStaffListCommand = new RelayCommand((() => RaisePropertyChanged(()=> SortedStaff)));
 
             InitializeAsync();
 
@@ -327,8 +329,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
                 RaisePropertyChanged(() => Belt1Items);
                 RaisePropertyChanged(() => Belt2Items);
-
-                RaisePropertyChanged(() => SortedStaff);
             }
         }
 
@@ -900,6 +900,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private void PackCloth (List<ConveyorItemViewModel> items)
         {
             RemoveBeltItems(items);
+            items.ForEach(AddPackedLinen);
+
             //Thread.Sleep(2000);
             Plc1.Packclothes();
         }
