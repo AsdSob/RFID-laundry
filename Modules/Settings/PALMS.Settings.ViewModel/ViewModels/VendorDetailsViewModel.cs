@@ -295,6 +295,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             Impinj = new RfidCommon();
             PropertyChanged += OnPropertyChanged;
 
+            PackedLinens = new ObservableCollection<PackedLinenViewModel>();
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -414,7 +415,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         #endregion
 
-
 #region Data Methods
 
         private void SaveConveyorItem(ConveyorItemViewModel item)
@@ -439,6 +439,11 @@ namespace PALMS.Settings.ViewModel.ViewModels
         {
             if(beltItems == null || beltItems.Count == 0) return;
 
+            _dispatcher.RunInMainThread(() =>
+            {
+                beltItems.ForEach(AddPackedLinen);
+            }); 
+
             foreach (var item in beltItems)
             {
                 item.ClientLinenId = null;
@@ -446,7 +451,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 item.Tag = null;
             }
 
-            beltItems.ForEach(AddPackedLinen);
             SortStaff();
         }
 
@@ -819,8 +823,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
             // Подготовка слота 
             if (belt.GetNowPoint() != slotNumb)
             {
-                belt.GetModel();
                 belt.SetNowPoint(slotNumb);
+                Thread.Sleep(500);
                 belt.GotoPoint();
 
                 // ожыдание окончание подготовки слота в линии
@@ -902,23 +906,23 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 }
             }
 
-            if (!IsBeltFull(2))
-            {
-                var currentSlot = Belt2.GetNowPoint();
-                while (true)
-                {
-                    if (currentSlot <= 1 || currentSlot >= 776)
-                        currentSlot = 2;
+            //if (!IsBeltFull(2))
+            //{
+            //    var currentSlot = Belt2.GetNowPoint();
+            //    while (true)
+            //    {
+            //        if (currentSlot <= 1 || currentSlot >= 776)
+            //            currentSlot = 2;
 
-                    if (IsSlotHasItem(2, currentSlot))
-                    {
-                        currentSlot++;
-                        continue;
-                    }
-                    SendToBelt(2, currentSlot);
-                    break;
-                }
-            }
+            //        if (IsSlotHasItem(2, currentSlot))
+            //        {
+            //            currentSlot++;
+            //            continue;
+            //        }
+            //        SendToBelt(2, currentSlot);
+            //        break;
+            //    }
+            //}
         }
 
         #endregion
@@ -942,7 +946,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
             SetDataLinenPacked(items);
 
-            //Thread.Sleep(2000);
+            Thread.Sleep(10000);
+
             PackClothHard();
         }
 
@@ -976,8 +981,8 @@ namespace PALMS.Settings.ViewModel.ViewModels
             var items1 = Belt1Items.Where(x => x.IsSelected).ToList();
             ManualTakeClothBelt(Belt1, items1);
 
-            var items2 = Belt2Items.Where(x => x.IsSelected).ToList();
-            ManualTakeClothBelt(Belt2, items2);
+            //var items2 = Belt2Items.Where(x => x.IsSelected).ToList();
+            //ManualTakeClothBelt(Belt2, items2);
         }
 
         private void ManualTakeClothBelt(FinsTcp belt, List<ConveyorItemViewModel> items)
