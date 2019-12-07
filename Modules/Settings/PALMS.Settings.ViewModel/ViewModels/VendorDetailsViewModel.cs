@@ -275,7 +275,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             RemoveAllSLotsCommand = new RelayCommand(RemoveAllSlots);
             RemovePackedLinenCommand = new RelayCommand(RemovePackedLinen);
             RemovePackedLinensCommand = new RelayCommand(RemovePackedLinens);
-            GetStaffListCommand = new RelayCommand((() => RaisePropertyChanged(()=> SortedStaff)));
+            GetStaffListCommand = new RelayCommand(SortStaff);
             UpdateWaitingSlotCommand = new RelayCommand(UpdateWaitingSlot);
 
             InitializeAsync();
