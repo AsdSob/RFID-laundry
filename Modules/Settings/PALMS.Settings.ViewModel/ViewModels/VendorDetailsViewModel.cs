@@ -62,7 +62,13 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private ClientStaffEntityViewModel _selectedStaff;
         private ObservableCollection<PackedLinenViewModel> _packedLinens;
         private PackedLinenViewModel _selectedPackedLinen;
+        private ObservableCollection<ClientStaffEntityViewModel> _sortedStaff;
 
+        public ObservableCollection<ClientStaffEntityViewModel> SortedStaff
+        {
+            get => _sortedStaff;
+            set => Set(() => SortedStaff, ref _sortedStaff, value);
+        }
         public PackedLinenViewModel SelectedPackedLinen
         {
             get => _selectedPackedLinen;
@@ -201,7 +207,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         public ObservableCollection<ConveyorItemViewModel> Belt1Items => SortBeltItems(1);
         public ObservableCollection<ConveyorItemViewModel> Belt2Items => SortBeltItems(2);
-        public ObservableCollection<ClientStaffEntityViewModel> SortedStaff => SortStaff();
 
         public RelayCommand ConnectConveyorCommand { get; }
         public RelayCommand StartConveyorCommand { get; }
@@ -332,6 +337,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
                 RaisePropertyChanged(() => Belt1Items);
                 RaisePropertyChanged(() => Belt2Items);
+                SortStaff();
             }
         }
 
@@ -485,20 +491,20 @@ namespace PALMS.Settings.ViewModel.ViewModels
             return ordered;
         }
 
-        private ObservableCollection<ClientStaffEntityViewModel> SortStaff()
+        private void SortStaff()
         {
             var items = new ObservableCollection<ClientStaffEntityViewModel>();
 
-            if (BeltItems == null || BeltItems.Count == 0) return items;
+            if (BeltItems == null || BeltItems.Count == 0) return;
 
             foreach (var beltItem in BeltItems?.Where(x=> x.StaffId != null))
             {
-                if(SortedStaff.Any(x=> x.Id == beltItem.StaffId)) { continue;}
+                if(items.Any(x=> x.Id == beltItem.StaffId)) { continue;}
 
                 items.Add(Staff.FirstOrDefault(x=> x.Id == beltItem.StaffId));
             }
 
-            return items;
+            SortedStaff = items;
         }
 
         private ObservableCollection<ConveyorItemViewModel> GetBeltItems(int beltNumb)
