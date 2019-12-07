@@ -245,6 +245,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             _dispatcher.RunInMainThread(() => BeltItems = conveyorItems.ToObservableCollection());
 
             BeltItems.ForEach(SubscribeItem);
+            SortStaff();
 
             foreach (var item in BeltItems.Where(x=>x.ClientLinenId != null))
             {
@@ -272,7 +273,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             AutoPackModeCommand = new RelayCommand(AutoPacking);
             ManualPackCommand = new RelayCommand(ManualTakeCloth);
             PackClothCommand = new RelayCommand((PackClothHard));
-            RemoveAllSLotsCommand = new RelayCommand(RemoveAllSlots);
+            RemoveAllSLotsCommand = new RelayCommand(RemoveAllBeltItems);
             RemovePackedLinenCommand = new RelayCommand(RemovePackedLinen);
             RemovePackedLinensCommand = new RelayCommand(RemovePackedLinens);
             GetStaffListCommand = new RelayCommand(SortStaff);
@@ -300,7 +301,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         {
             if (e.PropertyName == nameof(SelectedStaff))
             {
-                BeltItemsForPacking();
+                SelectBeltItemsForPacking();
             }
 
             if (e.PropertyName == nameof(IsAutoPackMode))
@@ -352,6 +353,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         }
         
 #region Conveyor Start
+
         public void StartConveyor()
         {
             Plc1.Start();
@@ -424,7 +426,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             }
         }
 
-        private void SaveClientLinen(ClientLinenEntityViewModel item)
+        private void SaveClientLinenStatus(ClientLinenEntityViewModel item)
         {
             if (item.HasChanges())
             {
@@ -433,15 +435,66 @@ namespace PALMS.Settings.ViewModel.ViewModels
             }
         }
 
-        private void RemoveAllSlots()
+        private void SetDataLinenPacked(List<ConveyorItemViewModel> beltItems)
         {
-            var items = BeltItems.Where(x => x.HasItem).ToList();
-            RemoveBeltItems(items);
+            if(beltItems == null || beltItems.Count == 0) return;
+
+            foreach (var item in beltItems)
+            {
+                item.ClientLinenId = null;
+                item.StaffId = null;
+                item.Tag = null;
+            }
+
+            beltItems.ForEach(AddPackedLinen);
+            SortStaff();
+        }
+
+        private void RemoveAllBeltItems()
+        {
+            var items = GetHangedBeltItems().ToList();
+
+            foreach (var item in items)
+            {
+                item.ClientLinenId = null;
+                item.StaffId = null;
+                item.Tag = null;
+            }
+        }
+
+        private void AddPackedLinen(ConveyorItemViewModel conveyorItem)
+        {
+            if (conveyorItem == null) return;
+
+            var clientLinen = ClientLinens.FirstOrDefault(x => x.Id == conveyorItem.ClientLinenId);
+            var masterLinen = MasterLinens?.FirstOrDefault(x => x.Id == clientLinen?.MasterLinenId);
+
+            var newPackedLinen = new PackedLinenViewModel()
+            {
+                OriginalObject = clientLinen?.OriginalObject,
+                Id = clientLinen.Id,
+                Name = masterLinen.Name,
+                ParentId = clientLinen.StaffId,
+            };
+            PackedLinens.Add(newPackedLinen);
+
+            if (!PackedLinens.Any(x => x.Id == clientLinen.StaffId && x.ParentId == null))
+            {
+                var staff = Staff.FirstOrDefault(x => x.Id == clientLinen.StaffId);
+                var newPackedStaff = new PackedLinenViewModel()
+                {
+                    OriginalObject = staff?.OriginalObject,
+                    Id = staff.Id,
+                    Name = staff.Name,
+                    ParentId = null,
+                };
+                PackedLinens.Add(newPackedStaff);
+            }
         }
 
         private void RemovePackedLinen()
         {
-            if(SelectedPackedLinen == null) return;
+            if (SelectedPackedLinen == null) return;
 
             PackedLinens.Remove(SelectedPackedLinen);
         }
@@ -467,16 +520,13 @@ namespace PALMS.Settings.ViewModel.ViewModels
             IsItemPrepared = true;
         }
 
-        private void SetConveyorItemData(int beltNumb, int slotNumb)
+        private void SetDataLinenHangedToSlot(int beltNumb, int slotNumb)
         {
             var beltItem = BeltItems.FirstOrDefault(x => x.BeltNumber == beltNumb && x.SlotNumber == slotNumb);
 
-            if (beltItem != null)
-
-                beltItem.ClientLinenId = WaitingLinenId;
+            if (beltItem != null) beltItem.ClientLinenId = WaitingLinenId;
 
             IsItemPrepared = false;
-
             WaitingLinenId = null;
         }
 
@@ -507,16 +557,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             SortedStaff = items;
         }
 
-        private ObservableCollection<ConveyorItemViewModel> GetBeltItems(int beltNumb)
-        {
-            var items = new ObservableCollection<ConveyorItemViewModel>();
-
-            items.AddRange(BeltItems.Where(x => x.BeltNumber == beltNumb));
-
-            return items;
-        }
-
-        private ObservableCollection<ConveyorItemViewModel> GetBeltHangedItems()
+        private ObservableCollection<ConveyorItemViewModel> GetHangedBeltItems()
         {
             var items = new ObservableCollection<ConveyorItemViewModel>();
 
@@ -525,41 +566,11 @@ namespace PALMS.Settings.ViewModel.ViewModels
             return items;
         }
 
-        private void AddPackedLinen(ConveyorItemViewModel conveyorItem)
+        private void SelectBeltItemsForPacking()
         {
-            if(conveyorItem == null)return;
+            if(SelectedStaff == null) return;
 
-            var clientLinen = ClientLinens.FirstOrDefault(x => x.Id == conveyorItem.ClientLinenId);
-            var masterLinen = MasterLinens?.FirstOrDefault(x => x.Id == clientLinen?.MasterLinenId);
-
-            var newPackedLinen = new PackedLinenViewModel()
-            {
-                OriginalObject = clientLinen?.OriginalObject,
-                Id = (int)clientLinen.Id,
-                Name = masterLinen.Name,
-                ParentId = clientLinen.StaffId,
-            };
-            PackedLinens.Add(newPackedLinen);
-
-
-            if (!PackedLinens.Any(x => x.Id == clientLinen.StaffId && x.ParentId == null))
-            {
-                var staff = Staff.FirstOrDefault(x => x.Id == clientLinen.StaffId);
-                var newPackedStaff = new PackedLinenViewModel()
-                {
-                    OriginalObject = staff?.OriginalObject,
-                    Id = staff.Id,
-                    Name = staff.Name,
-                    ParentId = null,
-                };
-                PackedLinens.Add(newPackedStaff);
-            }
-
-        }
-
-        private void BeltItemsForPacking()
-        {
-            BeltItems.ForEach(x=> x.IsSelected = false);
+            BeltItems.Where(x=> x.IsSelected).ForEach(x=> x.IsSelected = false);
 
             foreach (var beltItem in BeltItems.Where(x=> x.StaffId == SelectedStaff.Id))
             {
@@ -584,9 +595,9 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private bool IsBeltFull(int beltNumb)
         {
-            var belt = GetBeltItems(beltNumb);
+            var beltItems = BeltItems.Where(x => x.BeltNumber == beltNumb);
 
-            return belt.All(x => x.HasItem);
+             return beltItems.All(x => x.HasItem);
         }
 
         private void UpdateWaitingSlot()
@@ -729,7 +740,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
                     if (!showDialog) return;
 
                     linenAdded = true;
-                };
+                }
 
                 DialogThread.Set();
             });
@@ -766,7 +777,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
         private void SendToBelt(int beltNumb, int slotNumb)
         {
             FinsTcp belt = null;
-
             switch (beltNumb)
             {
                 case 1:
@@ -780,38 +790,12 @@ namespace PALMS.Settings.ViewModel.ViewModels
             Plc1.Sorting(beltNumb);
             HangToBeltSlot(belt, slotNumb);
 
-            SetConveyorItemData(beltNumb, slotNumb);
-
-            //ReleaseFromWaitingArea(beltNumb, slotNumb);
+            SetDataLinenHangedToSlot(beltNumb, slotNumb);
         }
-
-        //private void ReleaseFromWaitingArea(int beltNumb, int slotNumb)
-        //{
-        //    if (slotNumb <= 0)
-        //        return;
-        //    Plc1.Sorting(beltNumb);
-        //    SetConveyorItemData(beltNumb, slotNumb);
-        //}
 
         private void HangToBeltSlot(FinsTcp belt, int slotNumb)
         {
-            // Подготовка слота 
-            if (belt.GetNowPoint() != slotNumb)
-            {
-                belt.GetModel();
-                belt.SetNowPoint(slotNumb);
-                belt.GotoPoint();
-
-                //belt.SetNowPoint(slotNumb);
-                //belt.GetNowPoint();
-                //belt.GotoPoint();
-
-                // ожыдание окончание подготовки слота в линии
-                while (belt.DialState())
-                {
-                    Thread.Sleep(500);
-                }
-            }
+            PrepareBeltSlot(belt, slotNumb);
 
             // начала загрузки в слот
             var isHangWorking = false;
@@ -822,8 +806,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 isHangWorking = belt.GetClotheinhook();
             }
 
-            //belt.HangUpToPoint(slotNumb);
-
             var getClothInHook = false;
             while (!getClothInHook)
             {
@@ -832,19 +814,45 @@ namespace PALMS.Settings.ViewModel.ViewModels
             }
         }
 
-        #endregion
+        private void PrepareBeltSlot(FinsTcp belt, int slotNumb)
+        {
+            // Подготовка слота 
+            if (belt.GetNowPoint() != slotNumb)
+            {
+                belt.GetModel();
+                belt.SetNowPoint(slotNumb);
+                belt.GotoPoint();
 
+                // ожыдание окончание подготовки слота в линии
+                while (belt.DialState())
+                {
+                    Thread.Sleep(500);
+                }
+            }
+        }
+
+        #endregion
 
 #region Hanging Manual/Auto Mode
 
         private void ManualSendToBelt1()
         {
+            if (SetBelt1SlotNumb > 600 || SetBelt1SlotNumb < 2)
+            {
+                _dialogService.ShowInfoDialog("Slot number must be between 2 and 600");
+                return;
+            }
             ManualSendToBelt(1, SetBelt1SlotNumb);
         }
 
         private void ManualSendToBelt2()
         {
-            ManualSendToBelt(1, SetBelt1SlotNumb);
+            if (SetBelt1SlotNumb > 776 || SetBelt1SlotNumb < 2)
+            {
+                _dialogService.ShowInfoDialog("Slot number must be between 2 and 776");
+                return;
+            }
+            ManualSendToBelt(2, SetBelt1SlotNumb);
         }
 
         private void ManualSendToBelt(int beltNumb, int slotNumb)
@@ -855,10 +863,9 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 return;
             }
 
-            if (IsSlotHasItem(1, SetBelt1SlotNumb))
+            if (IsSlotHasItem(beltNumb, SetBelt1SlotNumb))
             {
                 _dialogService.ShowInfoDialog("Selected slot is not empty");
-
                 return;
             }
 
@@ -877,18 +884,13 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private void RunAutoMode()
         {
-            //Belt 1 проверка слота
             if (!IsBeltFull(1))
             {
                 var currentSlot = Belt1.GetNowPoint();
-                //var slotsByOrder = GetBeltEmptyItems(1).OrderByDescending(x => x.SlotNumber == currentSlot).ThenBy(x => x.SlotNumber < currentSlot).ToList();
-
                 while (true)
                 {
-                    if (currentSlot <= 0 || currentSlot >= 601)
-                    {
-                        currentSlot = 3;
-                    }
+                    if (currentSlot <= 1 || currentSlot >= 601)
+                        currentSlot = 2;
 
                     if (IsSlotHasItem(1, currentSlot))
                     {
@@ -900,124 +902,53 @@ namespace PALMS.Settings.ViewModel.ViewModels
                 }
             }
 
-            //TODO: Belt 2 проверка слота
+            if (!IsBeltFull(2))
+            {
+                var currentSlot = Belt2.GetNowPoint();
+                while (true)
+                {
+                    if (currentSlot <= 1 || currentSlot >= 776)
+                        currentSlot = 2;
+
+                    if (IsSlotHasItem(2, currentSlot))
+                    {
+                        currentSlot++;
+                        continue;
+                    }
+                    SendToBelt(2, currentSlot);
+                    break;
+                }
+            }
         }
 
         #endregion
 
-
 #region Packing Methods
 
-        private void TakeClothFromBelt(FinsTcp belt, string linenList)
+        private void TakeClothFromBelt(FinsTcp belt, List<ConveyorItemViewModel> items)
         {
+            var linenString = GetStringUniformSlots(items);
+
             // Take out clothes
-            belt.TakeOutClothes(linenList);
+            belt.TakeOutClothes(linenString);
 
             //Working state of the clothes taking device
-            while (!belt.GetTakeOutClothesState())
+            var takeOutClothState = false;
+            while (!takeOutClothState)
             {
-                Thread.Sleep(15000);
+                Thread.Sleep(500);
+                takeOutClothState = belt.GetTakeOutClothesState();
             }
-        }
 
-        private void PackCloth (List<ConveyorItemViewModel> items)
-        {
-            RemoveBeltItems(items);
-            items.ForEach(AddPackedLinen);
+            SetDataLinenPacked(items);
 
             //Thread.Sleep(2000);
-            Plc1.Packclothes();
+            PackClothHard();
         }
 
         private void PackClothHard()
         {
             Plc1.Packclothes();
-        }
-
-        #endregion
-
-#region Paking Manual/Auto Mode
-        
-        private void ManualTakeCloth()
-        {
-            var items1 = Belt1Items.Where(x => x.IsSelected).ToList();
-            ManualTakeClothBelt(Belt1, items1);
-
-            var items2 = Belt2Items.Where(x => x.IsSelected).ToList();
-            ManualTakeClothBelt(Belt2, items2);
-        }
-
-        private void ManualTakeClothBelt(FinsTcp belt, List<ConveyorItemViewModel> items)
-        {
-            if (items == null || items.Count == 0)
-            {
-                _dialogService.ShowInfoDialog("No linen was selected");
-                return;
-            }
-
-            var stringList = GetStringUniformSlots(items);
-            TakeClothFromBelt(belt, stringList);
-
-            PackCloth(items);
-        }
-
-        private void AutoPacking()
-        {
-            if (IsAutoMode)
-            {
-                _dialogService.ShowWarnigDialog("Auto Hanging Mode is ON!");
-                return;
-            }
-
-            IsAutoPackMode = !IsAutoPackMode;
-        }
-
-        private void RunAutoPacking()
-        {
-            while (IsAutoPackMode)
-            {
-                var staffId = GetStaffList();
-
-                if (staffId == null)
-                {
-                    IsAutoPackMode = false;
-                    break;
-                }
-
-                var linens = BeltItems?.Where(x => x.StaffId == staffId).ToList();
-
-                if(linens == null || linens.Count == 0) continue;
-
-                var slotsBelt1 = linens.Where(x => x.BeltNumber == 1).ToList();
-                var slotsBelt2 = linens.Where(x => x.BeltNumber == 2).ToList();
-
-                //TODO: запустить два метода линии 1 и 2 в паралельных потоках
-
-                if (slotsBelt1.Count != 0)
-                {
-                    var beltString = GetStringUniformSlots(slotsBelt1);
-                    TakeClothFromBelt(Belt1, beltString);
-                }
-
-                if (slotsBelt2.Count != 0)
-                {
-                    var beltString = GetStringUniformSlots(slotsBelt2);
-                    TakeClothFromBelt(Belt1, beltString);
-                }
-
-                PackCloth(linens);
-            }
-        }
-
-        private int? GetStaffList()
-        {
-            var beltItems = GetBeltHangedItems();
-
-            if (beltItems == null || beltItems.Count == 0)
-                return null;
-
-            var staffId = beltItems.First(x => x.StaffId != null).StaffId;
-            return staffId;
         }
 
         private string GetStringUniformSlots(List<ConveyorItemViewModel> linens)
@@ -1034,20 +965,85 @@ namespace PALMS.Settings.ViewModel.ViewModels
             return slotList;
         }
 
-        private void RemoveBeltItems(List<ConveyorItemViewModel> beltItems)
+        #endregion
+
+#region Paking Manual/Auto Mode
+        
+        private void ManualTakeCloth()
         {
-            foreach(var item in beltItems)
+            //TODO: сделать паралельный сбор белья
+
+            var items1 = Belt1Items.Where(x => x.IsSelected).ToList();
+            ManualTakeClothBelt(Belt1, items1);
+
+            var items2 = Belt2Items.Where(x => x.IsSelected).ToList();
+            ManualTakeClothBelt(Belt2, items2);
+        }
+
+        private void ManualTakeClothBelt(FinsTcp belt, List<ConveyorItemViewModel> items)
+        {
+            if (items == null || items.Count == 0)
             {
-                item.ClientLinenId = null;
-                item.StaffId = null;
-                item.Tag = null;
+                _dialogService.ShowInfoDialog("No linen was selected");
+                return;
             }
 
-            RaisePropertyChanged(() => Belt1Items);
-            RaisePropertyChanged(() => Belt2Items);
+            TakeClothFromBelt(belt, items);
+        }
+
+        private void AutoPacking()
+        {
+            if (IsAutoMode)
+            {
+                _dialogService.ShowWarnigDialog("Auto Hanging Mode is ON!");
+                return;
+            }
+            IsAutoPackMode = !IsAutoPackMode;
+        }
+
+        private void RunAutoPacking()
+        {
+            while (IsAutoPackMode)
+            {
+                var staffId = GetStaffList();
+                if (staffId == null)
+                {
+                    IsAutoPackMode = false;
+                    break;
+                }
+
+                var linens = BeltItems?.Where(x => x.StaffId == staffId).ToList();
+
+                if(linens == null || linens.Count == 0) continue;
+
+                var slotsBelt1 = linens.Where(x => x.BeltNumber == 1).ToList();
+                var slotsBelt2 = linens.Where(x => x.BeltNumber == 2).ToList();
+
+                //TODO: запустить два метода линии 1 и 2 в паралельных потоках
+                if (slotsBelt1.Count != 0)
+                {
+                    TakeClothFromBelt(Belt1, slotsBelt1);
+                }
+
+                if (slotsBelt2.Count != 0)
+                {
+                    TakeClothFromBelt(Belt1, slotsBelt2);
+                }
+            }
+        }
+
+        private int? GetStaffList()
+        {
+            var beltItems = GetHangedBeltItems();
+
+            if (beltItems == null || beltItems.Count == 0)
+                return null;
+
+            var staffId = beltItems.First(x => x.StaffId != null).StaffId;
+            return staffId;
         }
 
         #endregion
-        
+
     }
 }
