@@ -818,15 +818,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
             belt.HangUpToPoint(slotNumb);
 
-            // начала загрузки в слот
-            var isHangWorking = false;
-            while (!isHangWorking)
-            {
-                belt.Hang_In();
-                Thread.Sleep(500);
-                isHangWorking = belt.GetClotheinhook();
-            }
-
             var getClothInHook = false;
             while (!getClothInHook)
             {
