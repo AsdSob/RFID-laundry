@@ -200,13 +200,23 @@
             <!-- List Packed Cloth -->
             <GroupBox Header="Packed Cloth" Grid.Row="3">
 
-                <!--<TreeView ItemsSource="{Binding СвойствоОбщейВьюМоделиСодержащееКоллекциюЗаписей}">
-                    <TreeView.ItemTemplate>
-                        <HierarchicalDataTemplate ItemsSource="{Binding СвойствоОбъектаСсылающеесяНаОбъектРодитель}" DataType="{x:Type local:КлассОбъекта}">
-                            <TreeViewItem Header="{Binding СвойствоВОбъектеСТекстомДляОтображенияВУзле}"/>
-                        </HierarchicalDataTemplate>
-                    </TreeView.ItemTemplate>
-                </TreeView>-->
+                <DataGrid AutoGenerateColumns="False"
+                          Height="NaN"
+                          ItemsSource="{Binding PackedLinens}"
+                          VerticalScrollBarVisibility="Visible"
+                          Width="400"
+                          AllowDrop="True" 
+                          HorizontalAlignment="Stretch"
+                          EnableRowVirtualization="True" 
+                          IsTextSearchCaseSensitive="False">
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn IsReadOnly="False" Width="50" Header="*" Binding="{Binding Id}" />
+                        <DataGridTextColumn IsReadOnly="True" Width="50" Header="Slot" Binding="{Binding Name}" />
+                        <DataGridTextColumn IsReadOnly="True" Header="StaffId" Binding="{Binding ParentId}" />
+                    </DataGrid.Columns>
+
+                </DataGrid>
 
             </GroupBox>
 

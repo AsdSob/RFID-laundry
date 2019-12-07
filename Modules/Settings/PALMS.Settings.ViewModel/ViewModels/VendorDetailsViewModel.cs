@@ -529,7 +529,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         {
             if(conveyorItem == null)return;
 
-            var clientLinen = ClientLinens.FirstOrDefault(x => x.Id == conveyorItem.Id);
+            var clientLinen = ClientLinens.FirstOrDefault(x => x.Id == conveyorItem.ClientLinenId);
             var masterLinen = MasterLinens?.FirstOrDefault(x => x.Id == clientLinen?.MasterLinenId);
 
             var newPackedLinen = new PackedLinenViewModel()
