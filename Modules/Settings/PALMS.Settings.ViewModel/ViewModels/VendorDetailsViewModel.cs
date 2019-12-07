@@ -216,6 +216,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
         public RelayCommand RemovePackedLinenCommand { get; }
         public RelayCommand RemovePackedLinensCommand { get; }
         public RelayCommand GetStaffListCommand { get; }
+        public RelayCommand UpdateWaitingSlotCommand { get; }
 
         #endregion
 
@@ -269,6 +270,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             RemovePackedLinenCommand = new RelayCommand(RemovePackedLinen);
             RemovePackedLinensCommand = new RelayCommand(RemovePackedLinens);
             GetStaffListCommand = new RelayCommand((() => RaisePropertyChanged(()=> SortedStaff)));
+            UpdateWaitingSlotCommand = new RelayCommand(UpdateWaitingSlot);
 
             InitializeAsync();
 
@@ -374,12 +376,13 @@ namespace PALMS.Settings.ViewModel.ViewModels
             Plc2Error = Belt1.conn(LocalIp, Plc2Ip, 9600);
             Plc3Error = Belt2.conn(LocalIp, Plc3Ip, 9600);
 
-            GetBelt1SlotNumb = Belt1.GetNowPoint();
-            GetBelt2SlotNumb = Belt2.GetNowPoint();
+            UpdateWaitingSlot();
 
+            Belt1.SetModel(0);
             Belt1.GetBasePoint();
             Belt1.GetHanginpoint();
 
+            Belt2.SetModel(0);
             Belt2.GetBasePoint();
             Belt2.GetHanginpoint();
 
@@ -577,6 +580,12 @@ namespace PALMS.Settings.ViewModel.ViewModels
             var belt = GetBeltItems(beltNumb);
 
             return belt.All(x => x.HasItem);
+        }
+
+        private void UpdateWaitingSlot()
+        {
+            GetBelt1SlotNumb = Belt1.GetNowPoint();
+            GetBelt2SlotNumb = Belt2.GetNowPoint();
         }
 
         #endregion
@@ -782,9 +791,13 @@ namespace PALMS.Settings.ViewModel.ViewModels
             // Подготовка слота 
             if (belt.GetNowPoint() != slotNumb)
             {
+                belt.GetModel();
                 belt.SetNowPoint(slotNumb);
-                Thread.Sleep(500);
                 belt.GotoPoint();
+
+                //belt.SetNowPoint(slotNumb);
+                //belt.GetNowPoint();
+                //belt.GotoPoint();
 
                 // ожыдание окончание подготовки слота в линии
                 while (belt.DialState())
@@ -863,13 +876,14 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
                 while (true)
                 {
+                    if (currentSlot <= 0 || currentSlot >= 601)
+                    {
+                        currentSlot = 3;
+                    }
+
                     if (IsSlotHasItem(1, currentSlot))
                     {
                         currentSlot++;
-                        if (currentSlot <= 0 || currentSlot >= 601)
-                        {
-                            currentSlot = 1;
-                        }
                         continue;
                     }
                     SendToBelt(1, currentSlot);
