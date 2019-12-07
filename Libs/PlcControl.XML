@@ -1,0 +1,327 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>PlcControl</name>
+    </assembly>
+    <members>
+        <member name="T:PlcControl.FinsTcp">
+            <summary>
+            Device control class
+            </summary>
+        </member>
+        <member name="F:PlcControl.FinsTcp.connected">
+            <summary>
+            Connection Status
+            </summary>
+        </member>
+        <member name="F:PlcControl.FinsTcp.maxpoint">
+            <summary>
+            Maximum number of stations
+            </summary>
+        </member>
+        <member name="F:PlcControl.FinsTcp.Hanginginterval">
+            <summary>
+            Hanging interval
+            </summary>
+        </member>
+        <member name="M:PlcControl.FinsTcp.#ctor(System.String,System.String,System.Int32)">
+            <summary>
+            Fins protocol Tcp connection constructor (Local IP address,PLC IP address, PLC port number)
+            </summary>
+            <param name="localip">Local IP address</param>
+            <param name="remoteip">Remote IP address</param>
+            <param name="port">Port number, default:9600</param>
+            <returns>实例化一个Fins协议Tcp连接</returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.conn(System.String,System.String,System.Int32)">
+            <summary>
+            Connect PLC, default ip: 192.168.250.1; default port: 9600
+            </summary>
+            <param name="localip">Local IP address</param>
+            <param name="remoteip">Remote IP address,default:192.168.250.1</param>
+            <param name="port">Port number, default:9600</param>
+            <returns>Int 0 execution succeeded, connected=true, others see error list</returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.disconn">
+            <summary>
+            Disconnect
+            </summary>
+            <returns>Int 0 execution succeeded, connected=false, others see error list</returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.Start">
+            <summary>
+            Start command
+            </summary>
+        </member>
+        <member name="M:PlcControl.FinsTcp.GetWorkState">
+            <summary>
+            Get the working status of the device; true=working, false=stop
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.Stop">
+            <summary>
+            Stop command
+            </summary>
+        </member>
+        <member name="M:PlcControl.FinsTcp.Reset">
+            <summary>
+            Conveyor turntable reset zero return command
+            </summary>
+        </member>
+        <member name="M:PlcControl.FinsTcp.Clear">
+            <summary>
+            PLC hanging point data clear command
+            </summary>
+            <returns>int 0 execution succeed,connected=true，Other see error list</returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.GetBasePoint">
+            <summary>
+            Get the origin number
+            </summary>
+            <returns>slot num</returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.GetResetState">
+            <summary>
+            Get the device reset state; true = reset complete, false = reset
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.GetClotheReady">
+            <summary>
+            Get clothes ready state
+            This command can only be applied to controller number 1 (strip controller)
+            If the clothes are ready, you can turn on the RFID read or send the next command.
+            </summary>
+            <returns>true is ready</returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.Sorting(System.Int32)">
+            <summary>
+            Control the direction of the clothes,, LineNum=1or2
+            This command can only be applied to controller number 1 (strip controller)
+            </summary>
+            <param name="LineNum"></param>
+            <returns></returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.GetWaitHangNum">
+            <summary>
+            GetWaitHangNum()
+            </summary>
+            <returns>0 </returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.ResetWaitHangNum">
+            <summary>
+            ResetWaitHangNum()
+            </summary>
+            <returns>slot number</returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.GetClotheinhook">
+            <summary>
+            Put clothes into the clothes test, 
+            indicating that clothes have entered the hanging hook 
+            the true has clothes and false has No clothes.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.Packclothes">
+            <summary>
+            Pack clothes
+            This command can only be applied to controller number 1 (strip controller)
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.GetModel">
+            <summary>
+            Get the hanging operation mode, false is the upper machine control, true is the automatic control mode
+            
+            </summary>
+            <returns>false为上位机控制,true为自动控制</returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.SetModel(System.Int32)">
+            <summary>
+            设置挂衣工作模式
+            </summary>
+            <param name="num">0为上位机控制；1为自动控制</param>
+            <returns>0为写入成功</returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.HangUpToPoint(System.Int32)">
+            <summary>
+            Hang clothing into the specified slot number
+            </summary>
+            <param name="num">slot number</param>
+            <returns>successfully Return 0</returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.SetNowPoint(System.Int32)">
+            <summary>
+            Set the current hanging point number, which must be executed in working mode 0；
+            </summary>
+            <param name="num">slot num</param>
+            <returns>int 0 Indicates successful write</returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.GetNowPoint">
+            <summary>
+            Get the current slot number
+            </summary>
+            <returns>slot number</returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.GotoPoint">
+            <summary>
+            Go to the specified clothing point, first set the target position by executing SetNowPoint()；
+            </summary>
+        </member>
+        <member name="M:PlcControl.FinsTcp.Hang_In">
+            <summary>
+            Hanging in the clothes, first execute GotoPoint to go to the specified point and execute；
+            </summary>
+        </member>
+        <member name="M:PlcControl.FinsTcp.Hang_In_State">
+            <summary>
+            hang in state, 0 in Executing, 1 in Finished;
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.DialState">
+            <summary>
+            Turntable status, 1 when going, stop 0
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.TakeOutClothes(System.String)">
+            <summary>
+            Take out clothes
+            </summary>
+            <param name="FrameList"></param>
+            <returns></returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.GetTakeoutStartdelay">
+            <summary>
+            Get the clothes extractor open delay
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.SetTakeoutStartdelay(System.Int32)">
+            <summary>
+            Set the clothes extractor open delay, usually this number is very small 0-5
+            When taking the clothes, adjust the parameter when the take-up device advances or delays the action until the clothes cannot be taken out.
+            </summary>
+            <param name="num">0-5</param>
+            <returns></returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.GetTakeoutStopdelay">
+            <summary>
+            获取衣物取出器关闭延时，通常这个数字很小0-5
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.SetTakeoutStopdelay(System.Int32)">
+            <summary>
+            Set the clothes extractor off delay, usually this number is very small 0-5
+            When taking the clothes, adjust the parameter when the take-up device advances or delays the action until the clothes cannot be taken out.
+            </summary>
+            <param name="num">0-5</param>
+            <returns></returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.GetTakeOutClothesState">
+            <summary>
+            Working state of the clothes taking device
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.GetMaxPoint">
+            <summary>
+            Get the maximum number of slots set
+            </summary>
+            <returns>int slots num</returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.SetMaxPoint(System.Int32)">
+            <summary>
+            Set the maximum number of slots
+            </summary>
+            <param name="num">slots num</param>
+            <returns>int 0 Indicates successful write</returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.GetHanginpoint">
+            <summary>
+            Get the position of the hanging point (the distance from the origin) is generally set by default, no need to change
+            </summary>
+            <returns>int Interval number</returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.SetHanginpoint(System.Int32)">
+            <summary>
+            Set the position of the hanging point (distance from the origin) is generally set by default, no need to change
+            </summary>
+            <param name="num">Number of points from the origin</param>
+            <returns></returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.SetTakeOutClothesPoint(System.Int32)">
+            <summary>
+            Set the position of the clothes extractor (distance from the origin)
+            </summary>
+            <param name="num">Number of points from the origin</param>
+            <returns></returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.GetTakeOutClothesPoint">
+            <summary>
+            Get the position of the clothes extractor (distance from the origin)
+            </summary>
+            <returns>int Number of points from the origin</returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.readBit(System.String,System.Boolean@)">
+            <summary>
+            读取PLC上的位数据（内存地址、读取结果）
+            </summary>
+            <param name="memory">PLC的内存地址(区域.地址.位 如：CIO.1.2)</param>
+            <param name="result">读取结果</param>
+        </member>
+        <member name="M:PlcControl.FinsTcp.writeBit(System.String,System.Boolean)">
+            <summary>
+            写入PLC上的位数据（内存地址、写入数据）
+            </summary>
+            <param name="memory">PLC的内存地址(区域.地址.位 如：WR.3.0)</param>
+            <param name="sendBit">写入数据</param>
+        </member>
+        <member name="M:PlcControl.FinsTcp.readWord(System.String,System.Object[]@)">
+            <summary>
+            读取PLC上的位数据（内存地址、读取结果）
+            </summary>
+            <param name="memory">PLC的内存地址(区域.地址.字长度 如：DR.1.2)</param>
+            <param name="result">读取结果</param>
+        </member>
+        <member name="M:PlcControl.FinsTcp.readWord(System.String,System.Int32,System.Object[]@)">
+            <summary>
+            读取PLC上的位数据（内存地址、数据类型、读取结果）
+            </summary>
+            <param name="memory">PLC的内存地址(区域.地址.字长度 如：DR.1.2)</param>
+            <param name="DataType">数据类型</param>
+            <param name="result">读取结果</param>
+            <returns></returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.writeWord(System.String,System.Object[])">
+            <summary>
+            写入PLC上的位数据（内存地址、写入数据）
+            </summary>
+            <param name="memory">PLC的内存地址(区域.地址.字长度 如：WR.10.4)</param>
+            <param name="sendWord">写入数据</param>
+        </member>
+        <member name="M:PlcControl.FinsTcp.Getmemory(System.String)">
+            <summary>
+            内存数组转换
+            </summary>
+            <param name="memory"></param>
+            <returns></returns>
+        </member>
+        <member name="M:PlcControl.FinsTcp.Delay(System.Int32)">
+            <summary>
+            延时
+            </summary>
+            <param name="milliSecond">毫秒</param>
+        </member>
+        <member name="M:PlcControl.FinsTcp.byteToHexStr(System.Byte[])">
+            <summary>
+            字节数组转换16进制
+            </summary>
+            <param name="bytes"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

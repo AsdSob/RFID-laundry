@@ -15,6 +15,7 @@ using PALMS.Settings.ViewModel.EntityViewModels;
 using PALMS.Settings.ViewModel.Windows;
 using PALMS.ViewModels.Common;
 using PALMS.ViewModels.Common.Services;
+using PlcControl;
 
 namespace PALMS.Settings.ViewModel.ViewModels
 {
@@ -788,23 +789,34 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
         private void HangToBeltSlot(FinsTcp belt, int slotNumb)
         {
-            // Подготовка слота 
-            if (belt.GetNowPoint() != slotNumb)
-            {
-                belt.GetModel();
-                belt.SetNowPoint(slotNumb);
-                belt.GotoPoint();
+            //// Подготовка слота 
+            //if (belt.GetNowPoint() != slotNumb)
+            //{
+            //    belt.GetModel();
+            //    belt.SetNowPoint(slotNumb);
+            //    belt.GotoPoint();
 
-                //belt.SetNowPoint(slotNumb);
-                //belt.GetNowPoint();
-                //belt.GotoPoint();
+            //    //belt.SetNowPoint(slotNumb);
+            //    //belt.GetNowPoint();
+            //    //belt.GotoPoint();
 
-                // ожыдание окончание подготовки слота в линии
-                while (belt.DialState())
-                {
-                    Thread.Sleep(500);
-                }
-            }
+            //    // ожыдание окончание подготовки слота в линии
+            //    while (belt.DialState())
+            //    {
+            //        Thread.Sleep(500);
+            //    }
+            //}
+
+            //// начала загрузки в слот
+            //var isHangWorking = false;
+            //while (!isHangWorking)
+            //{
+            //    belt.Hang_In();
+            //    Thread.Sleep(500);
+            //    isHangWorking = belt.GetClotheinhook();
+            //}
+
+            belt.HangUpToPoint(slotNumb);
 
             // начала загрузки в слот
             var isHangWorking = false;
@@ -812,14 +824,14 @@ namespace PALMS.Settings.ViewModel.ViewModels
             {
                 belt.Hang_In();
                 Thread.Sleep(500);
-                isHangWorking = belt.GetClotheInHook();
+                isHangWorking = belt.GetClotheinhook();
             }
 
             var getClothInHook = false;
             while (!getClothInHook)
             {
                 Thread.Sleep(300);
-                getClothInHook = belt.GetClotheInHook();
+                getClothInHook = belt.GetClotheinhook();
             }
         }
 
