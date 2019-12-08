@@ -10,15 +10,12 @@
 
     <Menu DockPanel.Dock="Top">
         <MenuItem Header="_File">
-            <MenuItem Header="_Home" Command="{Binding NewCommand}"/>
+            <MenuItem Header="_Client" Command="{Binding ClientCommand}"/>
+            <MenuItem Header="_Linen" Command="{Binding LinenCommand}"/>
+            <MenuItem Header="_Conveyor" Command="{Binding ConveyorCommand}"/>
             <Separator />
             <MenuItem Header="_Exit" Command="{Binding ExitCommand}"/>
         </MenuItem>
 
-        <MenuItem Header="_Operation">
-            <MenuItem Header="_Client" Command="{Binding ClientCommand}"/>
-            <MenuItem Header="_Linen" Command="{Binding LinenCommand}"/>
-            <MenuItem Header="_Conveyor" Command="{Binding ConveyorCommand}"/>
-        </MenuItem>
     </Menu>
 </UserControl>

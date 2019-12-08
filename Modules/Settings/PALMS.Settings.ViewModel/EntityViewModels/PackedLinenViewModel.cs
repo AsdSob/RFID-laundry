@@ -1,9 +1,10 @@
 ﻿using GalaSoft.MvvmLight;
 using PALMS.Data.Objects.EntityModel;
+using PALMS.ViewModels.Common.Interfaces;
 
 namespace PALMS.Settings.ViewModel.EntityViewModels
 {
-    public class PackedLinenViewModel : ViewModelBase
+    public class PackedLinenViewModel : ViewModelBase, IOrderItem
     {
         private Entity _originalObject;
         private string _name;

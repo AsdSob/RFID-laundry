@@ -93,7 +93,6 @@ namespace PALMS.ViewModels
                 Helper.RunInMainThread(() => Items.Add(section));
             }
 
-            //Helper.RunInMainThread(() => SelectedItem = Items.FirstOrDefault());
         }
     }
 }
