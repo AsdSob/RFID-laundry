@@ -467,8 +467,9 @@ namespace PALMS.Settings.ViewModel.ViewModels
             {
                 foreach (var item in beltItems)
                 {
-                    RemoveLinenFromBeltItem(item);
                     AddPackedLinen(item);
+
+                    RemoveLinenFromBeltItem(item);
                 }
             }); 
         }
@@ -549,7 +550,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
             var beltItem = BeltItems.FirstOrDefault(x => x.BeltNumber == beltNumb && x.SlotNumber == slotNumb);
 
             if (beltItem != null) beltItem.ClientLinenId = WaitingLinen.Id;
-            WaitingLinen.StaffId = (int) LinenStatus.ConveyorHanged;
+            WaitingLinen.StatusId = (int) LinenStatus.ConveyorHanged;
 
             IsItemPrepared = false;
             WaitingLinen = null;

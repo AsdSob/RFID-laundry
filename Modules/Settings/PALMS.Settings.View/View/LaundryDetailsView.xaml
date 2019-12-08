@@ -147,7 +147,7 @@
 
                     <Label Grid.Column="2" Grid.Row="0" Content="{Binding WaitingLinen.Id}"/>
                     <Label Grid.Column="2" Grid.Row="1" Content="{Binding WaitingLinen.MasterLinenId}"/>
-                    <Label Grid.Column="2" Grid.Row="2" Content="{Binding WaitingLinen.IsInDesignModeStatic}"/>
+                    <Label Grid.Column="2" Grid.Row="2" Content="{Binding WaitingLinen.StaffId}"/>
                     <Label Grid.Column="2" Grid.Row="3" Content="{Binding WaitingLinen.Tag}"/>
                 </Grid>
             </GroupBox>
@@ -207,6 +207,7 @@
                 <DataGrid AutoGenerateColumns="False"
                           Height="NaN"
                           ItemsSource="{Binding PackedLinens}"
+                          SelectedItem="{Binding SelectedPackedLinen}"                        
                           VerticalScrollBarVisibility="Visible"
                           Width="400"
                           AllowDrop="True" 
