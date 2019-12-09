@@ -254,6 +254,7 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
                 item.Tag = clientLinen?.Tag;
                 item.StaffId = clientLinen?.StaffId;
+                item.MasterLinenId = (int)clientLinen?.MasterLinenId;
             }
         }
 

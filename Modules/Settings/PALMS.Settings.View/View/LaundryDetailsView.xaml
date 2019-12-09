@@ -149,23 +149,34 @@
 
                     <ComboBox Grid.Column="2" Grid.Row="1"
                               ItemsSource="{Binding MasterLinens}" 
-                              IsReadOnly="True"
+                              SelectedIndex="{Binding WaitingLinen.MasterLinenId}"
                               DisplayMemberPath="Name"
                               SelectedValuePath="Id"
-                              SelectedIndex="{Binding WaitingLinen.MasterLinenId}"
                               IsEditable="False"
-                              AllowDrop="False"
+                              IsEnabled="False"
+                              IsReadOnly="True"
                               />
 
-                    <ComboBox Grid.Column="2" Grid.Row="2"
-                              ItemsSource="{Binding Staff}" 
-                              IsReadOnly="True"
+                    <ListView Grid.Column="2" Grid.Row="2"
+                              ItemsSource="{Binding Staff}"
+                              SelectedItem="{Binding WaitingLinen.StaffId}"
                               DisplayMemberPath="Name"
                               SelectedValuePath="Id"
-                              SelectedIndex="{Binding WaitingLinen.StaffId}"
-                              IsEditable="False"
+                              IsEnabled="False"
                               AllowDrop="False"
-                              />
+                              >
+
+                    </ListView>
+
+                    <!--<ComboBox Grid.Column="2" Grid.Row="2"
+                              ItemsSource="{Binding Staff}" 
+                              SelectedItem="{Binding WaitingLinen.StaffId}"
+                              DisplayMemberPath="Name"
+                              SelectedValuePath="Id"
+                              IsEditable="False"
+                              IsEnabled="False"
+                              IsReadOnly="True"
+                              />-->
 
                     <Label Grid.Column="2" Grid.Row="3" Content="{Binding WaitingLinen.Tag}"/>
                 </Grid>
