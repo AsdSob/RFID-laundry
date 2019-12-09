@@ -15,7 +15,13 @@ namespace PALMS.Settings.ViewModel.EntityViewModels
         private int? _clientLinenId;
         private int? _staffId;
         private string _tag;
+        private int _masterLinenId;
 
+        public int MasterLinenId
+        {
+            get => _masterLinenId;
+            set => Set(() => MasterLinenId, ref _masterLinenId, value);
+        }
         public string Tag
         {
             get => _tag;

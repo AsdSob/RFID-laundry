@@ -329,11 +329,14 @@ namespace PALMS.Settings.ViewModel.ViewModels
 
                             beltItem.StaffId = linen?.StaffId;
                             beltItem.Tag = linen?.Tag;
+                            beltItem.MasterLinenId = linen.MasterLinenId;
                         }
                         else
                         {
                             beltItem.StaffId = null;
                             beltItem.Tag = null;
+                            beltItem.MasterLinenId = 0;
+
                         }
 
                         SaveConveyorItem(beltItem);
@@ -490,18 +493,18 @@ namespace PALMS.Settings.ViewModel.ViewModels
             };
             PackedLinens.Add(newPackedLinen);
 
-            if (!PackedLinens.Any(x => x.Id == clientLinen.StaffId && x.ParentId == null))
-            {
-                var staff = Staff.FirstOrDefault(x => x.Id == clientLinen.StaffId);
-                var newPackedStaff = new PackedLinenViewModel()
-                {
-                    OriginalObject = staff?.OriginalObject,
-                    Id = staff.Id,
-                    Name = staff.Name,
-                    ParentId = null,
-                };
-                PackedLinens.Add(newPackedStaff);
-            }
+            //if (!PackedLinens.Any(x => x.Id == clientLinen.StaffId && x.ParentId == null))
+            //{
+            //    var staff = Staff.FirstOrDefault(x => x.Id == clientLinen.StaffId);
+            //    var newPackedStaff = new PackedLinenViewModel()
+            //    {
+            //        OriginalObject = staff?.OriginalObject,
+            //        Id = staff.Id,
+            //        Name = staff.Name,
+            //        ParentId = null,
+            //    };
+            //    PackedLinens.Add(newPackedStaff);
+            //}
         }
 
         private void RemovePackedLinen()

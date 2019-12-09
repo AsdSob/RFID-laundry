@@ -207,6 +207,7 @@
                 <DataGrid AutoGenerateColumns="False"
                           Height="NaN"
                           ItemsSource="{Binding PackedLinens}"
+                          SelectionMode="Single"
                           SelectedItem="{Binding SelectedPackedLinen}"                        
                           VerticalScrollBarVisibility="Visible"
                           Width="400"
@@ -219,9 +220,25 @@
 
                     <DataGrid.Columns>
                         <DataGridTextColumn IsReadOnly="False" Width="50" Header="*" Binding="{Binding OrderNumber}" SortDirection="Ascending" Visibility="Hidden" />
-                        <DataGridTextColumn IsReadOnly="False" Width="50" Header="*" Binding="{Binding Id}" />
+
+                        <DataGridComboBoxColumn Header="Staff"
+                                                IsReadOnly="True"
+                                                DisplayMemberPath="Name"
+                                                SelectedValuePath="Id"
+                                                SelectedValueBinding="{Binding ParentId}">
+                            <DataGridComboBoxColumn.ElementStyle>
+                                <Style TargetType="{x:Type ComboBox}">
+                                    <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Staff, ElementName=UserControl}" />
+                                </Style>
+                            </DataGridComboBoxColumn.ElementStyle>
+                            <DataGridComboBoxColumn.EditingElementStyle>
+                                <Style TargetType="{x:Type ComboBox}">
+                                    <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Staff, ElementName=UserControl}" />
+                                </Style>
+                            </DataGridComboBoxColumn.EditingElementStyle>
+                        </DataGridComboBoxColumn>
+
                         <DataGridTextColumn IsReadOnly="True" Width="50" Header="Slot" Binding="{Binding Name}" />
-                        <DataGridTextColumn IsReadOnly="True" Header="StaffId" Binding="{Binding ParentId}" />
                     </DataGrid.Columns>
 
                 </DataGrid>
@@ -246,9 +263,41 @@
                 <DataGrid.Columns>
                     <DataGridCheckBoxColumn IsReadOnly="False" Width="50" Header="*" Binding="{Binding IsSelected}" />
                     <DataGridTextColumn IsReadOnly="True" Width="50" Header="Slot" Binding="{Binding SlotNumber}" />
-                    <DataGridTextColumn IsReadOnly="True" Header="StaffId" Binding="{Binding StaffId}" />
 
-                    <DataGridTextColumn IsReadOnly="True" Header="LinenId" Binding="{Binding ClientLinenId}" />
+                    <DataGridComboBoxColumn Header="Staff"
+                                            IsReadOnly="True"
+                                            DisplayMemberPath="Name"
+                                            SelectedValuePath="Id"
+                                            SelectedValueBinding="{Binding StaffId}">
+                        <DataGridComboBoxColumn.ElementStyle>
+                            <Style TargetType="{x:Type ComboBox}">
+                                <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Staff, ElementName=UserControl}" />
+                            </Style>
+                        </DataGridComboBoxColumn.ElementStyle>
+                        <DataGridComboBoxColumn.EditingElementStyle>
+                            <Style TargetType="{x:Type ComboBox}">
+                                <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Staff, ElementName=UserControl}" />
+                            </Style>
+                        </DataGridComboBoxColumn.EditingElementStyle>
+                    </DataGridComboBoxColumn>
+
+                    <DataGridComboBoxColumn Header="Linen"
+                                            IsReadOnly="True"
+                                            DisplayMemberPath="Name"
+                                            SelectedValuePath="Id"
+                                            SelectedValueBinding="{Binding MasterLinenId}">
+                        <DataGridComboBoxColumn.ElementStyle>
+                            <Style TargetType="{x:Type ComboBox}">
+                                <Setter Property="ItemsSource" Value="{Binding Path=DataContext.MasterLinens, ElementName=UserControl}" />
+                            </Style>
+                        </DataGridComboBoxColumn.ElementStyle>
+                        <DataGridComboBoxColumn.EditingElementStyle>
+                            <Style TargetType="{x:Type ComboBox}">
+                                <Setter Property="ItemsSource" Value="{Binding Path=DataContext.MasterLinens, ElementName=UserControl}" />
+                            </Style>
+                        </DataGridComboBoxColumn.EditingElementStyle>
+                    </DataGridComboBoxColumn>
+
                     <DataGridTextColumn IsReadOnly="True" Header="Tag" Binding="{Binding Tag}" />
                 </DataGrid.Columns>
 
@@ -270,9 +319,41 @@
                 <DataGrid.Columns>
                     <DataGridCheckBoxColumn IsReadOnly="False" Width="50" Header="*" Binding="{Binding IsSelected}" />
                     <DataGridTextColumn IsReadOnly="True" Width="50" Header="Slot" Binding="{Binding SlotNumber}" />
-                    <DataGridTextColumn IsReadOnly="True" Header="StaffId" Binding="{Binding StaffId}" />
 
-                    <DataGridTextColumn IsReadOnly="True" Header="LinenId" Binding="{Binding ClientLinenId}" />
+                    <DataGridComboBoxColumn Header="Staff"
+                                            IsReadOnly="True"
+                                            DisplayMemberPath="Name"
+                                            SelectedValuePath="Id"
+                                            SelectedValueBinding="{Binding StaffId}">
+                        <DataGridComboBoxColumn.ElementStyle>
+                            <Style TargetType="{x:Type ComboBox}">
+                                <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Staff, ElementName=UserControl}" />
+                            </Style>
+                        </DataGridComboBoxColumn.ElementStyle>
+                        <DataGridComboBoxColumn.EditingElementStyle>
+                            <Style TargetType="{x:Type ComboBox}">
+                                <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Staff, ElementName=UserControl}" />
+                            </Style>
+                        </DataGridComboBoxColumn.EditingElementStyle>
+                    </DataGridComboBoxColumn>
+
+                    <DataGridComboBoxColumn Header="Linen"
+                                            IsReadOnly="True"
+                                            DisplayMemberPath="Name"
+                                            SelectedValuePath="Id"
+                                            SelectedValueBinding="{Binding MasterLinenId}">
+                        <DataGridComboBoxColumn.ElementStyle>
+                            <Style TargetType="{x:Type ComboBox}">
+                                <Setter Property="ItemsSource" Value="{Binding Path=DataContext.MasterLinens, ElementName=UserControl}" />
+                            </Style>
+                        </DataGridComboBoxColumn.ElementStyle>
+                        <DataGridComboBoxColumn.EditingElementStyle>
+                            <Style TargetType="{x:Type ComboBox}">
+                                <Setter Property="ItemsSource" Value="{Binding Path=DataContext.MasterLinens, ElementName=UserControl}" />
+                            </Style>
+                        </DataGridComboBoxColumn.EditingElementStyle>
+                    </DataGridComboBoxColumn>
+
                     <DataGridTextColumn IsReadOnly="True" Header="Tag" Binding="{Binding Tag}" />
                 </DataGrid.Columns>
 
