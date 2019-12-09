@@ -146,8 +146,27 @@
                     <Label Grid.Column="0" Grid.Row="3" Content="Tag"/>
 
                     <Label Grid.Column="2" Grid.Row="0" Content="{Binding WaitingLinen.Id}"/>
-                    <Label Grid.Column="2" Grid.Row="1" Content="{Binding WaitingLinen.MasterLinenId}"/>
-                    <Label Grid.Column="2" Grid.Row="2" Content="{Binding WaitingLinen.StaffId}"/>
+
+                    <ComboBox Grid.Column="2" Grid.Row="1"
+                              ItemsSource="{Binding MasterLinens}" 
+                              IsReadOnly="True"
+                              DisplayMemberPath="Name"
+                              SelectedValuePath="Id"
+                              SelectedIndex="{Binding WaitingLinen.MasterLinenId}"
+                              IsEditable="False"
+                              AllowDrop="False"
+                              />
+
+                    <ComboBox Grid.Column="2" Grid.Row="2"
+                              ItemsSource="{Binding Staff}" 
+                              IsReadOnly="True"
+                              DisplayMemberPath="Name"
+                              SelectedValuePath="Id"
+                              SelectedIndex="{Binding WaitingLinen.StaffId}"
+                              IsEditable="False"
+                              AllowDrop="False"
+                              />
+
                     <Label Grid.Column="2" Grid.Row="3" Content="{Binding WaitingLinen.Tag}"/>
                 </Grid>
             </GroupBox>
