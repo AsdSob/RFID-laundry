@@ -131,8 +131,6 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -157,18 +155,7 @@
                               IsReadOnly="True"
                               />
 
-                    <ListView Grid.Column="2" Grid.Row="2"
-                              ItemsSource="{Binding Staff}"
-                              SelectedItem="{Binding WaitingLinen.StaffId}"
-                              DisplayMemberPath="Name"
-                              SelectedValuePath="Id"
-                              IsEnabled="False"
-                              AllowDrop="False"
-                              >
-
-                    </ListView>
-
-                    <!--<ComboBox Grid.Column="2" Grid.Row="2"
+                    <ComboBox Grid.Column="2" Grid.Row="2"
                               ItemsSource="{Binding Staff}" 
                               SelectedItem="{Binding WaitingLinen.StaffId}"
                               DisplayMemberPath="Name"
@@ -176,7 +163,7 @@
                               IsEditable="False"
                               IsEnabled="False"
                               IsReadOnly="True"
-                              />-->
+                              />
 
                     <Label Grid.Column="2" Grid.Row="3" Content="{Binding WaitingLinen.Tag}"/>
                 </Grid>

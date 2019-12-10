@@ -337,7 +337,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
                             beltItem.StaffId = null;
                             beltItem.Tag = null;
                             beltItem.MasterLinenId = 0;
-
                         }
 
                         SaveConveyorItem(beltItem);
@@ -966,7 +965,6 @@ namespace PALMS.Settings.ViewModel.ViewModels
             //    {
             //        if (currentSlot <= 1 || currentSlot >= 776)
             //            currentSlot = 2;
-
             //        if (IsSlotHasItem(2, currentSlot))
             //        {
             //            currentSlot++;
