@@ -2,7 +2,7 @@
 using Client.Desktop.Laundry.Module;
 using Client.Desktop.ViewModels;
 using Client.Desktop.ViewModels.Content;
-using Client.Desktop.ViewModels.Content.Operation;
+using Client.Desktop.ViewModels.Content.Master;
 using Common.Logger.Module;
 using Storage.Module;
 
@@ -29,9 +29,10 @@ namespace Client.Desktop.Laundry.ViewModels
             builder.RegisterType<MainViewModel>().SingleInstance();
             builder.RegisterType<MenuViewModel>().SingleInstance();
 
+
             builder.RegisterType<DataViewModel>().SingleInstance();
             builder.RegisterType<AddViewModel>().SingleInstance();
-            builder.RegisterType<UniformConveyorViewModel>().SingleInstance();
+            builder.RegisterType<ClientViewModel>().SingleInstance();
         }
 
         private void RegisterModules(ContainerBuilder builder)

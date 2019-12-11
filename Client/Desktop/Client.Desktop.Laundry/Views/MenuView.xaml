@@ -16,8 +16,8 @@
                 <MenuItem Header="_Exit" Command="{Binding ExitCommand}"/>
             </MenuItem>
 
-            <MenuItem Header="_Operation">
-            <MenuItem Header="_Conveyor" Command="{Binding UniformConveyorCommand}"/>
+            <MenuItem Header="_Master">
+            <MenuItem Header="_Clients" Command="{Binding ClientCommand}"/>
             </MenuItem>
     </Menu>
 

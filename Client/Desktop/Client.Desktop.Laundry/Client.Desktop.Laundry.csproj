@@ -4,7 +4,26 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>LLMS.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Module\Pictures\LLMS.ico" />
+    <None Remove="Module\Pictures\LLMS_logo.jpg" />
+    <None Remove="Module\Pictures\LLMS_logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Module\Pictures\LLMS.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Module\Pictures\LLMS_logo.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Module\Pictures\LLMS_logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.9.4" />

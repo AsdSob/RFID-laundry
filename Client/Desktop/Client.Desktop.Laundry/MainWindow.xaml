@@ -19,6 +19,11 @@
 
         <ContentPresenter Grid.Row="1" Content="{Binding Content}"/>
 
+        <Image Grid.Row="1"  Source="/Module/Pictures/LLMS_logo.png"
+               Width="400"
+               VerticalAlignment="Center"
+               HorizontalAlignment="Center"/>
+
         <!-- busy indicator -->
         <!--<dx:WaitIndicator x:Name="BusyIndicator"
                           Content="Loading..."
