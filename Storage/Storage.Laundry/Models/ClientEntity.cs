@@ -13,5 +13,10 @@ namespace Storage.Laundry.Models
         public bool Active { get; set; }
         public string Address { get; set; }
         public int CityId { get; set; }
+
+        public virtual ClientEntity Parent { get; set; }
+        public virtual ICollection<ClientEntity> ChildEntities { get; set; }
+        public virtual ICollection<DepartmentEntity> DepartmentEntities { get; set; }
+        public virtual ICollection<ClientLinenEntity> ClientLinenEntities { get; set; }
     }
 }

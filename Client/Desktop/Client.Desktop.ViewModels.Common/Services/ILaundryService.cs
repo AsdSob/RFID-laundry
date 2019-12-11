@@ -11,7 +11,7 @@ namespace Client.Desktop.ViewModels.Common.Services
     {
         Task<ICollection<Laundry>> GetAllAsync();
     }
-
+    
     public class Laundry
     {
         public int Id { get; set; }

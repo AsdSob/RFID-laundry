@@ -14,6 +14,10 @@ namespace Storage.Laundry.Configurations
             builder.Property(x => x.Name).HasColumnName("name");
             builder.Property(x => x.DepartmentId).HasColumnName("departmentId");
             builder.Property(x => x.StaffId).HasColumnName("staffId");
+            builder.Property(x => x.PhoneNumber).HasColumnName("phoneNumber");
+            builder.Property(x => x.Email).HasColumnName("email");
+
+            builder.HasOne(x => x.DepartmentEntity).WithMany(x => x.ClientStaffEntities).HasForeignKey(x=> x.DepartmentId);
 
         }
     }

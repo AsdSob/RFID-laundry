@@ -1,21 +1,17 @@
-﻿
+﻿using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 
 namespace Client.Desktop.ViewModels.Content.Master
 {
     public class ClientViewModel : ViewModelBase
     {
-        private string _text;
-
-        public string Text
-        {
-            get => _text;
-            set => Set(() => Text, ref _text, value);
-        }
+        private readonly ILaundryService _dataService;
+        private readonly IDialogService _dialogService;
+        private readonly IResolver _resolverService;
 
         public ClientViewModel()
         {
-            Text = "ADD Content of AddViewModel";
+
         }
     }
 }
