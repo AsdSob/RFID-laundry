@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Storage.Core.Abstract;
-using Storage.Laundry.Models;
+using Storage.Laundry.Models.Abstract;
 
 namespace Client.Desktop.ViewModels.Common.Services
 {
     public interface ILaundryService
     {
-        Task<ICollection<Laundry>> GetAllAsync();
+        Task<ICollection<T>> GetAllAsync<T>() where T : class, IEntity<int>;
+        Task AddOrUpdate<T>(T entity) where T : class, IEntity<int>;
     }
     
     public class Laundry
@@ -27,19 +27,39 @@ namespace Client.Desktop.ViewModels.Common.Services
             _contextFactory = contextFactory;
         }
 
-        public async Task<ICollection<Laundry>> GetAllAsync()
+        public async Task<ICollection<T>> GetAllAsync<T>() where T : class, IEntity<int>
         {
             using (var context = await _contextFactory.CreateAsync())
             {
-                var laundries = await context.Set<LaundryEntity>().ToListAsync();
+                var entities = await context.Set<T>().ToListAsync();
 
-                return laundries.Select(x => new Laundry
-                {
-                    Id = x.Id,
-                    Name = x.Name
-                }).ToList();
+                return entities;
             }
         }
+
+        public async Task Delete<T>(T entity) where T : class, IEntity<int>
+        {
+            using (var context = await _contextFactory.CreateAsync())
+            {
+                context.Remove(entity);
+            }
+        }
+
+        public async Task AddOrUpdate<T>(T entity) where T : class, IEntity<int>
+        {
+            using (var context = await _contextFactory.CreateAsync())
+            {
+                if (entity.Id == 0)
+                {
+                    context.Add(entity);
+                }
+                else
+                {
+                    context.Update(entity);
+                }
+            }
+        }
+
     }
 }
 

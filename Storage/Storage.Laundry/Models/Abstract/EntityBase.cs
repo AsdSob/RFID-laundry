@@ -6,5 +6,7 @@ namespace Storage.Laundry.Models.Abstract
     {
         public int Id { get; set; }
         public DateTime CreatedDateUtc { get; set; }
+
+        public virtual bool IsNew => Id <= 0;
     }
 }

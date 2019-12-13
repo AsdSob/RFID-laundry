@@ -1,9 +1,12 @@
 ﻿using Autofac;
 using Client.Desktop.Laundry.Module;
 using Client.Desktop.ViewModels;
+using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Content;
 using Client.Desktop.ViewModels.Content.Master;
+using Client.Desktop.Views.Services;
 using Common.Logger.Module;
+using Microsoft.EntityFrameworkCore.Internal;
 using Storage.Module;
 
 namespace Client.Desktop.Laundry.ViewModels
@@ -20,6 +23,7 @@ namespace Client.Desktop.Laundry.ViewModels
 
             RegisterViewModels(builder);
             RegisterModules(builder);
+            RegisterServices(builder);
 
             Container = builder.Build();
         }
@@ -40,6 +44,12 @@ namespace Client.Desktop.Laundry.ViewModels
             builder.RegisterMainModule();
             builder.RegisterLaundryDataModule();
             builder.RegisterLoggerModule();
+        }
+
+        private void RegisterServices(ContainerBuilder builder)
+        {
+            builder.RegisterType<LaundryService>().As<ILaundryService>().SingleInstance();
+            builder.RegisterType<DialogService>().As<IDialogService>().SingleInstance();
         }
     }
 }
