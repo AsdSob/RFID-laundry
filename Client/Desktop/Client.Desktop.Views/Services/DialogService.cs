@@ -69,7 +69,7 @@ namespace Client.Desktop.Views.Services
         private bool ShowMessageDialog(string questionMessage, string caption, MessageBoxButton buttons, MessageBoxImage image)
         {
             return true;
-            //MessageBox.Show(Application.Current.MainWindow, "")
+            //MessageBox.Show(Application.Current.MainWindow, "");
             //var dialogResult = MessageBox.Show(Application.Current.MainWindow, questionMessage, caption, buttons, image);
 
             //return dialogResult == MessageBoxResult.OK || dialogResult == MessageBoxResult.Yes;

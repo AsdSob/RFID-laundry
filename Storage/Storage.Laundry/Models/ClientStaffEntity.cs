@@ -1,4 +1,5 @@
-﻿using Storage.Laundry.Models.Abstract;
+﻿using System.Collections.Generic;
+using Storage.Laundry.Models.Abstract;
 
 namespace Storage.Laundry.Models
 {
@@ -11,5 +12,6 @@ namespace Storage.Laundry.Models
         public string Email { get; set; }
 
         public virtual DepartmentEntity DepartmentEntity { get; set; }
+        public virtual ICollection<ClientLinenEntity> ClientLinenEntities { get; set; }
     }
 }

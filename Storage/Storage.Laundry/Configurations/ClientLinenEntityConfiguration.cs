@@ -21,6 +21,7 @@ namespace Storage.Laundry.Configurations
             builder.HasOne(x => x.ClientEntity).WithMany(x => x.ClientLinenEntities).HasForeignKey(x=> x.ClientId);
             builder.HasOne(x => x.DepartmentEntity).WithMany(x => x.ClientLinenEntities).HasForeignKey(x=> x.DepartmentId);
             builder.HasOne(x => x.MasterLinenEntity).WithMany(x => x.ClientLinenEntities).HasForeignKey(x=> x.MasterLinenId);
+            builder.HasOne(x => x.ClientStaffEntity).WithMany(x => x.ClientLinenEntities).HasForeignKey(x=> x.StaffId);
 
         }
     }

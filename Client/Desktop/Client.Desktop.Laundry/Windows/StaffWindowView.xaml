@@ -1,12 +1,214 @@
 ﻿<UserControl x:Class="Client.Desktop.Laundry.Windows.StaffWindowView"
+             x:Name="StaffWindow"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Client.Desktop.Laundry.Windows"
+             xmlns:windows="clr-namespace:Client.Desktop.ViewModels.Windows;assembly=Client.Desktop.ViewModels"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance windows:StaffWindowViewModel}">
     <Grid>
-            
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition  Height="Auto"/>
+                <RowDefinition  Height="Auto"/>
+                <RowDefinition  Height="Auto"/>
+                <RowDefinition  Height="*"/>
+                <RowDefinition  Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!--Clients-->
+            <GroupBox Grid.Row="0" 
+                      Header="Clients" 
+                      Margin="5">
+                <ComboBox ItemsSource="{Binding Clients}" 
+                          SelectedItem="{Binding SelectedClient}" 
+                          DisplayMemberPath="Name" />
+            </GroupBox>
+
+            <!--Departments-->
+            <GroupBox Grid.Row="1" 
+                      Header="Departments" 
+                      Margin="5">
+                <ComboBox ItemsSource="{Binding SortedDepartments}" 
+                          SelectedItem="{Binding SelectedDepartment}" 
+                          DisplayMemberPath="Name" />
+            </GroupBox>
+
+            <!--Staff List-->
+
+            <StackPanel  Grid.Row="2" Orientation="Horizontal" Margin="10,0">
+                <Button Margin = "5" Padding="10,2"  Content="New" Command="{Binding AddStaffCommand}"/>
+                <Button Margin = "5" Padding="10,2"  Content="Delete" Command="{Binding DeleteStaffCommand}"/>
+                <Button Margin = "5" Padding="10,2"  Content="Save" Command="{Binding SaveCommand}"/>
+            </StackPanel>
+
+            <GroupBox Grid.Row="3" 
+                      Header="Staff"
+                      Margin="5">
+
+                <DataGrid Height="Auto"
+                          ItemsSource="{Binding SortedStaff}"
+                          SelectedItem="{Binding SelectedStaff}"
+                          SelectionMode="Single"
+                          VerticalScrollBarVisibility="Visible"
+                          AllowDrop="True" 
+                          IsReadOnly="True"
+                          HorizontalAlignment="Stretch"
+                          AutoGenerateColumns="False"
+                          IsTextSearchEnabled="True"
+                          IsTextSearchCaseSensitive="False">
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Id" Binding="{Binding StaffId}" />
+                        <DataGridTextColumn Header="Name" Binding="{Binding StaffName}" Width="*" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </GroupBox>
+
+            <!-- Staff Details-->
+            <Grid Row="4">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <GroupBox Grid.Column="0" Grid.Row="0" Header="Staff Id" Margin="5">
+                    <TextBox Text="{Binding SelectedStaff.StaffId}" TextWrapping="Wrap" />
+                </GroupBox>
+
+                <GroupBox Grid.Column="1" Grid.Row="0" Header="Staff Name" Margin="5">
+                    <TextBox Text="{Binding SelectedStaff.StaffName}" TextWrapping="Wrap" />
+                </GroupBox>
+
+                <GroupBox Grid.Column="0" Grid.Row="1" Header="Phone" Margin="5">
+                    <TextBox Text="{Binding SelectedStaff.PhoneNumber}" TextWrapping="Wrap" />
+                </GroupBox>
+
+                <GroupBox Grid.Column="1" Grid.Row="1" Header="Email" Margin="5">
+                    <TextBox Text="{Binding SelectedStaff.Email}" TextWrapping="Wrap" />
+                </GroupBox>
+            </Grid>
+        </Grid>
+
+        <GroupBox Grid.Column="1" Header="Client Linen">
+            <DataGrid Height="Auto"
+                      ItemsSource="{Binding SortedLinens}"
+                      SelectedItem="{Binding SelectedLinen}"
+                      SelectionMode="Single"
+                      VerticalScrollBarVisibility="Visible"
+                      AllowDrop="True" 
+                      IsReadOnly="True"
+                      HorizontalAlignment="Stretch"
+                      AutoGenerateColumns="False"
+                      IsTextSearchEnabled="True"
+                      IsTextSearchCaseSensitive="False">
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Id" Binding="{Binding Id}" />
+
+                    <DataGridComboBoxColumn Header="Name"
+                                            IsReadOnly="True"
+                                            DisplayMemberPath="Name"
+                                            SelectedValuePath="Id"
+                                            SelectedValueBinding="{Binding MasterLinenId}">
+                        <DataGridComboBoxColumn.ElementStyle>
+                            <Style TargetType="{x:Type ComboBox}">
+                                <Setter Property="ItemsSource" Value="{Binding Path=DataContext.MasterLinens, ElementName=StaffWindow}" />
+                            </Style>
+                        </DataGridComboBoxColumn.ElementStyle>
+                        <DataGridComboBoxColumn.EditingElementStyle>
+                            <Style TargetType="{x:Type ComboBox}">
+                                <Setter Property="ItemsSource" Value="{Binding Path=DataContext.MasterLinens, ElementName=StaffWindow}" />
+                            </Style>
+                        </DataGridComboBoxColumn.EditingElementStyle>
+                    </DataGridComboBoxColumn>
+
+                    <DataGridComboBoxColumn Header="Staff"
+                                            IsReadOnly="True"
+                                            DisplayMemberPath="StaffName"
+                                            SelectedValuePath="Id"
+                                            SelectedValueBinding="{Binding StaffId}">
+                        <DataGridComboBoxColumn.ElementStyle>
+                            <Style TargetType="{x:Type ComboBox}">
+                                <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Staff, ElementName=StaffWindow}" />
+                            </Style>
+                        </DataGridComboBoxColumn.ElementStyle>
+                        <DataGridComboBoxColumn.EditingElementStyle>
+                            <Style TargetType="{x:Type ComboBox}">
+                                <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Staff, ElementName=StaffWindow}" />
+                            </Style>
+                        </DataGridComboBoxColumn.EditingElementStyle>
+                    </DataGridComboBoxColumn>
+
+                    <DataGridTextColumn Header="Tag" Binding="{Binding Tag}" />
+
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+        
+        <!--RFID-->
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <GroupBox Grid.Row="0" Header="RFID Reader" Margin="5">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal">
+                        <Button Margin = "5" Padding="20,2"  Content="Start" Command="{Binding StartReadCommand}"/>
+                        <Button Margin = "5" Padding="20,2"  Content="Stop" Command="{Binding StopReadCommand}"/>
+                        <Button Margin = "5" Padding="20,2"  Content="Add" Command="{Binding AddTagCommand}"/>
+                    </StackPanel>
+
+                    <GroupBox Grid.Column="0" Grid.Row="1" Header="Tags">
+
+                        <DataGrid AutoGenerateColumns="False"
+                                  Height="NaN"
+                                  ItemsSource="{Binding Tags}"
+                                  SelectedItem="{Binding SelectedTag}"
+                                  VerticalScrollBarVisibility="Visible"
+                                  Width="400"
+                                  AllowDrop="True" 
+                                  HorizontalAlignment="Stretch"
+                                  EnableRowVirtualization="True" 
+                                  IsReadOnly="True" 
+                                  IsTextSearchCaseSensitive="False"
+                        >
+
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Antenna" Binding="{Binding Path=Item1}" />
+                                <DataGridTextColumn Header="Tag" Binding="{Binding Path=Item2}" />
+                            </DataGrid.Columns>
+
+                        </DataGrid>
+
+                    </GroupBox>
+
+                </Grid>
+            </GroupBox>
+        </Grid>
+
     </Grid>
 </UserControl>

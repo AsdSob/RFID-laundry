@@ -69,7 +69,7 @@
                 <StackPanel Grid.Row="0" Orientation="Horizontal">
                     <Button Margin = "5" Padding="10,2"  Content="New" Command="{Binding AddDepartmentCommand}"/>
                     <Button Margin = "5" Padding="10,2"  Content="Delete" Command="{Binding DeleteDepartmentCommand}"/>
-                    <Button Margin = "5" Padding="10,2"  Content="Save" Command="{Binding SaveDepartmentCommand}"/>
+                    <Button Margin = "5" Padding="10,2"  Content="Save" Command="{Binding SaveCommand}"/>
                 </StackPanel>
 
                 <DataGrid Grid.Row="1" Height="Auto"

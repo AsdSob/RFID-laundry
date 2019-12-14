@@ -16,5 +16,6 @@ namespace Storage.Laundry.Models
         public virtual MasterLinenEntity MasterLinenEntity { get; set; }
         public virtual DepartmentEntity DepartmentEntity { get; set; }
         public virtual ClientEntity ClientEntity { get; set; }
+        public virtual ClientStaffEntity ClientStaffEntity { get; set; }
     }
 }

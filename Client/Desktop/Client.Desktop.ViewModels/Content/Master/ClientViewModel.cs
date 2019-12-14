@@ -105,7 +105,6 @@ namespace Client.Desktop.ViewModels.Content.Master
         {
             if (e.PropertyName == nameof(SelectedClient))
             {
-                RaisePropertyChanged(()=> SortedDepartments);
 
                 AddDepartmentCommand.RaiseCanExecuteChanged();
                 DeleteClientCommand.RaiseCanExecuteChanged();
