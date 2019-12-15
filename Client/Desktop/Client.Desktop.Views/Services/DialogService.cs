@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.Windows;
 using Microsoft.Win32;
@@ -10,13 +9,14 @@ namespace Client.Desktop.Views.Services
     {
         public bool ShowDialog(IWindowDialogViewModel windowDialogViewModel)
         {
-            var window = windowDialogViewModel?.GetType().GetControl<Window>();
-            if (window == null)
-                return false;
+            return true;
+            //var window = windowDialogViewModel?.GetType().GetControl<Window>();
+            //if (window == null)
+            //    return false;
 
-            window.DataContext = windowDialogViewModel;
+            //window.DataContext = windowDialogViewModel;
 
-            return window.ShowDialog() == true;
+            //return window.ShowDialog() == true;
         }
 
         public bool ShowQuestionDialog(string message)
@@ -66,11 +66,13 @@ namespace Client.Desktop.Views.Services
             //Helper.RunInMainThread(() => viewModel.IsBusy = isBusy);
         }
 
-        private bool ShowMessageDialog(string message, string caption, MessageBoxButton buttons, MessageBoxImage image)
+        private bool ShowMessageDialog(string questionMessage, string caption, MessageBoxButton buttons, MessageBoxImage image)
         {
-            var dialogResult = MessageBox.Show(Application.Current.MainWindow, message, caption, buttons, image);
+            return true;
+            //MessageBox.Show(Application.Current.MainWindow, "");
+            //var dialogResult = MessageBox.Show(Application.Current.MainWindow, questionMessage, caption, buttons, image);
 
-            return dialogResult == MessageBoxResult.OK || dialogResult == MessageBoxResult.Yes;
+            //return dialogResult == MessageBoxResult.OK || dialogResult == MessageBoxResult.Yes;
         }
     }
 }
