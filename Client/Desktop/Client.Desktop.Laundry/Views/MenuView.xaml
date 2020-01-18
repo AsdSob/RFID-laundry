@@ -10,15 +10,16 @@
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
                 <MenuItem Header="_New" Command="{Binding NewCommand}"/>
-                <MenuItem Header="_Add" Command="{Binding AddCommand}"/>
-                <MenuItem Header="_Save" />
+
                 <Separator />
                 <MenuItem Header="_Exit" Command="{Binding ExitCommand}"/>
             </MenuItem>
 
             <MenuItem Header="_Master">
             <MenuItem Header="_Clients" Command="{Binding ClientCommand}"/>
-            </MenuItem>
+            <MenuItem Header="_Staff" Command="{Binding StaffCommand}"/>
+
+        </MenuItem>
     </Menu>
 
 </UserControl>

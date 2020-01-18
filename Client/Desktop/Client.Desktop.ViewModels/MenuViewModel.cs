@@ -16,17 +16,19 @@ namespace Client.Desktop.ViewModels
             set { Set(() => SelectedItem, ref _selectedItem, value); }
         }
 
-        public ICommand ClientCommand { get; }
         public ICommand NewCommand { get; }
-        public ICommand AddCommand { get; }
         public ICommand ExitCommand { get; }
+
+        public ICommand ClientCommand { get; }
+        public ICommand StaffCommand { get; }
 
         public MenuViewModel()
         {
             NewCommand = new RelayCommand(() => Select(typeof(DataViewModel)));
-            AddCommand = new RelayCommand(() => Select(typeof(AddViewModel)));
             ExitCommand = new RelayCommand(() => Select(typeof(ExitViewModel)));
             ClientCommand = new RelayCommand(() => Select(typeof(ClientViewModel)));
+            StaffCommand = new RelayCommand(() => Select(typeof(StaffViewModel)));
+
         }
 
         private void Select(Type type)

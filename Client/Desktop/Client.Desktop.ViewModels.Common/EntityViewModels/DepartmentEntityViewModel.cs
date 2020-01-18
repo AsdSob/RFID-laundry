@@ -45,7 +45,7 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
         }
 
 
-        private void Update(DepartmentEntity originalObject)
+        public void Update(DepartmentEntity originalObject)
         {
             OriginalObject = originalObject;
 

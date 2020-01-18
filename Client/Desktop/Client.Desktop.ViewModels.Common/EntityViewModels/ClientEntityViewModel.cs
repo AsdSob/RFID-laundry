@@ -81,6 +81,11 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             Address = OriginalObject.Address;
         }
 
+        public void Refresh()
+        {
+            Update(OriginalObject);
+        }
+
         public void AcceptChanges()
         {
             if (OriginalObject == null) return;

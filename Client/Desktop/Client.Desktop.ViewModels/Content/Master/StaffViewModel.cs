@@ -9,9 +9,9 @@ using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Storage.Laundry.Models.Abstract;
 
-namespace Client.Desktop.ViewModels.Windows
+namespace Client.Desktop.ViewModels.Content.Master
 {
-    public class StaffWindowViewModel : ViewModelBase
+    public class StaffViewModel : ViewModelBase
     {
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
@@ -87,7 +87,7 @@ namespace Client.Desktop.ViewModels.Windows
 
 
 
-        public StaffWindowViewModel(ILaundryService dataService, IDialogService dialogService)
+        public StaffViewModel(ILaundryService dataService, IDialogService dialogService)
         {
             _laundryService = dataService ?? throw new ArgumentNullException(nameof(dataService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
@@ -262,5 +262,6 @@ namespace Client.Desktop.ViewModels.Windows
 
             RaisePropertyChanged(()=> SortedLinens);
         }
+
     }
 }

@@ -9,6 +9,7 @@ namespace Storage.Laundry.Models
     {
         public string Name { get; set; }
         public string ReaderIp { get; set; }
+        public int ReaderPort { get; set; }
 
         public double Antenna1Rx { get; set; }
         public double Antenna1Tx { get; set; }

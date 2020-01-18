@@ -35,8 +35,10 @@ namespace Client.Desktop.Laundry.ViewModels
 
 
             builder.RegisterType<DataViewModel>().SingleInstance();
-            builder.RegisterType<AddViewModel>().SingleInstance();
             builder.RegisterType<ClientViewModel>().SingleInstance();
+
+            builder.RegisterType<StaffViewModel>().SingleInstance();
+
         }
 
         private void RegisterModules(ContainerBuilder builder)

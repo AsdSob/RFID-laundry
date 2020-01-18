@@ -38,4 +38,8 @@
     <ProjectReference Include="..\Client.Desktop.Views\Client.Desktop.Views.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Windows\" />
+  </ItemGroup>
+
 </Project>

@@ -3,23 +3,23 @@
                     xmlns:viewModels="clr-namespace:Client.Desktop.ViewModels;assembly=Client.Desktop.ViewModels"
                     xmlns:views="clr-namespace:Client.Desktop.Laundry.Views"
                     xmlns:content="clr-namespace:Client.Desktop.ViewModels.Content;assembly=Client.Desktop.ViewModels"
-                    xmlns:master="clr-namespace:Client.Desktop.Laundry.Views.Master"
-                    xmlns:content1="clr-namespace:Client.Desktop.ViewModels.Content.Master;assembly=Client.Desktop.ViewModels">
+                    xmlns:contentModel="clr-namespace:Client.Desktop.ViewModels.Content.Master;assembly=Client.Desktop.ViewModels"
+                    xmlns:master="clr-namespace:Client.Desktop.Laundry.Views.Master">
 
     <DataTemplate DataType="{x:Type viewModels:MenuViewModel}">
         <views:MenuView/>
-    </DataTemplate>
-
-    <DataTemplate DataType="{x:Type content:DataViewModel}">
-        <views:DataView/>
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type content:AddViewModel}">
         <views:AddView/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type content1:ClientViewModel}">
+    <DataTemplate DataType="{x:Type contentModel:ClientViewModel}">
         <master:ClientView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type contentModel:StaffViewModel}">
+        <master:StaffView/>
     </DataTemplate>
 
 </ResourceDictionary>

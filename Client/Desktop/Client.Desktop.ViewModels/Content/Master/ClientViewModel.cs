@@ -56,7 +56,7 @@ namespace Client.Desktop.ViewModels.Content.Master
             Departments?.Where(x => x.ClientId == SelectedClient?.Id || x.OriginalObject.ClientEntity == SelectedClient?.OriginalObject).ToObservableCollection();
 
         public ObservableCollection<ClientEntityViewModel> SortedParentClients =>
-           Clients?.Where(x=> x.ParentId == 0).ToObservableCollection();
+           Clients?.Where(x=> x.ParentId == 0 || x.ParentId == null).ToObservableCollection();
 
         #endregion
 
@@ -142,10 +142,10 @@ namespace Client.Desktop.ViewModels.Content.Master
 
             var client = SelectedClient;
             SelectedClient = null;
-            
-            Clients.Remove(client);
 
-            //TODO: delete data from DB
+            _laundryService.Delete(client.OriginalObject);
+
+            Clients.Remove(client);
         }
 
         private void AddNewDepartment()
@@ -154,12 +154,11 @@ namespace Client.Desktop.ViewModels.Content.Master
             if (!_dialogService.ShowQuestionDialog("Do you want add new department?"))
                 return;
 
-            var newDepartment = new DepartmentEntityViewModel()
-            {
-                ClientId = SelectedClient.Id,
-            };
+            var newDepartment = new DepartmentEntityViewModel();
 
-            newDepartment.OriginalObject.ClientEntity = SelectedClient.OriginalObject;
+            newDepartment.ClientId = SelectedClient.Id;
+
+            //newDepartment.OriginalObject.ClientEntity = SelectedClient.OriginalObject;
 
             Departments.Add(newDepartment);
             SelectedDepartment = newDepartment;
@@ -175,9 +174,9 @@ namespace Client.Desktop.ViewModels.Content.Master
             var department = SelectedDepartment;
             SelectedDepartment = null;
 
-            Departments.Remove(department);
+            _laundryService.Delete(department.OriginalObject);
 
-            //TODO: delete data from DB
+            Departments.Remove(department);
         }
 
         private void Save()
@@ -185,19 +184,32 @@ namespace Client.Desktop.ViewModels.Content.Master
             var clients = Clients.Where(x => x.HasChanges()).ToList();
             var departments = Departments.Where(x => x.HasChanges()).ToList();
 
-            foreach (var client in clients)
+            if (clients.Count > 0)
             {
-                client.AcceptChanges();
-                _laundryService.AddOrUpdate(client.OriginalObject);
+                foreach (var client in clients)
+                {
+                    client.AcceptChanges();
+                    _laundryService.AddOrUpdate(client.OriginalObject);
+
+                    client.Refresh();
+                }
+
+                _dialogService.ShowInfoDialog("All changes saved");
             }
 
-            foreach (var department in departments)
+            if (departments.Count > 0)
             {
-                department.AcceptChanges();
-                _laundryService.AddOrUpdate(department.OriginalObject);
+                foreach (var department in departments)
+                {
+                    department.AcceptChanges();
+                    _laundryService.AddOrUpdate(department.OriginalObject);
+                }
+
+                _dialogService.ShowInfoDialog("All changes saved");
             }
 
-            _dialogService.ShowInfoDialog("All changes saved");
+
         }
+
     }
 }

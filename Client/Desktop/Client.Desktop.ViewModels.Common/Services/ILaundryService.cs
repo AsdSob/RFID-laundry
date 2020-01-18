@@ -10,6 +10,7 @@ namespace Client.Desktop.ViewModels.Common.Services
     {
         Task<ICollection<T>> GetAllAsync<T>() where T : class, IEntity<int>;
         Task AddOrUpdate<T>(T entity) where T : class, IEntity<int>;
+        Task Delete<T>(T entity) where T : class, IEntity<int>;
     }
     
     public class Laundry
@@ -39,9 +40,12 @@ namespace Client.Desktop.ViewModels.Common.Services
 
         public async Task Delete<T>(T entity) where T : class, IEntity<int>
         {
+            if(entity.Id == 0) return;
+
             using (var context = await _contextFactory.CreateAsync())
             {
                 context.Remove(entity);
+                context.SaveChanges();
             }
         }
 
@@ -57,6 +61,8 @@ namespace Client.Desktop.ViewModels.Common.Services
                 {
                     context.Update(entity);
                 }
+
+                context.SaveChanges();
             }
         }
 
