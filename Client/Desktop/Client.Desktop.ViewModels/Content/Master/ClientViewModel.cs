@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -9,6 +10,7 @@ using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Storage.Laundry.Models;
+using Storage.Laundry.Models.Abstract;
 
 namespace Client.Desktop.ViewModels.Content.Master
 {
@@ -52,8 +54,7 @@ namespace Client.Desktop.ViewModels.Content.Master
             set => Set(() => Clients, ref _clients, value);
         }
 
-        public ObservableCollection<DepartmentEntityViewModel> SortedDepartments =>
-            Departments?.Where(x => x.ClientId == SelectedClient?.Id || x.OriginalObject.ClientEntity == SelectedClient?.OriginalObject).ToObservableCollection();
+        public ObservableCollection<DepartmentEntityViewModel> SortedDepartments => SortDepartments();
 
         public ObservableCollection<ClientEntityViewModel> SortedParentClients =>
            Clients?.Where(x=> x.ParentId == 0 || x.ParentId == null).ToObservableCollection();
@@ -119,6 +120,23 @@ namespace Client.Desktop.ViewModels.Content.Master
 
         }
 
+        private ObservableCollection<DepartmentEntityViewModel> SortDepartments()
+        {
+            var departments = new ObservableCollection<DepartmentEntityViewModel>();
+            if (SelectedClient == null) return departments;
+
+            if (SelectedClient.IsNew)
+            {
+                departments.AddRange(Departments.Where(x=> x.OriginalObject.ClientEntity == SelectedClient.OriginalObject));
+            }
+            else
+            {
+                departments.AddRange(Departments.Where(x=> x.ClientId == SelectedClient.Id));
+            }
+
+            return departments;
+        }
+
         private void AddNewClient()
         {
             if(!_dialogService.ShowQuestionDialog("Do you want add new client?")) 
@@ -156,9 +174,14 @@ namespace Client.Desktop.ViewModels.Content.Master
 
             var newDepartment = new DepartmentEntityViewModel();
 
-            newDepartment.ClientId = SelectedClient.Id;
-
-            //newDepartment.OriginalObject.ClientEntity = SelectedClient.OriginalObject;
+            if (SelectedClient.IsNew)
+            {
+                newDepartment.OriginalObject.ClientEntity = SelectedClient.OriginalObject;
+            }
+            else
+            {
+                newDepartment.ClientId = SelectedClient.Id;
+            }
 
             Departments.Add(newDepartment);
             SelectedDepartment = newDepartment;
@@ -181,34 +204,28 @@ namespace Client.Desktop.ViewModels.Content.Master
 
         private void Save()
         {
+            ArrayList entities = new ArrayList();
+
             var clients = Clients.Where(x => x.HasChanges()).ToList();
             var departments = Departments.Where(x => x.HasChanges()).ToList();
 
-            if (clients.Count > 0)
+            clients?.ForEach(x=> x.AcceptChanges());
+            departments?.ForEach(x => x.AcceptChanges());
+
+            //entities.Add(clients.Select(x=> x.OriginalObject));
+            //entities.Add(departments.Select(x=> x.OriginalObject));
+
+            foreach (var client in clients)
             {
-                foreach (var client in clients)
-                {
-                    client.AcceptChanges();
-                    _laundryService.AddOrUpdate(client.OriginalObject);
-
-                    client.Refresh();
-                }
-
-                _dialogService.ShowInfoDialog("All changes saved");
+                _laundryService.AddOrUpdate(client.OriginalObject);
+            }
+            foreach (var client in departments)
+            {
+                _laundryService.AddOrUpdate(client.OriginalObject);
             }
 
-            if (departments.Count > 0)
-            {
-                foreach (var department in departments)
-                {
-                    department.AcceptChanges();
-                    _laundryService.AddOrUpdate(department.OriginalObject);
-                }
-
-                _dialogService.ShowInfoDialog("All changes saved");
-            }
-
-
+            //_laundryService.AddOrUpdate(entities);
+            _dialogService.ShowInfoDialog("All changes saved");
         }
 
     }

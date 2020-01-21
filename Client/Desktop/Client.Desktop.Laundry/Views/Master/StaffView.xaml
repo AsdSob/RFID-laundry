@@ -10,7 +10,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
@@ -19,8 +19,8 @@
                 <RowDefinition  Height="Auto"/>
                 <RowDefinition  Height="Auto"/>
                 <RowDefinition  Height="Auto"/>
-                <RowDefinition  Height="*"/>
                 <RowDefinition  Height="Auto"/>
+                <RowDefinition  Height="*"/>
             </Grid.RowDefinitions>
 
             <!--Clients-->
@@ -49,7 +49,7 @@
                 <Button Margin = "5" Padding="10,2"  Content="Save" Command="{Binding SaveCommand}"/>
             </StackPanel>
 
-            <GroupBox Grid.Row="3" 
+            <GroupBox Grid.Row="4" 
                       Header="Staff"
                       Margin="5">
 
@@ -73,7 +73,7 @@
             </GroupBox>
 
             <!-- Staff Details-->
-            <Grid Row="4">
+            <Grid Row="3">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>

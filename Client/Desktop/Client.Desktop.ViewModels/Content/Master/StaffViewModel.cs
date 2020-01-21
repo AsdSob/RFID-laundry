@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
+using Storage.Laundry.Models;
 using Storage.Laundry.Models.Abstract;
 
 namespace Client.Desktop.ViewModels.Content.Master
@@ -86,7 +88,6 @@ namespace Client.Desktop.ViewModels.Content.Master
         public RelayCommand DeleteLinenCommand { get; }
 
 
-
         public StaffViewModel(ILaundryService dataService, IDialogService dialogService)
         {
             _laundryService = dataService ?? throw new ArgumentNullException(nameof(dataService));
@@ -99,8 +100,52 @@ namespace Client.Desktop.ViewModels.Content.Master
             AddLinenCommand = new RelayCommand(AddLinen, (() => SelectedDepartment != null));
             DeleteLinenCommand = new RelayCommand(DeleteLinen, (() => SelectedLinen != null));
 
-
             PropertyChanged += OnPropertyChanged;
+
+            Task.Factory.StartNew( () => GetData());
+
+            _dialogService.ShowInfoDialog("Done");
+        }
+
+
+        private async Task GetData()
+        {
+            _dialogService.ShowBusy();
+
+            try
+            {
+                var client = await _laundryService.GetAllAsync<ClientEntity>();
+                var clients = client.Select(x => new ClientEntityViewModel(x));
+                Clients = clients.ToList();
+
+                var department = await _laundryService.GetAllAsync<DepartmentEntity>();
+                var departments = department.Select(x => new DepartmentEntityViewModel(x));
+                Departments = departments.ToList();
+
+                var master = await _laundryService.GetAllAsync<MasterLinenEntity>();
+                var masters = master.Select(x => new MasterLinenEntityViewModel(x));
+                MasterLinens = masters.ToObservableCollection();
+
+                var linen = await _laundryService.GetAllAsync<ClientLinenEntity>();
+                var linens = linen.Select(x => new LinenEntityViewModel(x));
+                Linens = linens.ToObservableCollection();
+
+                var staff = await _laundryService.GetAllAsync<ClientStaffEntity>();
+                var staffs = staff.Select(x => new StaffEntityViewModel(x));
+                Staff = staffs.ToObservableCollection();
+
+            }
+            catch (Exception e)
+            {
+                _dialogService.HideBusy();
+            }
+
+            finally
+            {
+                _dialogService.HideBusy();
+            }
+
+            SelectedClient = Clients.FirstOrDefault();
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -108,6 +153,7 @@ namespace Client.Desktop.ViewModels.Content.Master
             if (e.PropertyName == nameof(SelectedClient))
             {
                 RaisePropertyChanged(() => SortedDepartments);
+                SelectedDepartment = SortedDepartments.FirstOrDefault();
             }
 
             if (e.PropertyName == nameof(SelectedDepartment))
@@ -152,13 +198,18 @@ namespace Client.Desktop.ViewModels.Content.Master
         {
             if (Staff.Any(x => x.HasChanges()))
             {
-                var items = Staff.Where(x => x.HasChanges()).ToList();
+                var staffs = Staff.Where(x => x.HasChanges()).ToList();
 
-                foreach (var item in items)
+                if (Staff.Count > 0)
                 {
-                    item.AcceptChanges();
-                    SaveEntity(item.OriginalObject);
+                    foreach (var staff in staffs)
+                    {
+                        staff.AcceptChanges();
+                        SaveEntity(staff.OriginalObject);
+                    }
                 }
+
+                _dialogService.ShowInfoDialog("All changes saved");
             }
 
             if (Linens.Any(x => x.HasChanges()))
@@ -172,7 +223,6 @@ namespace Client.Desktop.ViewModels.Content.Master
                 }
             }
 
-            _dialogService.ShowInfoDialog("All changes saved");
         }
 
         private void SaveEntity<T>(T entity) where T : EntityBase
@@ -195,6 +245,7 @@ namespace Client.Desktop.ViewModels.Content.Master
                 DepartmentId = SelectedDepartment.Id,
                 PhoneNumber = "+971",
             };
+
 
             Staff.Add(newStaff);
 
