@@ -14,7 +14,7 @@ using Storage.Laundry.Models.Abstract;
 
 namespace Client.Desktop.ViewModels.Content.Master
 {
-    public class ClientViewModel : ViewModelBase
+    public class MasterClientViewModel : ViewModelBase
     {
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
@@ -69,7 +69,7 @@ namespace Client.Desktop.ViewModels.Content.Master
         public RelayCommand DeleteDepartmentCommand { get; }
 
 
-        public ClientViewModel(ILaundryService dataService, IDialogService dialogService, IResolver resolver)
+        public MasterClientViewModel(ILaundryService dataService, IDialogService dialogService, IResolver resolver)
         {
             _laundryService = dataService ?? throw new ArgumentNullException(nameof(dataService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
@@ -212,9 +212,6 @@ namespace Client.Desktop.ViewModels.Content.Master
             clients?.ForEach(x=> x.AcceptChanges());
             departments?.ForEach(x => x.AcceptChanges());
 
-            //entities.Add(clients.Select(x=> x.OriginalObject));
-            //entities.Add(departments.Select(x=> x.OriginalObject));
-
             foreach (var client in clients)
             {
                 _laundryService.AddOrUpdate(client.OriginalObject);
@@ -224,7 +221,6 @@ namespace Client.Desktop.ViewModels.Content.Master
                 _laundryService.AddOrUpdate(client.OriginalObject);
             }
 
-            //_laundryService.AddOrUpdate(entities);
             _dialogService.ShowInfoDialog("All changes saved");
         }
 

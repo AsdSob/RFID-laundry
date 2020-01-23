@@ -9,8 +9,13 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
         private string _name;
         private int _id;
         private int _clientId;
+        private int _departmentTypeId;
 
-
+        public int DepartmentTypeId
+        {
+            get => _departmentTypeId;
+            set => Set(() => DepartmentTypeId, ref _departmentTypeId, value);
+        }
         public int ClientId
         {
             get => _clientId;
@@ -52,6 +57,7 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             Id = OriginalObject.Id;
             Name = OriginalObject.Name;
             ClientId = OriginalObject.ClientId;
+            DepartmentTypeId = OriginalObject.DepartmentTypeId;
         }
 
         public void AcceptChanges()
@@ -60,11 +66,13 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
 
             OriginalObject.Name = Name;
             OriginalObject.ClientId = ClientId;
+            OriginalObject.DepartmentTypeId = DepartmentTypeId;
         }
 
         public bool HasChanges() => OriginalObject == null ||
                                     OriginalObject.IsNew ||
                                     !Equals(Name, OriginalObject.Name) ||
+                                    !Equals(DepartmentTypeId, OriginalObject.DepartmentTypeId) ||
                                     !Equals(ClientId, OriginalObject.ClientId);
     }
 }

@@ -4,6 +4,7 @@ using Client.Desktop.ViewModels;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Content;
 using Client.Desktop.ViewModels.Content.Master;
+using Client.Desktop.ViewModels.Windows;
 using Client.Desktop.Views.Services;
 using Common.Logger.Module;
 using Microsoft.EntityFrameworkCore.Internal;
@@ -33,11 +34,12 @@ namespace Client.Desktop.Laundry.ViewModels
             builder.RegisterType<MainViewModel>().SingleInstance();
             builder.RegisterType<MenuViewModel>().SingleInstance();
 
-
             builder.RegisterType<DataViewModel>().SingleInstance();
-            builder.RegisterType<ClientViewModel>().SingleInstance();
+            builder.RegisterType<MasterClientViewModel>().SingleInstance();
+            builder.RegisterType<MasterStaffViewModel>().SingleInstance();
+            builder.RegisterType<MasterLinenViewModel>().SingleInstance();
 
-            builder.RegisterType<StaffViewModel>().SingleInstance();
+            builder.RegisterType<RfidReaderWindowModel>().SingleInstance();
 
         }
 

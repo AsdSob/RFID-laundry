@@ -12,6 +12,7 @@ namespace Storage.Laundry.Configurations
             builder.ToTable("masterLinen");
 
             builder.Property(x => x.Name).HasColumnName("name");
+            builder.Property(x => x.PackingValue).HasColumnName("packingValue");
         }
     }
 }

@@ -14,6 +14,7 @@ namespace Client.Desktop.ViewModels.Common.Services
         Task AddOrUpdate<T>(T entity) where T : class, IEntity<int>;
 
         Task Delete<T>(T entity) where T : class, IEntity<int>;
+        Task Delete<T>(IEnumerable<T> entities) where T : class, IEntity<int>;
     }
     
 
@@ -44,6 +45,14 @@ namespace Client.Desktop.ViewModels.Common.Services
             {
                 context.Remove(entity);
                 context.SaveChanges();
+            }
+        }
+
+        public async Task Delete<T>(IEnumerable<T> entities) where T : class, IEntity<int>
+        {
+            foreach (var entity in entities)
+            {
+                await Delete(entity);
             }
         }
 

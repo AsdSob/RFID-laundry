@@ -8,7 +8,13 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
         private MasterLinenEntity _originalObject;
         private int _id;
         private string _name;
+        private int _packingValue;
 
+        public int PackingValue
+        {
+            get => _packingValue;
+            set => Set(() => PackingValue, ref _packingValue, value);
+        }
         public string Name
         {
             get => _name;
@@ -43,6 +49,7 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
 
             Id = OriginalObject.Id;
             Name = OriginalObject.Name;
+            PackingValue = OriginalObject.PackingValue;
         }
 
         public void AcceptChanges()
@@ -50,10 +57,12 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             if (OriginalObject == null) return;
 
             OriginalObject.Name = Name;
+            OriginalObject.PackingValue = PackingValue;
         }
 
         public bool HasChanges() => OriginalObject == null ||
                                     OriginalObject.IsNew ||
-                                    !Equals(Name, OriginalObject.Name);
+                                    !Equals(Name, OriginalObject.Name) ||
+                                    !Equals(PackingValue, OriginalObject.PackingValue);
     }
 }

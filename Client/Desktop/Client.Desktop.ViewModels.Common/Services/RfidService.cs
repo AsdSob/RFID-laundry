@@ -1,26 +1,70 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
+using Client.Desktop.ViewModels.Common.EntityViewModels;
+using Client.Desktop.ViewModels.Common.Extensions;
+using Client.Desktop.ViewModels.Common.ViewModels;
 using Impinj.OctaneSdk;
 
 namespace Client.Desktop.ViewModels.Common.Services
 {
-    public interface IRfidService
+    public class RfidService : ViewModelBase
     {
-        
-    }
-
-    public class RfidService
-    {
-        public ImpinjReader Reader = new ImpinjReader();
-        public Impinj.OctaneSdk.Settings settings;
-
+        private ImpinjReader Reader = new ImpinjReader();
+        private Settings settings;
         private ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>> _data =
             new ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>>();
+        
+        private ObservableCollection<RfidReaderEntityViewModel> _readers;
+        private ObservableCollection<RfidAntennaEntityViewModel> _antennas;
+        private RfidReaderEntityViewModel _selectedReader;
 
-        public bool Connection()
+        public RfidReaderEntityViewModel SelectedReader
+        {
+            get => _selectedReader;
+            set => Set(() => SelectedReader, ref _selectedReader, value);
+        }
+        public ObservableCollection<RfidAntennaEntityViewModel> Antennas
+        {
+            get => _antennas;
+            set => Set(() => Antennas, ref _antennas, value);
+        }
+        public ObservableCollection<RfidReaderEntityViewModel> Readers
+        {
+            get => _readers;
+            set => Set(() => Readers, ref _readers, value);
+        }
+
+        public ObservableCollection<RfidAntennaEntityViewModel> ReaderAntennas =>
+            Antennas?.Where(x => x.RfidReaderId == SelectedReader?.Id).ToObservableCollection();
+
+
+        public RfidService()
+        {
+            
+        }
+
+        public void StartRead()
+        {
+            if(!Connection()) return;
+
+            _data = new ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>>();
+
+            Reader.Start();
+            Reader.TagsReported += DisplayTag;
+        }
+
+        public void StopRead()
+        {
+            Reader.TagsReported -= DisplayTag;
+            Reader.Stop();
+            Reader.Disconnect();
+        }
+
+        private bool Connection()
         {
             try
             {
@@ -29,10 +73,10 @@ namespace Client.Desktop.ViewModels.Common.Services
                     Reader.Disconnect();
                 }
 
-                Reader.Connect("192.168.250.55");
+                //Reader.Connect(ReaderEntity.ReaderIp,ReaderEntity.ReaderPort);
                 Reader.Stop();
-
             }
+
             catch (OctaneSdkException ee)
             {
                 Console.WriteLine("Octane SDK exception: Reader #1" + ee.Message, "error");
@@ -74,57 +118,42 @@ namespace Client.Desktop.ViewModels.Common.Services
 
             settings.Report.Mode = ReportMode.Individual;
 
-            Antenna();
+            SetAntennaSettings();
 
             Reader.ApplySettings(settings);
         }
 
-        public void Antenna()
+        private void SetAntennaSettings()
         {
             settings.Antennas.DisableAll();
-            var j = settings.Antennas.AntennaConfigs.Count;
 
-            for (ushort i = 1; i <= j; i++)
-            {
-                settings.Antennas.GetAntenna(i).IsEnabled = true;
-                settings.Antennas.GetAntenna(i).TxPowerInDbm = Convert.ToDouble("20");
-                settings.Antennas.GetAntenna(i).RxSensitivityInDbm = Convert.ToDouble("-70");
-            }
+            //foreach (var antenna in RfidAntennas)
+            //{
+            //    settings.Antennas.GetAntenna((ushort)antenna.AntennaNumb).IsEnabled = true;
+            //    settings.Antennas.GetAntenna((ushort)antenna.AntennaNumb).TxPowerInDbm = antenna.TxPower;
+            //    settings.Antennas.GetAntenna((ushort)antenna.AntennaNumb).RxSensitivityInDbm = antenna.RxSensitivity;
+            //}
         }
+        
+        #region Read tags during specified time
 
-        public void StartRead()
+        public void ReadDuringTime(double seconds)
         {
-            Connection();
-            _data = new ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>>();
+            int time = (int) (seconds * 1000);
 
-            Reader.Start();
-            Reader.TagsReported += DisplayTag;
-        }
-
-        public void StopRead()
-        {
-            Reader.TagsReported -= DisplayTag;
-            Reader.Stop();
-            Reader.Disconnect();
-        }
-
-        public void ReadDuringTime(int readTime)
-        {
             StartRead();
 
-            Thread.Sleep(readTime);
+            Thread.Sleep(time);
 
             StopRead();
         }
-
-
 
         public ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>> GetFullData()
         {
             return _data;
         }
 
-        public List<Tuple<int, string>> GetSortedData()
+        public List<Tuple<int, string>> GetAntennaAndTags()
         {
             var data = GetFullData();
             var tags = new List<Tuple<int, string>>();
@@ -137,7 +166,7 @@ namespace Client.Desktop.ViewModels.Common.Services
             return tags;
         }
 
-        public List<string> GetAntennasTags()
+        public List<string> GetOnlyTags()
         {
             var data = GetFullData();
             var tags = new List<string>();
@@ -174,6 +203,8 @@ namespace Client.Desktop.ViewModels.Common.Services
             return tags;
         }
 
+        #endregion
+
 
         private void DisplayTag(ImpinjReader reader, TagReport report)
         {
@@ -204,8 +235,6 @@ namespace Client.Desktop.ViewModels.Common.Services
                 val.TryUpdate(epc, new Tuple<DateTime?, DateTime?>(times.Item1, time), times);
                 //данные можно сохранять в БД, но метке можно обнулить
             }
-
-            // если метка повторно падает в считыватель, то нужно предыдущие данные сохранять в БД
         }
 
     }

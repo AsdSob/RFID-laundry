@@ -4,7 +4,9 @@
                     xmlns:views="clr-namespace:Client.Desktop.Laundry.Views"
                     xmlns:content="clr-namespace:Client.Desktop.ViewModels.Content;assembly=Client.Desktop.ViewModels"
                     xmlns:contentModel="clr-namespace:Client.Desktop.ViewModels.Content.Master;assembly=Client.Desktop.ViewModels"
-                    xmlns:master="clr-namespace:Client.Desktop.Laundry.Views.Master">
+                    xmlns:master="clr-namespace:Client.Desktop.Laundry.Views.Master"
+                    xmlns:windows="clr-namespace:Client.Desktop.ViewModels.Windows;assembly=Client.Desktop.ViewModels"
+                    xmlns:windows1="clr-namespace:Client.Desktop.Laundry.Windows">
 
     <DataTemplate DataType="{x:Type viewModels:MenuViewModel}">
         <views:MenuView/>
@@ -14,12 +16,20 @@
         <views:AddView/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type contentModel:ClientViewModel}">
+    <DataTemplate DataType="{x:Type contentModel:MasterClientViewModel}">
         <master:ClientView/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type contentModel:StaffViewModel}">
+    <DataTemplate DataType="{x:Type contentModel:MasterStaffViewModel}">
         <master:StaffView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type contentModel:MasterLinenViewModel}">
+        <master:MasterLinenView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type windows:RfidReaderWindowModel}">
+        <windows1:RfidReaderWindow/>
     </DataTemplate>
 
 </ResourceDictionary>

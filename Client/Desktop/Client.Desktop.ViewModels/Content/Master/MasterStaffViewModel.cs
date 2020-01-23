@@ -8,15 +8,17 @@ using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
+using Client.Desktop.ViewModels.Windows;
 using Storage.Laundry.Models;
 using Storage.Laundry.Models.Abstract;
 
 namespace Client.Desktop.ViewModels.Content.Master
 {
-    public class StaffViewModel : ViewModelBase
+    public class MasterStaffViewModel : ViewModelBase
     {
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
+        private readonly IResolver _resolverService;
         private List<ClientEntityViewModel> _clients;
         private ClientEntityViewModel _selectedClient;
         private List<DepartmentEntityViewModel> _departments;
@@ -86,25 +88,25 @@ namespace Client.Desktop.ViewModels.Content.Master
         public RelayCommand DeleteStaffCommand { get; }
         public RelayCommand AddLinenCommand { get; }
         public RelayCommand DeleteLinenCommand { get; }
+        public RelayCommand RfidReaderCommand { get; }
 
 
-        public StaffViewModel(ILaundryService dataService, IDialogService dialogService)
+        public MasterStaffViewModel(ILaundryService dataService, IDialogService dialogService, IResolver resolver)
         {
             _laundryService = dataService ?? throw new ArgumentNullException(nameof(dataService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
+            _resolverService = resolver ?? throw new ArgumentNullException(nameof(resolver));
 
-            SaveCommand = new RelayCommand(Save);
+            SaveCommand = new RelayCommand(RfidReader);
             AddStaffCommand = new RelayCommand(AddStaff, (() => SelectedDepartment != null));
             DeleteStaffCommand = new RelayCommand(DeleteStaff, (() => SelectedStaff != null));
 
             AddLinenCommand = new RelayCommand(AddLinen, (() => SelectedDepartment != null));
             DeleteLinenCommand = new RelayCommand(DeleteLinen, (() => SelectedLinen != null));
 
-            PropertyChanged += OnPropertyChanged;
+            RfidReaderCommand = new RelayCommand(RfidReader);
 
             Task.Factory.StartNew( () => GetData());
-
-            _dialogService.ShowInfoDialog("Done");
         }
 
 
@@ -145,7 +147,7 @@ namespace Client.Desktop.ViewModels.Content.Master
                 _dialogService.HideBusy();
             }
 
-            SelectedClient = Clients.FirstOrDefault();
+            PropertyChanged += OnPropertyChanged;
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -196,32 +198,8 @@ namespace Client.Desktop.ViewModels.Content.Master
 
         private void Save()
         {
-            if (Staff.Any(x => x.HasChanges()))
-            {
-                var staffs = Staff.Where(x => x.HasChanges()).ToList();
-
-                if (Staff.Count > 0)
-                {
-                    foreach (var staff in staffs)
-                    {
-                        staff.AcceptChanges();
-                        SaveEntity(staff.OriginalObject);
-                    }
-                }
-
-                _dialogService.ShowInfoDialog("All changes saved");
-            }
-
-            if (Linens.Any(x => x.HasChanges()))
-            {
-                var items = Linens.Where(x => x.HasChanges()).ToList();
-
-                foreach (var item in items)
-                {
-                    item.AcceptChanges();
-                    SaveEntity(item.OriginalObject);
-                }
-            }
+            var staffs = Staff.Where(x => x.HasChanges());
+            var linens = Linens.Where(x => x.HasChanges());
 
         }
 
@@ -314,5 +292,13 @@ namespace Client.Desktop.ViewModels.Content.Master
             RaisePropertyChanged(()=> SortedLinens);
         }
 
+
+        private void RfidReader()
+        {
+            var readerWindow = _resolverService.Resolve<RfidReaderWindowModel>();
+
+            var showDialog = _dialogService.ShowDialog(readerWindow);
+            if(showDialog) return;
+        }
     }
 }

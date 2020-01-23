@@ -21,13 +21,15 @@ namespace Client.Desktop.ViewModels
 
         public ICommand ClientCommand { get; }
         public ICommand StaffCommand { get; }
+        public ICommand MasterLinenCommand { get; }
 
         public MenuViewModel()
         {
             NewCommand = new RelayCommand(() => Select(typeof(DataViewModel)));
             ExitCommand = new RelayCommand(() => Select(typeof(ExitViewModel)));
-            ClientCommand = new RelayCommand(() => Select(typeof(ClientViewModel)));
-            StaffCommand = new RelayCommand(() => Select(typeof(StaffViewModel)));
+            ClientCommand = new RelayCommand(() => Select(typeof(MasterClientViewModel)));
+            StaffCommand = new RelayCommand(() => Select(typeof(MasterStaffViewModel)));
+            MasterLinenCommand = new RelayCommand(() => Select(typeof(MasterLinenViewModel)));
 
         }
 
