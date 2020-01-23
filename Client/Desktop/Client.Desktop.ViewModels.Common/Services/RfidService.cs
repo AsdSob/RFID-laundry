@@ -5,7 +5,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
-using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Impinj.OctaneSdk;
 
@@ -13,59 +12,26 @@ namespace Client.Desktop.ViewModels.Common.Services
 {
     public class RfidService : ViewModelBase
     {
-        private ImpinjReader Reader = new ImpinjReader();
+        public ImpinjReader Reader = new ImpinjReader();
         private Settings settings;
+
+        public RfidReaderEntityViewModel SelectedReader { get; set; }
+        private ObservableCollection<Tuple<int, string>> _tags;
+
+        public ObservableCollection<Tuple<int,string>> Tags
+        {
+            get => _tags;
+            set => Set(() => Tags, ref _tags, value);
+        }
         private ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>> _data =
             new ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>>();
-        
-        private ObservableCollection<RfidReaderEntityViewModel> _readers;
-        private ObservableCollection<RfidAntennaEntityViewModel> _antennas;
-        private RfidReaderEntityViewModel _selectedReader;
 
-        public RfidReaderEntityViewModel SelectedReader
+
+
+        public bool Connection(RfidReaderEntityViewModel r, List<RfidAntennaEntityViewModel> antennas)
         {
-            get => _selectedReader;
-            set => Set(() => SelectedReader, ref _selectedReader, value);
-        }
-        public ObservableCollection<RfidAntennaEntityViewModel> Antennas
-        {
-            get => _antennas;
-            set => Set(() => Antennas, ref _antennas, value);
-        }
-        public ObservableCollection<RfidReaderEntityViewModel> Readers
-        {
-            get => _readers;
-            set => Set(() => Readers, ref _readers, value);
-        }
+            if (r == null || !antennas.Any()) return false;
 
-        public ObservableCollection<RfidAntennaEntityViewModel> ReaderAntennas =>
-            Antennas?.Where(x => x.RfidReaderId == SelectedReader?.Id).ToObservableCollection();
-
-
-        public RfidService()
-        {
-            
-        }
-
-        public void StartRead()
-        {
-            if(!Connection()) return;
-
-            _data = new ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>>();
-
-            Reader.Start();
-            Reader.TagsReported += DisplayTag;
-        }
-
-        public void StopRead()
-        {
-            Reader.TagsReported -= DisplayTag;
-            Reader.Stop();
-            Reader.Disconnect();
-        }
-
-        private bool Connection()
-        {
             try
             {
                 if (Reader.IsConnected)
@@ -73,7 +39,7 @@ namespace Client.Desktop.ViewModels.Common.Services
                     Reader.Disconnect();
                 }
 
-                //Reader.Connect(ReaderEntity.ReaderIp,ReaderEntity.ReaderPort);
+                Reader.Connect(r.ReaderIp, r.ReaderPort);
                 Reader.Stop();
             }
 
@@ -83,16 +49,17 @@ namespace Client.Desktop.ViewModels.Common.Services
             }
             catch (Exception ee)
             {
-                // Handle other .NET errors.
                 Console.WriteLine("Exception : Reader #1" + ee.Message, "error");
                 Console.WriteLine(ee.StackTrace);
             }
 
-            SetSettings();
+            SetAntennaSettings(antennas);
+            SetSettings(r);
+
             return Reader.IsConnected;
         }
 
-        private void SetSettings()
+        private void SetSettings(RfidReaderEntityViewModel r)
         {
             settings = Reader.QueryDefaultSettings();
 
@@ -108,33 +75,48 @@ namespace Client.Desktop.ViewModels.Common.Services
             settings.Report.IncludePcBits = true;
             settings.Report.IncludeSeenCount = true;
 
+            //ReaderMode.AutoSetDenseReaderDeepScan | Rx = -70 | Tx = 15/20
+            //ReaderMode.MaxThrouput | Rx = -80 | Tx = 15
 
-            ///ReaderMode.AutoSetDenseReaderDeepScan | Rx = -70 | Tx = 15/20
-            ///ReaderMode.MaxThrouput | Rx = -80 | Tx = 15
             settings.ReaderMode = ReaderMode.AutoSetDenseReaderDeepScan;//.AutoSetDenseReader;
             settings.SearchMode = SearchMode.DualTarget;//.DualTarget;
             settings.Session = 1;
-            settings.TagPopulationEstimate = Convert.ToUInt16(200);
+            settings.TagPopulationEstimate = r.TagPopulation;
 
             settings.Report.Mode = ReportMode.Individual;
-
-            SetAntennaSettings();
 
             Reader.ApplySettings(settings);
         }
 
-        private void SetAntennaSettings()
+        private void SetAntennaSettings(List<RfidAntennaEntityViewModel> antennas)
         {
             settings.Antennas.DisableAll();
 
-            //foreach (var antenna in RfidAntennas)
-            //{
-            //    settings.Antennas.GetAntenna((ushort)antenna.AntennaNumb).IsEnabled = true;
-            //    settings.Antennas.GetAntenna((ushort)antenna.AntennaNumb).TxPowerInDbm = antenna.TxPower;
-            //    settings.Antennas.GetAntenna((ushort)antenna.AntennaNumb).RxSensitivityInDbm = antenna.RxSensitivity;
-            //}
+            foreach (var antenna in antennas)
+            {
+                settings.Antennas.GetAntenna((ushort)antenna.AntennaNumb).IsEnabled = true;
+                settings.Antennas.GetAntenna((ushort)antenna.AntennaNumb).TxPowerInDbm = antenna.TxPower;
+                settings.Antennas.GetAntenna((ushort)antenna.AntennaNumb).RxSensitivityInDbm = antenna.RxSensitivity;
+            }
         }
-        
+
+        public void StartRead()
+        {
+            if (!Reader.IsConnected) return;
+
+            _data = new ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>>();
+
+            Reader.Start();
+            Reader.TagsReported += DisplayTag;
+        }
+
+        public void StopRead()
+        {
+            Reader.TagsReported -= DisplayTag;
+            Reader.Stop();
+            Reader.Disconnect();
+        }
+
         #region Read tags during specified time
 
         public void ReadDuringTime(double seconds)
@@ -238,4 +220,5 @@ namespace Client.Desktop.ViewModels.Common.Services
         }
 
     }
+
 }

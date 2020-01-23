@@ -9,6 +9,7 @@ using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Windows;
+using Impinj.OctaneSdk;
 using Storage.Laundry.Models;
 using Storage.Laundry.Models.Abstract;
 
@@ -28,8 +29,21 @@ namespace Client.Desktop.ViewModels.Content.Master
         private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
         private ObservableCollection<LinenEntityViewModel> _linens;
         private LinenEntityViewModel _selectedLinen;
+        private ObservableCollection<Tuple<int, string>> _tags;
+        private Tuple<int, string> _selectedTag;
 
         public RfidReaderWindowModel RfidReaderWindow { get; set; }
+
+        public Tuple<int,string> SelectedTag
+        {
+            get => _selectedTag;
+            set => Set(() => SelectedTag, ref _selectedTag, value);
+        }
+        public ObservableCollection<Tuple<int, string>> Tags
+        {
+            get => _tags;
+            set => Set(() => Tags, ref _tags, value);
+        }
         public LinenEntityViewModel SelectedLinen
         {
             get => _selectedLinen;
@@ -91,6 +105,10 @@ namespace Client.Desktop.ViewModels.Content.Master
         public RelayCommand DeleteLinenCommand { get; }
         public RelayCommand RfidReaderCommand { get; }
 
+        public RelayCommand StartReadingCommand { get; }
+        public RelayCommand StopReadingCommand { get; }
+        public RelayCommand AddSelectedTagCommand { get; }
+
 
         public MasterStaffViewModel(ILaundryService dataService, IDialogService dialogService, IResolver resolver)
         {
@@ -98,7 +116,7 @@ namespace Client.Desktop.ViewModels.Content.Master
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _resolverService = resolver ?? throw new ArgumentNullException(nameof(resolver));
 
-            SaveCommand = new RelayCommand(RfidReader);
+            SaveCommand = new RelayCommand(Save);
             AddStaffCommand = new RelayCommand(AddStaff, (() => SelectedDepartment != null));
             DeleteStaffCommand = new RelayCommand(DeleteStaff, (() => SelectedStaff != null));
 
@@ -106,6 +124,9 @@ namespace Client.Desktop.ViewModels.Content.Master
             DeleteLinenCommand = new RelayCommand(DeleteLinen, (() => SelectedLinen != null));
 
             RfidReaderCommand = new RelayCommand(RfidReader);
+            StartReadingCommand = new RelayCommand(StartReading);
+            StopReadingCommand = new RelayCommand(StartReading);
+            AddSelectedTagCommand = new RelayCommand(AddSelectedTag, (() => SelectedTag != null));
 
             Task.Factory.StartNew( () => GetData());
 
@@ -180,6 +201,11 @@ namespace Client.Desktop.ViewModels.Content.Master
             if (e.PropertyName == nameof(SelectedLinen))
             {
                 DeleteLinenCommand.RaiseCanExecuteChanged();
+            }
+
+            if(e.PropertyName == nameof(SelectedTag))
+            {
+                AddSelectedTagCommand.RaiseCanExecuteChanged();
             }
 
         }
@@ -298,11 +324,45 @@ namespace Client.Desktop.ViewModels.Content.Master
 
         private void RfidReader()
         {
-            var readerWindow = _resolverService.Resolve<RfidReaderWindowModel>();
+            RfidReaderWindow.ReaderService.StopRead();
 
-            var showDialog = _dialogService.ShowDialog(readerWindow);
+            var showDialog = _dialogService.ShowDialog(RfidReaderWindow);
             
             
+        }
+
+        private void StartReading()
+        {
+            RfidReaderWindow.ReaderService.StartRead();
+
+            RfidReaderWindow.ReaderService.Reader.TagsReported += SHowAntennaTags;
+        }
+
+        private void StopReading()
+        {
+            RfidReaderWindow.ReaderService.StopRead();
+
+        }
+
+        private void AddSelectedTag()
+        {
+            RfidReaderWindow.ReaderService.StopRead();
+
+            RfidReaderWindow.ReaderService.Reader.TagsReported -= SHowAntennaTags;
+
+        }
+
+        public async void SHowAntennaTags(ImpinjReader reader, TagReport report)
+        {
+            foreach (var tag in report.Tags)
+            {
+                if (Tags.Any(x => Equals(x.Item2, tag.Epc.ToString()) && Equals(x.Item1, tag.AntennaPortNumber)))
+                {
+                    continue;
+                }
+
+                Tags.Add(new Tuple<int, string>(tag.AntennaPortNumber, tag.Epc.ToString()));
+            }
         }
     }
 }

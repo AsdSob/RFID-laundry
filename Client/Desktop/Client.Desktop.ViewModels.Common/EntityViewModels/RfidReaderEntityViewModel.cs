@@ -1,4 +1,5 @@
-﻿using Client.Desktop.ViewModels.Common.ViewModels;
+﻿using System.Collections.ObjectModel;
+using Client.Desktop.ViewModels.Common.ViewModels;
 using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Common.EntityViewModels
@@ -42,7 +43,6 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             get => _id;
             set => Set(() => Id, ref _id, value);
         }
-
 
         public bool IsNew => OriginalObject == null || OriginalObject.IsNew;
 

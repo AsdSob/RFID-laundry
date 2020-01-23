@@ -16,12 +16,20 @@ namespace Client.Desktop.ViewModels.Windows
     {
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
+
         public Action<bool> CloseAction { get; set; }
+
 
         private ObservableCollection<RfidReaderEntityViewModel> _rfidReaders;
         private RfidReaderEntityViewModel _selectedRfidReader;
         private ObservableCollection<RfidAntennaEntityViewModel> _rfidAntennas;
+        private RfidService _readerService;
 
+        public RfidService ReaderService
+        {
+            get => _readerService;
+            set => Set(() => ReaderService, ref _readerService, value);
+        }
         public ObservableCollection<RfidAntennaEntityViewModel> RfidAntennas
         {
             get => _rfidAntennas;
@@ -50,13 +58,14 @@ namespace Client.Desktop.ViewModels.Windows
         {
             _laundryService = laundryService ?? throw new ArgumentNullException(nameof(laundryService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
+            ReaderService = new RfidService();
 
             SaveCommand = new RelayCommand(Save);
             SelectReaderCommand = new RelayCommand(Close);
             AddReaderCommand = new RelayCommand(AddReader);
             CloseCommand = new RelayCommand(Close);
             DeleteReaderCommand = new RelayCommand(DeleteReader, () => SelectedRfidReader != null);
-
+            
             GetData();
         }
 
@@ -92,7 +101,20 @@ namespace Client.Desktop.ViewModels.Windows
             {
                 RaisePropertyChanged(()=> SortedAntennas);
                 DeleteReaderCommand.RaiseCanExecuteChanged();
+
+                ConnectReader();
             }
+        }
+
+        public void ConnectReader()
+        {
+            ReaderService.StopRead();
+
+            var isConnected = ReaderService.Connection(SelectedRfidReader, SortedAntennas.ToList());
+
+            _dialogService.ShowInfoDialog(isConnected
+                ? $"{SelectedRfidReader.Name} Is Connected"
+                : $"{SelectedRfidReader.Name} Is NOT Connected");
         }
 
         private ObservableCollection<RfidAntennaEntityViewModel> GetReaderAntennas()
