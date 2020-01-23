@@ -29,6 +29,7 @@ namespace Client.Desktop.ViewModels.Content.Master
         private ObservableCollection<LinenEntityViewModel> _linens;
         private LinenEntityViewModel _selectedLinen;
 
+        public RfidReaderWindowModel RfidReaderWindow { get; set; }
         public LinenEntityViewModel SelectedLinen
         {
             get => _selectedLinen;
@@ -107,6 +108,8 @@ namespace Client.Desktop.ViewModels.Content.Master
             RfidReaderCommand = new RelayCommand(RfidReader);
 
             Task.Factory.StartNew( () => GetData());
+
+            RfidReaderWindow = _resolverService.Resolve<RfidReaderWindowModel>();
         }
 
 
@@ -298,7 +301,8 @@ namespace Client.Desktop.ViewModels.Content.Master
             var readerWindow = _resolverService.Resolve<RfidReaderWindowModel>();
 
             var showDialog = _dialogService.ShowDialog(readerWindow);
-            if(showDialog) return;
+            
+            
         }
     }
 }

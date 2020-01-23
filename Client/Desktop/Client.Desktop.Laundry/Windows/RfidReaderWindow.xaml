@@ -1,17 +1,17 @@
-﻿<UserControl x:Class="Client.Desktop.Laundry.Windows.RfidReaderWindow"
+﻿<Window x:Class="Client.Desktop.Laundry.Windows.RfidReaderWindow"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:windows="clr-namespace:Client.Desktop.ViewModels.Windows;assembly=Client.Desktop.ViewModels"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="600"
-             d:DataContext="{d:DesignInstance windows:RfidReaderWindowModel}">
+             d:DataContext="{d:DesignInstance windows:RfidReaderWindowModel}"
+             Window.Width="400" Window.Height="450">
     <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
         <!-- Commands -->
@@ -87,4 +87,4 @@
         </GroupBox>
 
     </Grid>
-</UserControl>
+</Window>
