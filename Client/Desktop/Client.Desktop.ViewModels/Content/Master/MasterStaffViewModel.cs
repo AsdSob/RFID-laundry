@@ -154,6 +154,7 @@ namespace Client.Desktop.ViewModels.Content.Master
 
                 var linen = await _laundryService.GetAllAsync<ClientLinenEntity>();
                 var linens = linen.Select(x => new LinenEntityViewModel(x));
+                Linens = new ObservableCollection<LinenEntityViewModel>();
                 Linens = linens.ToObservableCollection();
 
                 var staff = await _laundryService.GetAllAsync<ClientStaffEntity>();
@@ -218,7 +219,7 @@ namespace Client.Desktop.ViewModels.Content.Master
             {
                 if (SelectedDepartment == null) return linens;
 
-                return Linens.Where(x => x.DepartmentId == SelectedDepartment.Id).ToObservableCollection();
+                return Linens?.Where(x => x.DepartmentId == SelectedDepartment?.Id).ToObservableCollection();
             }
 
             linens = Linens.Where(x => x.OriginalObject.ClientStaffEntity == SelectedStaff.OriginalObject).ToObservableCollection();

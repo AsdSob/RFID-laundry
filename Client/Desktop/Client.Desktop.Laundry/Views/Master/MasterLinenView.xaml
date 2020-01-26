@@ -32,14 +32,15 @@
                       IsTextSearchEnabled="True"
                       AutoGenerateColumns="False"
                       IsTextSearchCaseSensitive="False"
+                      CanUserAddRows="False"
                       >
 
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Id" Binding="{Binding Id}" IsReadOnly="True" />
 
-                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="Auto" />
+                    <DataGridTextColumn Header="Name" Binding="{Binding Name, ValidatesOnDataErrors=True , UpdateSourceTrigger=PropertyChanged}" Width="Auto" />
 
-                    <DataGridTextColumn Header="Packing Value" Binding="{Binding PackingValue}" />
+                    <DataGridTextColumn Header="Packing Value" Binding="{Binding PackingValue , ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" />
 
                 </DataGrid.Columns>
             </DataGrid>

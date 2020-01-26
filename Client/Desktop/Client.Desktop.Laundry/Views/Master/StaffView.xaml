@@ -84,11 +84,11 @@
                 </Grid.ColumnDefinitions>
 
                 <GroupBox Grid.Column="0" Grid.Row="0" Header="Staff Id" Margin="5">
-                    <TextBox Text="{Binding SelectedStaff.StaffId}" TextWrapping="Wrap" />
+                    <TextBox Text="{Binding SelectedStaff.StaffId , ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap"  />
                 </GroupBox>
 
                 <GroupBox Grid.Column="1" Grid.Row="0" Header="Staff Name" Margin="5">
-                    <TextBox Text="{Binding SelectedStaff.StaffName}" TextWrapping="Wrap" />
+                    <TextBox Text="{Binding SelectedStaff.StaffName , ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" />
                 </GroupBox>
 
                 <GroupBox Grid.Column="0" Grid.Row="1" Header="Phone" Margin="5">
@@ -102,7 +102,7 @@
         </Grid>
 
         <!-- Client Linen -->
-        <Grid Grid.Column="1">
+        <Grid Grid.Column="1" Name="StaffWindow">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -121,19 +121,21 @@
                       SelectionMode="Single"
                       VerticalScrollBarVisibility="Visible"
                       AllowDrop="True" 
-                      IsReadOnly="True"
+                      IsReadOnly="False"
                       HorizontalAlignment="Stretch"
                       AutoGenerateColumns="False"
                       IsTextSearchEnabled="True"
+                      CanUserAddRows="False"
                       IsTextSearchCaseSensitive="False">
 
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Id" Binding="{Binding Id}" />
+                    <DataGridTextColumn Header="Id" Binding="{Binding Id}" IsReadOnly="True" />
 
                     <DataGridComboBoxColumn Header="Name"
                                             IsReadOnly="False"
                                             DisplayMemberPath="Name"
                                             SelectedValuePath="Id"
+                                            MinWidth="150"
                                             SelectedValueBinding="{Binding MasterLinenId}">
                         <DataGridComboBoxColumn.ElementStyle>
                             <Style TargetType="{x:Type ComboBox}">
@@ -148,9 +150,9 @@
                     </DataGridComboBoxColumn>
 
                     <DataGridComboBoxColumn Header="Staff"
-                                            IsReadOnly="True"
                                             DisplayMemberPath="StaffName"
                                             SelectedValuePath="Id"
+                                            MinWidth="150"
                                             SelectedValueBinding="{Binding StaffId}">
                         <DataGridComboBoxColumn.ElementStyle>
                             <Style TargetType="{x:Type ComboBox}">
@@ -164,7 +166,27 @@
                         </DataGridComboBoxColumn.EditingElementStyle>
                     </DataGridComboBoxColumn>
 
-                    <DataGridTextColumn Header="Tag" Binding="{Binding Tag}" />
+
+                    <DataGridComboBoxColumn Header="Department"
+                                            DisplayMemberPath="Name"
+                                            IsReadOnly="True"
+                                            SelectedValuePath="Id"
+                                            SelectedValueBinding="{Binding DepartmentId}">
+                        <DataGridComboBoxColumn.ElementStyle>
+                            <Style TargetType="{x:Type ComboBox}">
+                                    <Setter Property="ItemsSource" Value="{Binding Path=DataContext.SortedDepartments, ElementName=StaffWindow}" />
+                            </Style>
+                        </DataGridComboBoxColumn.ElementStyle>
+                        <DataGridComboBoxColumn.EditingElementStyle>
+                            <Style TargetType="{x:Type ComboBox}">
+                                    <Setter Property="ItemsSource" Value="{Binding Path=DataContext.SortedDepartments, ElementName=StaffWindow}" />
+                            </Style>
+                        </DataGridComboBoxColumn.EditingElementStyle>
+                    </DataGridComboBoxColumn>
+
+                    <DataGridTextColumn Header="Packing Value" Binding="{Binding }" MinWidth="150"/>
+
+                        <DataGridTextColumn Header="Tag" Binding="{Binding Tag}" MinWidth="150"/>
 
                 </DataGrid.Columns>
             </DataGrid>

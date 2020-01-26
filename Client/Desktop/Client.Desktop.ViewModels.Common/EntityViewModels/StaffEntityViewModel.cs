@@ -1,9 +1,12 @@
-﻿using Client.Desktop.ViewModels.Common.ViewModels;
+﻿using System;
+using System.ComponentModel;
+using Client.Desktop.ViewModels.Common.Extensions;
+using Client.Desktop.ViewModels.Common.ViewModels;
 using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Common.EntityViewModels
 {
-    public class StaffEntityViewModel : ViewModelBase
+    public class StaffEntityViewModel : ViewModelBase,IDataErrorInfo
     {
         private ClientStaffEntity _originalObject;
         private int _id;
@@ -52,6 +55,9 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
         public StaffEntityViewModel()
         {
             OriginalObject = new ClientStaffEntity();
+
+            PropertyChanged += OnPropertyChanged;
+
         }
 
         public StaffEntityViewModel(ClientStaffEntity originalObject) :this()
@@ -88,5 +94,45 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
                                     !Equals(PhoneNumber, OriginalObject.PhoneNumber) ||
                                     !Equals(Email, OriginalObject.Email) ||
                                     !Equals(DepartmentId, OriginalObject.DepartmentId);
+
+
+        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+ 
+        }
+
+        public string Error { get; set; }
+        public string this[string columnName] => Validate(columnName);
+        public Func<StaffEntityViewModel, string, bool> NameUniqueValidationFunc { get; set; }
+
+        private string Validate(string columnName)
+        {
+            string error;
+
+            if (columnName == nameof(StaffName))
+            {
+                if (!StaffName.ValidateRequired(out error) ||
+                    !StaffName.ValidateBySpaces(out error))
+                {
+                    return error;
+                }
+
+            }
+
+            if (columnName == nameof(StaffId))
+            {
+                if (!StaffId.ValidateRequired(out error) ||
+                    !StaffId.ValidateBySpaces(out error) )
+                {
+                    return error;
+                }
+
+                if (NameUniqueValidationFunc != null && !NameUniqueValidationFunc(this, nameof(StaffId)))
+                {
+                    return "Staff Id is already exist";
+                }
+            }
+            return null;
+        }
     }
 }

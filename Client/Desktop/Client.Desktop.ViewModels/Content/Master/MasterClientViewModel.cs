@@ -27,7 +27,13 @@ namespace Client.Desktop.ViewModels.Content.Master
         private ObservableCollection<DepartmentEntityViewModel> _departments;
         private List<UnitViewModel> _cities;
         private DepartmentEntityViewModel _selectedDepartment;
+        private List<UnitViewModel> _departmentTypes;
 
+        public List<UnitViewModel> DepartmentTypes
+        {
+            get => _departmentTypes;
+            set => Set(() => DepartmentTypes, ref _departmentTypes, value);
+        }
         public DepartmentEntityViewModel SelectedDepartment
         {
             get => _selectedDepartment;
@@ -99,6 +105,7 @@ namespace Client.Desktop.ViewModels.Content.Master
             Departments = departments.ToObservableCollection();
 
             Cities = EnumExtensions.GetValues<CitiesEnum>();
+            DepartmentTypes = EnumExtensions.GetValues<DepartmentTypeEnum>();
         }
 
 
@@ -206,7 +213,7 @@ namespace Client.Desktop.ViewModels.Content.Master
         {
             ArrayList entities = new ArrayList();
 
-            var clients = Clients.Where(x => x.HasChanges()).ToList();
+            var clients = Clients.Where(x => x.HasChanges() && String.IsNullOrWhiteSpace(x.Error)).ToList();
             var departments = Departments.Where(x => x.HasChanges()).ToList();
 
             clients?.ForEach(x=> x.AcceptChanges());
@@ -216,9 +223,10 @@ namespace Client.Desktop.ViewModels.Content.Master
             {
                 _laundryService.AddOrUpdate(client.OriginalObject);
             }
-            foreach (var client in departments)
+
+            foreach (var department in departments)
             {
-                _laundryService.AddOrUpdate(client.OriginalObject);
+                _laundryService.AddOrUpdate(department.OriginalObject);
             }
 
             _dialogService.ShowInfoDialog("All changes saved");

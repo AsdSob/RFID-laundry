@@ -17,6 +17,7 @@ namespace Storage.Laundry.Configurations
             builder.Property(x => x.RfidTag).HasColumnName("rfidTag");
             builder.Property(x => x.StaffId).HasColumnName("staffId");
             builder.Property(x => x.StatusId).HasColumnName("statusId");
+            builder.Property(x => x.PackingValue).HasColumnName("packingValue");
 
             builder.HasOne(x => x.ClientEntity).WithMany(x => x.ClientLinenEntities).HasForeignKey(x=> x.ClientId);
             builder.HasOne(x => x.DepartmentEntity).WithMany(x => x.ClientLinenEntities).HasForeignKey(x=> x.DepartmentId);

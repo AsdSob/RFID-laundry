@@ -116,11 +116,11 @@
                 </GroupBox>
 
                 <GroupBox Grid.Row="0" Grid.Column="1" Header="Name" Margin="5">
-                    <TextBox Text="{Binding SelectedClient.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="Auto" TextWrapping="Wrap" />
+                    <TextBox Text="{Binding SelectedClient.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" Width="Auto" TextWrapping="Wrap" />
                 </GroupBox>
 
                 <GroupBox Grid.Row="0" Grid.Column="2" Header="Short Name" Margin="5" >
-                    <TextBox Text="{Binding SelectedClient.ShortName}" />
+                    <TextBox Text="{Binding SelectedClient.ShortName , ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" />
                 </GroupBox>
 
 
@@ -167,7 +167,16 @@
                 </Grid.ColumnDefinitions>
 
                 <GroupBox Grid.Row="0" Grid.Column="1" Header="Name" Margin="5">
-                    <TextBox Text="{Binding SelectedDepartment.Name}" Width="Auto"/>
+                    <TextBox Text="{Binding SelectedDepartment.Name, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" Width="Auto"/>
+                </GroupBox>
+
+                <GroupBox Grid.Row="0" Grid.Column="3" Header="Type" Margin="5">
+                    <ComboBox ItemsSource="{Binding DepartmentTypes}"
+                              SelectedIndex="{Binding SelectedDepartment.DepartmentTypeId}"
+                              DisplayMemberPath="Name"
+                              SelectedValuePath="Id"
+                              IsEditable="False">
+                    </ComboBox>
                 </GroupBox>
 
             </Grid>

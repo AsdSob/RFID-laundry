@@ -1,11 +1,14 @@
-﻿using Client.Desktop.ViewModels.Common.ViewModels;
+﻿using System;
+using System.ComponentModel;
+using Client.Desktop.ViewModels.Common.Extensions;
+using Client.Desktop.ViewModels.Common.ViewModels;
 using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Common.EntityViewModels
 {
-    public class LinenEntityViewModel : ViewModelBase
+    public class LinenEntityViewModel : ViewModelBase, IDataErrorInfo
     {
-        private ClientLinenEntity _originalObject;
+        private ClientLinenEntity _originalObject; 
         private int _departmentId;
         private int _clientId;
         private int? _staffId;
@@ -13,7 +16,13 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
         private string _tag;
         private int _statusId;
         private int _id;
+        private int _packingValue;
 
+        public int PackingValue
+        {
+            get => _packingValue;
+            set => Set(() => PackingValue, ref _packingValue, value);
+        }
         public int Id
         {
             get => _id;
@@ -76,6 +85,7 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             StatusId = OriginalObject.StatusId;
             MasterLinenId = OriginalObject.MasterLinenId;
             StaffId = OriginalObject.StaffId;
+            PackingValue = OriginalObject.PackingValue;
         }
 
         public void AcceptChanges()
@@ -88,6 +98,7 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             OriginalObject.StatusId = StatusId;
             OriginalObject.StaffId = StaffId;
             OriginalObject.MasterLinenId = MasterLinenId;
+            OriginalObject.PackingValue = PackingValue;
         }
 
         public bool HasChanges() => OriginalObject == null ||
@@ -97,6 +108,36 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
                                     !Equals(Tag, OriginalObject.RfidTag) ||
                                     !Equals(StatusId, OriginalObject.StatusId) ||
                                     !Equals(StaffId, OriginalObject.StaffId) ||
+                                    !Equals(PackingValue, OriginalObject.PackingValue) ||
                                     !Equals(MasterLinenId, OriginalObject.MasterLinenId);
+
+        public string Error { get; set; }
+        public string this[string columnName] => Validate(columnName);
+        public Func<ClientEntityViewModel, string, bool> NameUniqueValidationFunc { get; set; }
+
+        private string Validate(string columnName)
+        {
+            string error;
+
+            if (columnName == nameof(PackingValue))
+            {
+                if (!PackingValue.ValidateRequired(out error) ||
+                    (!PackingValue.ValidateMinAmount(out error)))
+                {
+                    return Error = error;
+                }
+            }
+
+            if (columnName == nameof(MasterLinenId))
+            {
+                if (!MasterLinenId.ValidateRequired(out error))
+                {
+                    return Error = error;
+                }
+
+            }
+            Error = String.Empty;
+            return null;
+        }
     }
 }

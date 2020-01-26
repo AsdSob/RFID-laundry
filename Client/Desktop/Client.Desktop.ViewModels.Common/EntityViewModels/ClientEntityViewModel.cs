@@ -1,9 +1,12 @@
-﻿using Client.Desktop.ViewModels.Common.ViewModels;
+﻿using System;
+using System.ComponentModel;
+using Client.Desktop.ViewModels.Common.Extensions;
+using Client.Desktop.ViewModels.Common.ViewModels;
 using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Common.EntityViewModels
 {
-    public class ClientEntityViewModel :ViewModelBase
+    public class ClientEntityViewModel :ViewModelBase, IDataErrorInfo
     {
         private ClientEntity _originalObject;
         private int _id;
@@ -60,6 +63,8 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
         public ClientEntityViewModel()
         {
             OriginalObject = new ClientEntity();
+
+            PropertyChanged += OnPropertyChanged;
         }
 
         public ClientEntityViewModel(ClientEntity originalObject) : this()
@@ -106,5 +111,55 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
                                     !Equals(CityId, OriginalObject.CityId) ||
                                     !Equals(Address, OriginalObject.Address) ||
                                     !Equals(ParentId, OriginalObject.ParentId);
+
+
+
+        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Name))
+            {
+                ShortName = Name;
+            }
+
+        }
+
+        public string Error { get; set; }
+        public string this[string columnName] => Validate(columnName);
+        public Func<ClientEntityViewModel, string, bool> NameUniqueValidationFunc { get; set; }
+
+        private string Validate(string columnName)
+        {
+            string error;
+
+            if (columnName == nameof(Name))
+            {
+                if (!Name.ValidateRequired(out error) ||
+                    !Name.ValidateBySpaces(out error))
+                {
+                    return Error = error;
+                }
+
+                if (NameUniqueValidationFunc != null && !NameUniqueValidationFunc(this, nameof(Name)))
+                {
+                    return Error = "Name is already exist";
+                }
+            }
+
+            if (columnName == nameof(ShortName))
+            {
+                if (!ShortName.ValidateRequired(out error) ||
+                    !ShortName.ValidateBySpaces(out error))
+                {
+                    return Error = error;
+                }
+
+                if (NameUniqueValidationFunc != null && !NameUniqueValidationFunc(this, nameof(ShortName)))
+                {
+                    return Error = "Name is already exist";
+                }
+            }
+            Error = String.Empty;
+            return null;
+        }
     }
 }
