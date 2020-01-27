@@ -1,9 +1,11 @@
-﻿using Client.Desktop.ViewModels.Common.ViewModels;
+﻿using System.ComponentModel;
+using Client.Desktop.ViewModels.Common.Extensions;
+using Client.Desktop.ViewModels.Common.ViewModels;
 using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Common.EntityViewModels
 {
-    public class RfidAntennaEntityViewModel :ViewModelBase
+    public class RfidAntennaEntityViewModel :ViewModelBase, IDataErrorInfo
     {
         private int _id;
         private string _name;
@@ -91,5 +93,30 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
                                     !Equals(RfidReaderId, OriginalObject.RfidReaderId) ||
                                     !Equals(RxSensitivity, OriginalObject.RxSensitivity) ||
                                     !Equals(TxPower, OriginalObject.TxPower);
+
+        public string Error { get; set; }
+        public string this[string columnName] => Validate(columnName);
+
+        private string Validate(string columnName)
+        {
+            string error;
+
+            if (columnName == nameof(RxSensitivity))
+            {
+                if (!RxSensitivity.ValidateRequired(out error))
+                {
+                    return error;
+                }
+            }
+
+            if (columnName == nameof(TxPower))
+            {
+                if (!TxPower.ValidateRequired(out error) )
+                {
+                    return error;
+                }
+            }
+            return null;
+        }
     }
 }

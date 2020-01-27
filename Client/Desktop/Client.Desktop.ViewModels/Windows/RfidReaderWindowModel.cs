@@ -101,8 +101,6 @@ namespace Client.Desktop.ViewModels.Windows
             {
                 RaisePropertyChanged(()=> SortedAntennas);
                 DeleteReaderCommand.RaiseCanExecuteChanged();
-
-                ConnectReader();
             }
         }
 
@@ -235,7 +233,10 @@ namespace Client.Desktop.ViewModels.Windows
         private void Close()
         {
             if (_dialogService.ShowQuestionDialog($"Do you want to close window ? "))
+            {
+                ConnectReader();
                 CloseAction?.Invoke(true);
+            }
         }
 
     }

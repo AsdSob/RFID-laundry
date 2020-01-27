@@ -112,6 +112,8 @@ namespace Client.Desktop.ViewModels.Common.Services
 
         public void StopRead()
         {
+            if (!Reader.IsConnected) return;
+
             Reader.TagsReported -= DisplayTag;
             Reader.Stop();
             Reader.Disconnect();

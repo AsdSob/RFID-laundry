@@ -42,15 +42,15 @@
                 </GroupBox>
 
                 <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Header="Name" Margin="5">
-                    <TextBox Text="{Binding SelectedRfidReader.Name}" TextWrapping="Wrap"/>
+                    <TextBox Text="{Binding SelectedRfidReader.Name , ValidatesOnDataErrors=True , UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap"/>
                 </GroupBox>
 
                 <GroupBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Header="Ip" Margin="5">
-                    <TextBox Text="{Binding SelectedRfidReader.ReaderIp}" TextWrapping="Wrap"/>
+                    <TextBox Text="{Binding SelectedRfidReader.ReaderIp, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap"/>
                 </GroupBox>
 
                 <GroupBox Grid.Row="3" Grid.Column="0" Header="Port" Margin="5">
-                    <TextBox Text="{Binding SelectedRfidReader.ReaderPort}" TextWrapping="Wrap"/>
+                    <TextBox Text="{Binding SelectedRfidReader.ReaderPort, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap"/>
                 </GroupBox>
 
                 <GroupBox Grid.Row="3" Grid.Column="1" Header="Population" Margin="5">
@@ -79,9 +79,9 @@
 
                     <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
 
-                    <DataGridTextColumn Header="TxPower" Binding="{Binding TxPower}" Width="0.2*"/>
+                    <DataGridTextColumn Header="TxPower" Binding="{Binding TxPower, ValidatesOnDataErrors=True , UpdateSourceTrigger=PropertyChanged}" Width="0.2*"/>
 
-                    <DataGridTextColumn Header="RxSensitivity" Binding="{Binding RxSensitivity}" Width="0.2*"/>
+                    <DataGridTextColumn Header="RxSensitivity" Binding="{Binding RxSensitivity, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" Width="0.2*"/>
                 </DataGrid.Columns>
             </DataGrid>
         </GroupBox>

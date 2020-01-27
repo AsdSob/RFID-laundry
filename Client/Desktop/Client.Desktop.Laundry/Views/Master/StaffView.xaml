@@ -216,7 +216,7 @@
                         <Button Margin = "5" Padding="20,2" Content="Start" Command="{Binding StartReadingCommand}"/>
                         <Button Margin = "5" Padding="20,2" Content="Stop" Command="{Binding StopReadingCommand}"/>
                         <Button Margin = "5" Padding="20,2" Content="Add" Command="{Binding AddSelectedTagCommand}"/>
-                        <Button Margin = "5" Padding="20,2" Content="Setting" DockPanel.Dock="Right" Command="{Binding AddSelectedTagCommand}"/>
+                        <Button Margin = "5" Padding="20,2" Content="Setting" DockPanel.Dock="Right" Command="{Binding RfidReaderCommand}"/>
                     </DockPanel>
 
                     <GroupBox Grid.Column="0" Grid.Row="1" Header="Tags">

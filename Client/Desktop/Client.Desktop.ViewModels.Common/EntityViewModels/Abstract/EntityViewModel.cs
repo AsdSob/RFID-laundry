@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.ComponentModel;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Storage.Laundry.Models.Abstract;
 
@@ -10,6 +8,7 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels.Abstract
     {
         private EntityBase _originalObject;
         private int _id;
+        public string Error { get; set; }
 
         public int Id
         {
