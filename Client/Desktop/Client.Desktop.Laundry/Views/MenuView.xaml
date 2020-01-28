@@ -4,10 +4,18 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModels="clr-namespace:Client.Desktop.ViewModels;assembly=Client.Desktop.ViewModels"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d" 
-             d:DataContext="{d:DesignInstance viewModels:MenuViewModel}">
+             d:DataContext="{d:DesignInstance viewModels:MenuViewModel}"
+             >
 
-        <Menu DockPanel.Dock="Top">
+    <b:Interaction.Triggers>
+        <b:EventTrigger EventName="Loaded">
+            <b:InvokeCommandAction Command="{Binding ClientCommand}" />
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
+
+    <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
                 <MenuItem Header="_New" Command="{Binding NewCommand}"/>
 

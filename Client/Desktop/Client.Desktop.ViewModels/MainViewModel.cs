@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Content;
@@ -33,6 +32,8 @@ namespace Client.Desktop.ViewModels
             MenuViewModel = menuViewModel ?? throw new ArgumentNullException(nameof(menuViewModel));
 
             MenuViewModel.PropertyChanged += MenuViewModelOnPropertyChanged;
+
+            SetMenuContent(MenuViewModel);
         }
 
         private void MenuViewModelOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -42,18 +43,22 @@ namespace Client.Desktop.ViewModels
 
             if (e.PropertyName == nameof(MenuViewModel.SelectedItem))
             {
-                if (menuViewModel.SelectedItem == typeof(ExitViewModel))
-                {
-                    // TODO: show question
-                    CloseAction?.Invoke();
-                    return;
-                }
-
-                var type = _resolver.Resolve(menuViewModel.SelectedItem);
-
-
-                Content = type;
+                SetMenuContent(menuViewModel);
             }
+        }
+
+        private void SetMenuContent(MenuViewModel menuViewModel)
+        {
+            if (menuViewModel.SelectedItem == typeof(ExitViewModel))
+            {
+                // TODO: show question
+                CloseAction?.Invoke();
+                return;
+            }
+
+            var type = _resolver.Resolve(menuViewModel.SelectedItem);
+
+            Content = type;
         }
     }
 }
