@@ -7,7 +7,6 @@ using Client.Desktop.ViewModels.Content.Master;
 using Client.Desktop.ViewModels.Windows;
 using Client.Desktop.Views.Services;
 using Common.Logger.Module;
-using Microsoft.EntityFrameworkCore.Internal;
 using Storage.Module;
 
 namespace Client.Desktop.Laundry.ViewModels
@@ -40,11 +39,11 @@ namespace Client.Desktop.Laundry.ViewModels
             builder.RegisterType<MasterLinenViewModel>().SingleInstance();
 
             builder.RegisterType<RfidReaderWindowModel>().SingleInstance();
-
         }
 
         private void RegisterModules(ContainerBuilder builder)
         {
+            builder.RegisterSettingsModule();
             builder.RegisterMainModule();
             builder.RegisterLaundryDataModule();
             builder.RegisterLoggerModule();
