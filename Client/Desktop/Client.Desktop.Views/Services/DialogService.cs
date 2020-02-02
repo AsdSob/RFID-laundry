@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.Windows;
 using Microsoft.Win32;

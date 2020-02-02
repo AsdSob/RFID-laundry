@@ -106,6 +106,8 @@ namespace Client.Desktop.ViewModels.Windows
 
         public void ConnectReader()
         {
+            if(SelectedRfidReader == null) return;
+
             ReaderService.StopRead();
 
             var isConnected = ReaderService.Connection(SelectedRfidReader, SortedAntennas.ToList());
