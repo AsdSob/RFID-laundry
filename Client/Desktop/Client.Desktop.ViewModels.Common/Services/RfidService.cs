@@ -53,8 +53,10 @@ namespace Client.Desktop.ViewModels.Common.Services
                 Console.WriteLine(ee.StackTrace);
             }
 
-            SetAntennaSettings(antennas);
             SetSettings(r);
+            SetAntennaSettings(antennas);
+
+            Reader.ApplySettings(settings);
 
             return Reader.IsConnected;
         }
@@ -85,7 +87,6 @@ namespace Client.Desktop.ViewModels.Common.Services
 
             settings.Report.Mode = ReportMode.Individual;
 
-            Reader.ApplySettings(settings);
         }
 
         private void SetAntennaSettings(List<RfidAntennaEntityViewModel> antennas)

@@ -125,7 +125,7 @@ namespace Client.Desktop.ViewModels.Content.Master
 
             RfidReaderCommand = new RelayCommand(RfidReader);
             StartReadingCommand = new RelayCommand(StartReading);
-            StopReadingCommand = new RelayCommand(StartReading);
+            StopReadingCommand = new RelayCommand(StopReading);
             AddSelectedTagCommand = new RelayCommand(AddSelectedTag, (() => SelectedTag != null));
 
             Task.Factory.StartNew( () => GetData());
@@ -231,6 +231,21 @@ namespace Client.Desktop.ViewModels.Content.Master
             var staffs = Staff.Where(x => x.HasChanges());
             var linens = Linens.Where(x => x.HasChanges());
 
+            foreach (var item in staffs)
+            {
+                item.AcceptChanges();
+
+                _laundryService.AddOrUpdate(item.OriginalObject);
+            }
+
+            foreach (var item in linens)
+            {
+                item.AcceptChanges();
+
+                _laundryService.AddOrUpdate(item.OriginalObject);
+            }
+
+            _dialogService.ShowInfoDialog("All changes saved");
         }
 
         private void SaveEntity<T>(T entity) where T : EntityBase
@@ -341,8 +356,9 @@ namespace Client.Desktop.ViewModels.Content.Master
 
         private void StopReading()
         {
+            RfidReaderWindow.ReaderService.Reader.TagsReported -= SHowAntennaTags;
+            
             RfidReaderWindow.ReaderService.StopRead();
-
         }
 
         private void AddSelectedTag()
