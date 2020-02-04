@@ -344,7 +344,6 @@ namespace Client.Desktop.ViewModels.Content.Master
 
             var showDialog = _dialogService.ShowDialog(RfidReaderWindow);
             
-            
         }
 
         private void StartReading()

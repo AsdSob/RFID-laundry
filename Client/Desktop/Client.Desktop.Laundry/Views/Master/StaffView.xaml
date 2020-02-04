@@ -215,6 +215,7 @@
                     <DockPanel Grid.Column="0" Grid.Row="0" LastChildFill="False">
                         <Button Margin = "5" Padding="20,2" Content="Start" Command="{Binding StartReadingCommand}"/>
                         <Button Margin = "5" Padding="20,2" Content="Stop" Command="{Binding StopReadingCommand}"/>
+                        <Label Margin = "5" Padding="20,2" Content="{Binding RfidReaderWindow.SelectedRfidReader.Name}" />
                         <Button Margin = "5" Padding="20,2" Content="Add" Command="{Binding AddSelectedTagCommand}"/>
                         <Button Margin = "5" Padding="20,2" Content="Setting" DockPanel.Dock="Right" Command="{Binding RfidReaderCommand}"/>
                     </DockPanel>
