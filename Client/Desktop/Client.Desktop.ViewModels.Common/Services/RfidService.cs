@@ -39,7 +39,15 @@ namespace Client.Desktop.ViewModels.Common.Services
                     Reader.Disconnect();
                 }
 
-                Reader.Connect(r.ReaderIp, r.ReaderPort);
+                if (r.ReaderPort == 0)
+                {
+                    Reader.Connect(r.ReaderIp);
+                }
+                else
+                {
+                    Reader.Connect(r.ReaderIp, r.ReaderPort);
+                }
+
                 Reader.Stop();
             }
 
