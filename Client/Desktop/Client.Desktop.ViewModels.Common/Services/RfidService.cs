@@ -61,7 +61,9 @@ namespace Client.Desktop.ViewModels.Common.Services
                 Console.WriteLine(ee.StackTrace);
             }
 
-            SetSettings(r);
+
+            if (!Reader.IsConnected) return false;
+            SetSettings(r.TagPopulation);
             SetAntennaSettings(antennas);
 
             Reader.ApplySettings(settings);
@@ -69,7 +71,7 @@ namespace Client.Desktop.ViewModels.Common.Services
             return Reader.IsConnected;
         }
 
-        private void SetSettings(RfidReaderEntityViewModel r)
+        private void SetSettings(ushort tagPopulation)
         {
             settings = Reader.QueryDefaultSettings();
 
@@ -91,7 +93,7 @@ namespace Client.Desktop.ViewModels.Common.Services
             settings.ReaderMode = ReaderMode.AutoSetDenseReaderDeepScan;//.AutoSetDenseReader;
             settings.SearchMode = SearchMode.DualTarget;//.DualTarget;
             settings.Session = 1;
-            settings.TagPopulationEstimate = r.TagPopulation;
+            settings.TagPopulationEstimate = tagPopulation;
 
             settings.Report.Mode = ReportMode.Individual;
 
@@ -111,6 +113,7 @@ namespace Client.Desktop.ViewModels.Common.Services
 
         public void StartRead()
         {
+            
             if (!Reader.IsConnected) return;
 
             _data = new ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>>();
