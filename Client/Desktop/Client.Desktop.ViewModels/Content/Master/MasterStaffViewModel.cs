@@ -131,6 +131,8 @@ namespace Client.Desktop.ViewModels.Content.Master
             Task.Factory.StartNew( () => GetData());
 
             RfidReaderWindow = _resolverService.Resolve<RfidReaderWindowModel>();
+
+            Tags = new ObservableCollection<Tuple<int, string>>();
         }
 
 
@@ -376,8 +378,9 @@ namespace Client.Desktop.ViewModels.Content.Master
                 {
                     continue;
                 }
+                var newTag = new Tuple<int, string>(tag.AntennaPortNumber, tag.Epc.ToString());
 
-                Tags.Add(new Tuple<int, string>(tag.AntennaPortNumber, tag.Epc.ToString()));
+                Tags.Add(newTag);
             }
         }
     }

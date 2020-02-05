@@ -46,7 +46,7 @@ namespace Client.Desktop.ViewModels.Common.Services
                 }
                 else
                 {
-                    Reader.Connect(r.ReaderIp, r.ReaderPort);
+                    Reader.Connect(r.ReaderIp);
                 }
 
                 Reader.Stop();
@@ -129,7 +129,6 @@ namespace Client.Desktop.ViewModels.Common.Services
 
             Reader.TagsReported -= DisplayTag;
             Reader.Stop();
-            Reader.Disconnect();
         }
 
         #region Read tags during specified time
