@@ -370,7 +370,7 @@ namespace Client.Desktop.ViewModels.Content.Master
 
         }
 
-        public async void SHowAntennaTags(ImpinjReader reader, TagReport report)
+        public void SHowAntennaTags(ImpinjReader reader, TagReport report)
         {
             foreach (var tag in report.Tags)
             {

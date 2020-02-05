@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Threading;
 using Client.Desktop.ViewModels.Common.Attributes;
 
 namespace Client.Desktop.Views
@@ -62,10 +63,10 @@ namespace Client.Desktop.Views
         /// </summary>
         /// <param name="action">The action.</param>
         /// <param name="dispatcherPriority">The disptcher priority.</param>
-        //public static void RunInMainThread(this Action action, DispatcherPriority dispatcherPriority = DispatcherPriority.Normal)
-        //{
-        //    Application.Current?.Dispatcher.Invoke(dispatcherPriority, action);
-        //}
+        public static void RunInMainThread(this Action action, DispatcherPriority dispatcherPriority = DispatcherPriority.Normal)
+        {
+            Application.Current?.Dispatcher.Invoke(dispatcherPriority, action);
+        }
 
 
         /// <summary>
