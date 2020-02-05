@@ -25,8 +25,8 @@ namespace Client.Desktop.ViewModels.Common.Extensions
         /// <summary>
         /// Run action in main thread.
         /// </summary>
-        /// <param name="action">The action.</param>
-        /// <param name="dispatcherPriority">The disptcher priority.</param>
+        /// <param name = "action" > The action.</param>
+        /// <param name = "dispatcherPriority" > The disptcher priority.</param>
         //public static void RunInMainThread(this Action action, DispatcherPriority dispatcherPriority = DispatcherPriority.Normal)
         //{
         //    Application.Current?.Dispatcher.Invoke(dispatcherPriority, action);

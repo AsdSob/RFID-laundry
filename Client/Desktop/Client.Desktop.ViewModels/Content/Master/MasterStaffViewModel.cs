@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -29,17 +30,17 @@ namespace Client.Desktop.ViewModels.Content.Master
         private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
         private ObservableCollection<LinenEntityViewModel> _linens;
         private LinenEntityViewModel _selectedLinen;
-        private ObservableCollection<Tuple<int, string>> _tags;
-        private Tuple<int, string> _selectedTag;
+        private ConcurrentDictionary<string, int> _tags;
+        private string _selectedTag;
 
         public RfidReaderWindowModel RfidReaderWindow { get; set; }
 
-        public Tuple<int,string> SelectedTag
+        public string SelectedTag
         {
             get => _selectedTag;
             set => Set(() => SelectedTag, ref _selectedTag, value);
         }
-        public ObservableCollection<Tuple<int, string>> Tags
+        public ConcurrentDictionary<string, int> Tags
         {
             get => _tags;
             set => Set(() => Tags, ref _tags, value);
@@ -109,6 +110,11 @@ namespace Client.Desktop.ViewModels.Content.Master
         public RelayCommand StopReadingCommand { get; }
         public RelayCommand AddSelectedTagCommand { get; }
 
+        public object SelectedTaaaag
+        {
+            get { throw new NotImplementedException(); }
+        }
+
 
         public MasterStaffViewModel(ILaundryService dataService, IDialogService dialogService, IResolver resolver)
         {
@@ -132,7 +138,7 @@ namespace Client.Desktop.ViewModels.Content.Master
 
             RfidReaderWindow = _resolverService.Resolve<RfidReaderWindowModel>();
 
-            Tags = new ObservableCollection<Tuple<int, string>>();
+            Tags = new ConcurrentDictionary<string, int>();
         }
 
 
@@ -364,23 +370,25 @@ namespace Client.Desktop.ViewModels.Content.Master
 
         private void AddSelectedTag()
         {
-            RfidReaderWindow.ReaderService.StopRead();
+            if (SelectedLinen == null)
+            {
+                AddLinen();
+                SelectedLinen.Tag = SelectedTag;
+            }
 
-            RfidReaderWindow.ReaderService.Reader.TagsReported -= SHowAntennaTags;
-
+            SelectedLinen.Tag = SelectedTag;
         }
 
         public void SHowAntennaTags(ImpinjReader reader, TagReport report)
         {
             foreach (var tag in report.Tags)
             {
-                if (Tags.Any(x => Equals(x.Item2, tag.Epc.ToString()) && Equals(x.Item1, tag.AntennaPortNumber)))
+                if (Tags.Any(x => Equals(x.Key, tag.Epc.ToString()) && Equals(x.Value, tag.AntennaPortNumber)))
                 {
                     continue;
                 }
-                var newTag = new Tuple<int, string>(tag.AntennaPortNumber, tag.Epc.ToString());
 
-                Tags.Add(newTag);
+                Tags.TryAdd(tag.Epc.ToString(), tag.AntennaPortNumber);
             }
         }
     }
