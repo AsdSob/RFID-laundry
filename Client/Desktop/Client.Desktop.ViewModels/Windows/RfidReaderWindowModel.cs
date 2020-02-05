@@ -228,16 +228,10 @@ namespace Client.Desktop.ViewModels.Windows
             SelectedRfidReader = RfidReaders.FirstOrDefault();
         }
 
-        public RfidReaderEntityViewModel GetSelectedReader()
-        {
-            return SelectedRfidReader;
-        }
-
         private void Close()
         {
             if (_dialogService.ShowQuestionDialog($"Do you want to close window ? "))
             {
-                ConnectReader();
                 CloseAction?.Invoke(true);
             }
         }

@@ -36,6 +36,7 @@ namespace Client.Desktop.ViewModels.Common.Services
             {
                 if (Reader.IsConnected)
                 {
+                    Reader.Stop();
                     Reader.Disconnect();
                 }
 
