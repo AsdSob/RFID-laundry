@@ -30,17 +30,17 @@ namespace Client.Desktop.ViewModels.Content.Master
         private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
         private ObservableCollection<LinenEntityViewModel> _linens;
         private LinenEntityViewModel _selectedLinen;
-        private ConcurrentDictionary<string, int> _tags;
-        private string _selectedTag;
+        private ObservableCollection<UnitViewModel> _tags;
+        private UnitViewModel _selectedTag;
 
         public RfidReaderWindowModel RfidReaderWindow { get; set; }
 
-        public string SelectedTag
+        public UnitViewModel SelectedTag
         {
             get => _selectedTag;
             set => Set(() => SelectedTag, ref _selectedTag, value);
         }
-        public ConcurrentDictionary<string, int> Tags
+        public ObservableCollection<UnitViewModel> Tags
         {
             get => _tags;
             set => Set(() => Tags, ref _tags, value);
@@ -109,12 +109,7 @@ namespace Client.Desktop.ViewModels.Content.Master
         public RelayCommand StartReadingCommand { get; }
         public RelayCommand StopReadingCommand { get; }
         public RelayCommand AddSelectedTagCommand { get; }
-
-        public object SelectedTaaaag
-        {
-            get { throw new NotImplementedException(); }
-        }
-
+        
 
         public MasterStaffViewModel(ILaundryService dataService, IDialogService dialogService, IResolver resolver)
         {
@@ -138,7 +133,7 @@ namespace Client.Desktop.ViewModels.Content.Master
 
             RfidReaderWindow = _resolverService.Resolve<RfidReaderWindowModel>();
 
-            Tags = new ConcurrentDictionary<string, int>();
+            Tags = new ObservableCollection<UnitViewModel>();
         }
 
 
@@ -373,22 +368,23 @@ namespace Client.Desktop.ViewModels.Content.Master
             if (SelectedLinen == null)
             {
                 AddLinen();
-                SelectedLinen.Tag = SelectedTag;
+                SelectedLinen.Tag = SelectedTag.Name;
             }
 
-            SelectedLinen.Tag = SelectedTag;
+            SelectedLinen.Tag = SelectedTag.Name;
         }
 
         public void SHowAntennaTags(ImpinjReader reader, TagReport report)
         {
             foreach (var tag in report.Tags)
             {
-                if (Tags.Any(x => Equals(x.Key, tag.Epc.ToString()) && Equals(x.Value, tag.AntennaPortNumber)))
+                if (Tags.Any(x => Equals(x.Name, tag.Epc.ToString())))
                 {
                     continue;
                 }
 
-                Tags.TryAdd(tag.Epc.ToString(), tag.AntennaPortNumber);
+                Tags.Add(new UnitViewModel(tag.AntennaPortNumber, tag.Epc.ToString()));
+
             }
         }
     }
