@@ -20,6 +20,7 @@ namespace Client.Desktop.ViewModels.Content.Master
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
         private readonly IResolver _resolverService;
+        private readonly IMainDispatcher _dispatcher;
 
         private List<ClientEntityViewModel> _clients;
         private ClientEntityViewModel _selectedClient;
@@ -111,11 +112,12 @@ namespace Client.Desktop.ViewModels.Content.Master
         public RelayCommand AddSelectedTagCommand { get; }
         
 
-        public MasterStaffViewModel(ILaundryService dataService, IDialogService dialogService, IResolver resolver)
+        public MasterStaffViewModel(ILaundryService dataService, IDialogService dialogService, IResolver resolver, IMainDispatcher dispatcher)
         {
             _laundryService = dataService ?? throw new ArgumentNullException(nameof(dataService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _resolverService = resolver ?? throw new ArgumentNullException(nameof(resolver));
+            _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
 
             SaveCommand = new RelayCommand(Save);
             AddStaffCommand = new RelayCommand(AddStaff, (() => SelectedDepartment != null));
@@ -383,7 +385,11 @@ namespace Client.Desktop.ViewModels.Content.Master
                     continue;
                 }
 
-                Tags.Add(new Tuple<int,string>(tag.AntennaPortNumber, tag.Epc.ToString()));
+                _dispatcher.RunInMainThread(() =>
+                {
+                    Tags.Add(new Tuple<int, string>(tag.AntennaPortNumber, tag.Epc.ToString()));
+
+                });
             }
         }
     }
