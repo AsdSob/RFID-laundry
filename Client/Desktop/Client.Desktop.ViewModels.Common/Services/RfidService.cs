@@ -15,7 +15,6 @@ namespace Client.Desktop.ViewModels.Common.Services
         public ImpinjReader Reader = new ImpinjReader();
         private Settings settings;
 
-        public RfidReaderEntityViewModel SelectedReader { get; set; }
         private ObservableCollection<Tuple<int, string>> _tags;
 
         public ObservableCollection<Tuple<int,string>> Tags
@@ -23,7 +22,7 @@ namespace Client.Desktop.ViewModels.Common.Services
             get => _tags;
             set => Set(() => Tags, ref _tags, value);
         }
-        private ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>> _data =
+        public ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>> _data =
             new ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>>();
 
 

@@ -30,10 +30,8 @@ namespace Client.Desktop.ViewModels.Common.Extensions
         /// <param name = "dispatcherPriority" > The disptcher priority.</param>
         //public static void RunInMainThread(this Action action, DispatcherPriority dispatcherPriority = DispatcherPriority.Normal)
         //{
-        //    MediaTypeNames.Application.Current?.Dispatcher.Invoke(dispatcherPriority, action);
+        //    Application.Current?.Dispatcher.Invoke(dispatcherPriority, action);
         //}
-
-        
 
 
         /// <summary>
