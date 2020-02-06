@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net.Mime;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
@@ -29,8 +30,10 @@ namespace Client.Desktop.ViewModels.Common.Extensions
         /// <param name = "dispatcherPriority" > The disptcher priority.</param>
         //public static void RunInMainThread(this Action action, DispatcherPriority dispatcherPriority = DispatcherPriority.Normal)
         //{
-        //    Application.Current?.Dispatcher.Invoke(dispatcherPriority, action);
+        //    MediaTypeNames.Application.Current?.Dispatcher.Invoke(dispatcherPriority, action);
         //}
+
+        
 
 
         /// <summary>

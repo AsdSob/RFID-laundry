@@ -206,6 +206,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
@@ -215,17 +216,18 @@
                     <DockPanel Grid.Column="0" Grid.Row="0" LastChildFill="False">
                         <Button Margin = "5" Padding="20,2" Content="Start" Command="{Binding StartReadingCommand}"/>
                         <Button Margin = "5" Padding="20,2" Content="Stop" Command="{Binding StopReadingCommand}"/>
-                        <Label Margin = "5" Padding="20,2" Content="{Binding RfidReaderWindow.SelectedRfidReader.Name}" />
                         <Button Margin = "5" Padding="20,2" Content="Add" Command="{Binding AddSelectedTagCommand}"/>
                         <Button Margin = "5" Padding="20,2" Content="Setting" DockPanel.Dock="Right" Command="{Binding RfidReaderCommand}"/>
                     </DockPanel>
 
-                    <GroupBox Grid.Column="0" Grid.Row="1" Header="Tags">
+                    <Label Grid.Row="1" Grid.Column="0"  Margin = "5" Padding="20,2" Content="{Binding RfidReaderWindow.SelectedRfidReader.Name}" />
+
+                    <GroupBox Grid.Column="0" Grid.Row="2" Header="Tags">
 
                         <DataGrid AutoGenerateColumns="False"
                                   Height="NaN"
                                   ItemsSource="{Binding Tags}"
-                                  SelectedItem="{Binding SelectedTaaaag}"
+                                  SelectedItem="{Binding SelectedTag}"
                                   
                                   VerticalScrollBarVisibility="Visible"
                                   Width="400"

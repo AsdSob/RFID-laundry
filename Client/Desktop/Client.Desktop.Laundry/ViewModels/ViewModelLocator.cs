@@ -53,6 +53,7 @@ namespace Client.Desktop.Laundry.ViewModels
         {
             builder.RegisterType<LaundryService>().As<ILaundryService>().SingleInstance();
             builder.RegisterType<DialogService>().As<IDialogService>().SingleInstance();
+            builder.RegisterType<MainDispatcher>().As<IMainDispatcher>().SingleInstance();
         }
     }
 }

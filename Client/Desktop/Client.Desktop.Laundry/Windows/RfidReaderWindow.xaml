@@ -19,7 +19,7 @@
                 <Button Margin = "5" Padding="10,2" DockPanel.Dock="Left"  Content="New" Command="{Binding AddReaderCommand}" />
                 <Button Margin = "5" Padding="10,2" DockPanel.Dock="Left"  Content="Delete" Command="{Binding DeleteReaderCommand}"/>
                 <Button Margin = "5" Padding="10,2" DockPanel.Dock="Left" Content="Save" Command="{Binding SaveCommand}"/>
-                <!--<Button Margin = "5" Padding="10,2" DockPanel.Dock="Right" Content="Close" Command="{Binding SelectReaderCommand}"/>-->
+                <Button Margin = "5" Padding="10,2" DockPanel.Dock="Right" Content="Connect" Command="{Binding ConnectReaderCommand}"/>
             </DockPanel>
 
             <!-- Reader Settings -->

@@ -49,7 +49,7 @@ namespace Client.Desktop.ViewModels.Windows
         public ObservableCollection<RfidAntennaEntityViewModel> SortedAntennas => GetReaderAntennas();
 
         public RelayCommand SaveCommand { get; }
-        public RelayCommand SelectReaderCommand { get; }
+        public RelayCommand ConnectReaderCommand { get; }
         public RelayCommand DeleteReaderCommand { get; }
         public RelayCommand AddReaderCommand { get; }
         public RelayCommand CloseCommand { get; }
@@ -61,7 +61,7 @@ namespace Client.Desktop.ViewModels.Windows
             ReaderService = new RfidService();
 
             SaveCommand = new RelayCommand(Save);
-            SelectReaderCommand = new RelayCommand(Close);
+            ConnectReaderCommand = new RelayCommand(ConnectReader);
             AddReaderCommand = new RelayCommand(AddReader);
             CloseCommand = new RelayCommand(Close);
             DeleteReaderCommand = new RelayCommand(DeleteReader, () => SelectedRfidReader != null);
@@ -101,7 +101,6 @@ namespace Client.Desktop.ViewModels.Windows
             {
                 RaisePropertyChanged(()=> SortedAntennas);
                 DeleteReaderCommand.RaiseCanExecuteChanged();
-                ConnectReader();
             }
         }
 
@@ -235,6 +234,5 @@ namespace Client.Desktop.ViewModels.Windows
                 CloseAction?.Invoke(true);
             }
         }
-
     }
 }
