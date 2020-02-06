@@ -108,11 +108,11 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <StackPanel  Grid.Row="0" Orientation="Horizontal" Margin="10,0">
+            <DockPanel  Grid.Row="0" LastChildFill="False" Margin="10,0">
                 <Button Margin = "5" Padding="10,2"  Content="New" Command="{Binding AddLinenCommand}"/>
                 <Button Margin = "5" Padding="10,2"  Content="Delete" Command="{Binding DeleteLinenCommand}"/>
                 <Button Margin = "5" Padding="10,2"  Content="Save" Command="{Binding SaveCommand}"/>
-            </StackPanel>
+            </DockPanel>
 
             <GroupBox Grid.Row="1" Header="Client Linen">
             <DataGrid Height="Auto"
@@ -214,13 +214,13 @@
                     </Grid.ColumnDefinitions>
 
                     <DockPanel Grid.Column="0" Grid.Row="0" LastChildFill="False">
-                        <Button Margin = "5" Padding="20,2" Content="Start" Command="{Binding StartReadingCommand}"/>
+                        <!--<Button Margin = "5" Padding="20,2" Content="Start" Command="{Binding StartReadingCommand}"/>
                         <Button Margin = "5" Padding="20,2" Content="Stop" Command="{Binding StopReadingCommand}"/>
-                        <Button Margin = "5" Padding="20,2" Content="Add" Command="{Binding AddSelectedTagCommand}"/>
-                        <Button Margin = "5" Padding="20,2" Content="Setting" DockPanel.Dock="Right" Command="{Binding RfidReaderCommand}"/>
+                        <Button Margin = "5" Padding="20,2" Content="Add" Command="{Binding AddSelectedTagCommand}"/>-->
+                        <Button Margin = "5" Padding="20,2" Content="Setting" DockPanel.Dock="Left" Command="{Binding RfidReaderCommand}"/>
                     </DockPanel>
 
-                    <Label Grid.Row="1" Grid.Column="0"  Margin = "5" Padding="20,2" Content="{Binding RfidReaderWindow.SelectedRfidReader.Name}" />
+                    <Label Grid.Row="1" Grid.Column="0"  Margin = "5" Padding="20,2" FontWeight="Bold" Content="{Binding RfidReaderWindow.SelectedRfidReader.Name}" />
 
                     <GroupBox Grid.Column="0" Grid.Row="2" Header="Tags">
 

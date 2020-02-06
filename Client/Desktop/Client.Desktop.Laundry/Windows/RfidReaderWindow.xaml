@@ -6,8 +6,17 @@
              xmlns:windows="clr-namespace:Client.Desktop.ViewModels.Windows;assembly=Client.Desktop.ViewModels"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance windows:RfidReaderWindowModel}"
-             Window.Width="400" Window.Height="450">
-    <Grid>
+             Window.Width="600" Window.Height="450">
+    <Grid >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="0.5*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Row="0" Grid.Column="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -87,4 +96,46 @@
         </GroupBox>
 
     </Grid>
+
+        <!-- Tags -->
+        <Grid Grid.Column="1" Grid.Row="0" Margin="10,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <DockPanel Grid.Column="0" Grid.Row="1">
+                <Button Margin = "5" Padding="20,2" Content="{Binding StartStopButton}" Command="{Binding StartStopReaderCommand}"/>
+                <Label DockPanel.Dock="Right"  Margin = "5" Padding="20,2" Content="{Binding SelectedRfidReader.Name}" />
+            </DockPanel>
+
+            <GroupBox Grid.Column="0" Grid.Row="2" Header="Tags">
+
+                <DataGrid AutoGenerateColumns="False"
+                          Height="NaN"
+                          ItemsSource="{Binding ReaderService.Tags}"
+                          VerticalScrollBarVisibility="Visible"
+                          AllowDrop="True" 
+                          HorizontalAlignment="Stretch"
+                          EnableRowVirtualization="True" 
+                          IsReadOnly="True" 
+                          IsTextSearchCaseSensitive="False"
+                >
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Antenna" Binding="{Binding Path=Item1}" />
+                        <DataGridTextColumn Header="Tag" Binding="{Binding Path=Item2}" />
+                    </DataGrid.Columns>
+
+                </DataGrid>
+
+            </GroupBox>
+        </Grid>
+    </Grid>
+
 </Window>

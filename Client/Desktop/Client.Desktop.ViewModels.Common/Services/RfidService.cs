@@ -22,9 +22,9 @@ namespace Client.Desktop.ViewModels.Common.Services
             get => _tags;
             set => Set(() => Tags, ref _tags, value);
         }
-        public ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>> _data =
-            new ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>>();
 
+        private ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>> _data =
+            new ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>>();
 
 
         public bool Connection(RfidReaderEntityViewModel r, List<RfidAntennaEntityViewModel> antennas)
@@ -113,10 +113,10 @@ namespace Client.Desktop.ViewModels.Common.Services
 
         public void StartRead()
         {
-            
             if (!Reader.IsConnected) return;
 
             _data = new ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>>();
+            Tags =new ObservableCollection<Tuple<int, string>>();
 
             Reader.Start();
             Reader.TagsReported += DisplayTag;
@@ -206,6 +206,13 @@ namespace Client.Desktop.ViewModels.Common.Services
             foreach (Tag tag in report)
             {
                 AddData(tag.AntennaPortNumber, tag.Epc.ToString(), tag.LastSeenTime.LocalDateTime);
+
+                if (Tags.Any(x => Equals(x.Item2, tag.Epc.ToString())))
+                {
+                    continue;
+                }
+
+                Tags.Add(new Tuple<int, string>(tag.AntennaPortNumber, tag.Epc.ToString()));
             }
         }
 
@@ -230,6 +237,8 @@ namespace Client.Desktop.ViewModels.Common.Services
                 val.TryUpdate(epc, new Tuple<DateTime?, DateTime?>(times.Item1, time), times);
                 //данные можно сохранять в БД, но метке можно обнулить
             }
+
+            
         }
 
     }

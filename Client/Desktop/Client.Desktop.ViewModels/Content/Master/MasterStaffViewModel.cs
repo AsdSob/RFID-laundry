@@ -111,8 +111,6 @@ namespace Client.Desktop.ViewModels.Content.Master
         public RelayCommand DeleteLinenCommand { get; }
         public RelayCommand RfidReaderCommand { get; }
 
-        public RelayCommand StartReadingCommand { get; }
-        public RelayCommand StopReadingCommand { get; }
         public RelayCommand AddSelectedTagCommand { get; }
         
 
@@ -131,8 +129,6 @@ namespace Client.Desktop.ViewModels.Content.Master
             DeleteLinenCommand = new RelayCommand(DeleteLinen, (() => SelectedLinen != null));
 
             RfidReaderCommand = new RelayCommand(RfidReader);
-            StartReadingCommand = new RelayCommand(StartReading);
-            StopReadingCommand = new RelayCommand(StopReading);
             AddSelectedTagCommand = new RelayCommand(AddSelectedTag, (() => SelectedTag != null));
 
             Task.Factory.StartNew( () => GetData());
@@ -358,21 +354,6 @@ namespace Client.Desktop.ViewModels.Content.Master
 
             var showDialog = _dialogService.ShowDialog(RfidReaderWindow);
             
-        }
-
-        private void StartReading()
-        {
-            RfidReaderWindow.ReaderService.StartRead();
-            
-            //RfidReaderWindow.ReaderService.Reader.TagsReported += SHowAntennaTags;
-            _tagData = RfidReaderWindow.ReaderService._data;
-        }
-
-        private void StopReading()
-        {
-            //RfidReaderWindow.ReaderService.Reader.TagsReported -= SHowAntennaTags;
-            
-            RfidReaderWindow.ReaderService.StopRead();
         }
 
         private void AddSelectedTag()

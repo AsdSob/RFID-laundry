@@ -8,6 +8,7 @@ using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Common.Windows;
+using Impinj.OctaneSdk;
 using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Windows
@@ -19,11 +20,12 @@ namespace Client.Desktop.ViewModels.Windows
 
         public Action<bool> CloseAction { get; set; }
 
-
         private ObservableCollection<RfidReaderEntityViewModel> _rfidReaders;
         private RfidReaderEntityViewModel _selectedRfidReader;
         private ObservableCollection<RfidAntennaEntityViewModel> _rfidAntennas;
         private RfidService _readerService;
+        public string ConnectionStatus { get; set; }
+        public string StartStopButton { get; set; }
 
         public RfidService ReaderService
         {
@@ -53,6 +55,7 @@ namespace Client.Desktop.ViewModels.Windows
         public RelayCommand DeleteReaderCommand { get; }
         public RelayCommand AddReaderCommand { get; }
         public RelayCommand CloseCommand { get; }
+        public RelayCommand StartStopReaderCommand { get; }
 
         public RfidReaderWindowModel(ILaundryService laundryService, IDialogService dialogService)
         {
@@ -65,7 +68,8 @@ namespace Client.Desktop.ViewModels.Windows
             AddReaderCommand = new RelayCommand(AddReader);
             CloseCommand = new RelayCommand(Close);
             DeleteReaderCommand = new RelayCommand(DeleteReader, () => SelectedRfidReader != null);
-            
+            StartStopReaderCommand = new RelayCommand(StartStopReader, () => SelectedRfidReader != null);
+
             GetData();
         }
 
@@ -101,6 +105,8 @@ namespace Client.Desktop.ViewModels.Windows
             {
                 RaisePropertyChanged(()=> SortedAntennas);
                 DeleteReaderCommand.RaiseCanExecuteChanged();
+
+                ConnectReaderCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -112,9 +118,15 @@ namespace Client.Desktop.ViewModels.Windows
 
             var isConnected = ReaderService.Connection(SelectedRfidReader, SortedAntennas.ToList());
 
-            _dialogService.ShowInfoDialog(isConnected
-                ? $"{SelectedRfidReader.Name} Is Connected"
-                : $"{SelectedRfidReader.Name} Is NOT Connected");
+            if (isConnected)
+            {
+                StartStopReaderCommand.CanExecute(true);
+                ConnectionStatus = "Connected";
+            }
+            else
+            {
+                ConnectionStatus = "NOT Connected";
+            }
         }
 
         private ObservableCollection<RfidAntennaEntityViewModel> GetReaderAntennas()
@@ -147,12 +159,38 @@ namespace Client.Desktop.ViewModels.Windows
                     {
                         newAntenna.RfidReaderId = SelectedRfidReader.Id;
                     }
-
                     antennas.Add(newAntenna);
                 }
             }
             return antennas;
         }
+
+        private void Close()
+        {
+            if (_dialogService.ShowQuestionDialog($"Do you want to close window ? "))
+            {
+                CloseAction?.Invoke(true);
+            }
+        }
+
+        private void StartStopReader()
+        {
+            if (StartStopButton == "Start")
+            {
+                ReaderService.StartRead();
+                StartStopButton = "Stop";
+                return;
+            }
+
+            if (StartStopButton == "Stop")
+            {
+                ReaderService.StopRead();
+                StartStopButton = "Start";
+            }
+        }
+
+
+        #region Reader DB Methods
 
         private void Save()
         {
@@ -226,13 +264,7 @@ namespace Client.Desktop.ViewModels.Windows
 
             SelectedRfidReader = RfidReaders.FirstOrDefault();
         }
+        #endregion
 
-        private void Close()
-        {
-            if (_dialogService.ShowQuestionDialog($"Do you want to close window ? "))
-            {
-                CloseAction?.Invoke(true);
-            }
-        }
     }
 }
