@@ -4,12 +4,14 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Windows;
 using Impinj.OctaneSdk;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions.Internal;
 using Storage.Laundry.Models;
 using Storage.Laundry.Models.Abstract;
 
@@ -376,7 +378,7 @@ namespace Client.Desktop.ViewModels.Content.Master
             SelectedLinen.Tag = SelectedTag.Item2;
         }
 
-        public void SHowAntennaTags(ImpinjReader reader, TagReport report)
+        public async void SHowAntennaTags(ImpinjReader reader, TagReport report)
         {
             foreach (var tag in report.Tags)
             {
@@ -388,7 +390,6 @@ namespace Client.Desktop.ViewModels.Content.Master
                 _dispatcher.RunInMainThread(() =>
                 {
                     Tags.Add(new Tuple<int, string>(tag.AntennaPortNumber, tag.Epc.ToString()));
-
                 });
             }
         }

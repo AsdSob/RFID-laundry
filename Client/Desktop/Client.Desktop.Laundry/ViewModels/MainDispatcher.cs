@@ -8,9 +8,12 @@ namespace Client.Desktop.Laundry.ViewModels
     public class MainDispatcher : IMainDispatcher
     {
 
-        public void RunInMainThread(Action action, DispatcherPriority dispatcherPriority = DispatcherPriority.Normal)
+        public void RunInMainThread(Action action)
         {
-            Application.Current.MainWindow.Dispatcher.Invoke(action, dispatcherPriority );
+            DispatcherPriority dispatcherPriority = DispatcherPriority.DataBind;
+
+            Application.Current.MainWindow.Dispatcher.Invoke(dispatcherPriority, action );
         }
+
     }
 }
