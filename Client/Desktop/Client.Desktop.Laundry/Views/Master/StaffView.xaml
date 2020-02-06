@@ -227,7 +227,7 @@
                         <DataGrid AutoGenerateColumns="False"
                                   Height="NaN"
                                   ItemsSource="{Binding Tags}"
-                                  SelectedItem="{Binding SelectedTag}"
+                                  SelectedItem="{Binding SelectedTag, UpdateSourceTrigger=PropertyChanged}"
                                   
                                   VerticalScrollBarVisibility="Visible"
                                   Width="400"
@@ -239,8 +239,8 @@
                         >
 
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Antenna" Binding="{Binding Path=Value}" />
-                                <DataGridTextColumn Header="Tag" Binding="{Binding Path=Key}" />
+                                <DataGridTextColumn Header="Antenna" Binding="{Binding Path=Item1}" />
+                                <DataGridTextColumn Header="Tag" Binding="{Binding Path=Item2}" />
                             </DataGrid.Columns>
 
                         </DataGrid>
