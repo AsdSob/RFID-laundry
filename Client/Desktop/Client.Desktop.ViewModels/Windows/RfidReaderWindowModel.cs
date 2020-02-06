@@ -8,7 +8,6 @@ using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Common.Windows;
-using Impinj.OctaneSdk;
 using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Windows
@@ -24,9 +23,19 @@ namespace Client.Desktop.ViewModels.Windows
         private RfidReaderEntityViewModel _selectedRfidReader;
         private ObservableCollection<RfidAntennaEntityViewModel> _rfidAntennas;
         private RfidService _readerService;
-        public string ConnectionStatus { get; set; }
-        public string StartStopButton { get; set; }
+        private string _connectionStatus;
+        private string _startStopButton;
 
+        public string StartStopButton
+        {
+            get => _startStopButton;
+            set => Set(() => StartStopButton, ref _startStopButton, value);
+        }
+        public string ConnectionStatus
+        {
+            get => _connectionStatus;
+            set => Set(() => ConnectionStatus, ref _connectionStatus, value);
+        }
         public RfidService ReaderService
         {
             get => _readerService;
@@ -64,11 +73,13 @@ namespace Client.Desktop.ViewModels.Windows
             ReaderService = new RfidService();
 
             SaveCommand = new RelayCommand(Save);
-            ConnectReaderCommand = new RelayCommand(ConnectReader);
+            ConnectReaderCommand = new RelayCommand(ConnectReader, ()=> SelectedRfidReader != null);
             AddReaderCommand = new RelayCommand(AddReader);
             CloseCommand = new RelayCommand(Close);
             DeleteReaderCommand = new RelayCommand(DeleteReader, () => SelectedRfidReader != null);
             StartStopReaderCommand = new RelayCommand(StartStopReader, () => SelectedRfidReader != null);
+
+            StartStopButton = "Start";
 
             GetData();
         }
@@ -107,9 +118,6 @@ namespace Client.Desktop.ViewModels.Windows
                 DeleteReaderCommand.RaiseCanExecuteChanged();
 
                 ConnectReaderCommand.RaiseCanExecuteChanged();
-
-                StartStopReaderCommand.CanExecute(false);
-                StartStopButton = "Stop";
             }
         }
 
@@ -128,6 +136,7 @@ namespace Client.Desktop.ViewModels.Windows
             }
             else
             {
+                StartStopReaderCommand.CanExecute(false);
                 ConnectionStatus = "NOT Connected";
             }
         }

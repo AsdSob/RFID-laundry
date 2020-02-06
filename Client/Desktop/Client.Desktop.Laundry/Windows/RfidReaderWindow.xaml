@@ -13,7 +13,7 @@
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="0.5*"/>
+            <ColumnDefinition Width="0.6*"/>
         </Grid.ColumnDefinitions>
 
         <Grid Grid.Row="0" Grid.Column="0">
@@ -110,8 +110,8 @@
             </Grid.RowDefinitions>
 
             <DockPanel Grid.Column="0" Grid.Row="1">
-                <Button Margin = "5" Padding="20,2" Content="{Binding StartStopButton}" Command="{Binding StartStopReaderCommand}"/>
-                <Label DockPanel.Dock="Right"  Margin = "5" Padding="20,2" Content="{Binding SelectedRfidReader.Name}" />
+                <Button DockPanel.Dock="Bottom" Margin = "5" Padding="20,2" Width="100" Content="{Binding StartStopButton}" Command="{Binding StartStopReaderCommand}"/>
+                <Label DockPanel.Dock="Left" Margin = "5" Padding="20,2" Content="{Binding ConnectionStatus}" FontWeight="ExtraBold" AllowDrop="True" />
             </DockPanel>
 
             <GroupBox Grid.Column="0" Grid.Row="2" Header="Tags">
