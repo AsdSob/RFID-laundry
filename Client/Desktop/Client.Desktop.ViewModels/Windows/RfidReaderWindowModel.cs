@@ -107,6 +107,9 @@ namespace Client.Desktop.ViewModels.Windows
                 DeleteReaderCommand.RaiseCanExecuteChanged();
 
                 ConnectReaderCommand.RaiseCanExecuteChanged();
+
+                StartStopReaderCommand.CanExecute(false);
+                StartStopButton = "Stop";
             }
         }
 
