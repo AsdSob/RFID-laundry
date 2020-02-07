@@ -202,9 +202,9 @@ namespace Client.Desktop.ViewModels.Windows
         {
             if (StartStopButton == "Start")
             {
+                Tags = new ObservableCollection<Tuple<int, string>>();
 
                 ReaderService.Reader.TagsReported += DisplayTag;
-                Tags = new ObservableCollection<Tuple<int, string>>();
                 ReaderService.StartRead();
                 StartStopButton = "Stop";
                 return;
@@ -216,7 +216,6 @@ namespace Client.Desktop.ViewModels.Windows
                 ReaderService.Reader.TagsReported -= DisplayTag;
 
                 StartStopButton = "Start";
-                Tags = ReaderService.Tags;
             }
         }
 

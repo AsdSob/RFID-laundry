@@ -367,12 +367,30 @@ namespace Client.Desktop.ViewModels.Content.Master
         private void AddSelectedTag()
         {
             if (SelectedLinen == null)
-            {
                 AddLinen();
-                SelectedLinen.Tag = SelectedTag.Item2;
+
+            if (SelectedLinen.Tag != null)
+            {
+                if (!_dialogService.ShowQuestionDialog("Linen already has tag \n Do you want to replace it?"))
+                {
+                    return;
+                }
+            }
+
+            if (Linens.Any(x => Equals(x.Tag, SelectedTag.Item2)))
+            {
+                var existLinen = Linens.FirstOrDefault(x => Equals(x.Tag, SelectedTag.Item2));
+                var staff = Staff.FirstOrDefault(x => x.Id == existLinen.StaffId);
+
+                if (!_dialogService.ShowQuestionDialog(
+                    $"Tag {SelectedTag.Item2} already using by {staff.StaffName} in <{existLinen.Id}> linen \n Do you want to shift Tag?")
+                ) return;
+
+                existLinen.Tag = null;
             }
 
             SelectedLinen.Tag = SelectedTag.Item2;
+
         }
 
         private void UpdateTags()

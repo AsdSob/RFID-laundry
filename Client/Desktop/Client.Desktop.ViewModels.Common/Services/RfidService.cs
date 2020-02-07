@@ -207,12 +207,6 @@ namespace Client.Desktop.ViewModels.Common.Services
             foreach (Tag tag in report)
             {
                 AddData(tag.AntennaPortNumber, tag.Epc.ToString(), tag.LastSeenTime.LocalDateTime);
-
-                //if (Tags.Any(x => Equals(x.Item2, tag.Epc.ToString())))
-                //{
-                //    continue;
-                //}
-                //Tags.Add(new Tuple<int, string>(tag.AntennaPortNumber, tag.Epc.ToString()));
             }
         }
 
