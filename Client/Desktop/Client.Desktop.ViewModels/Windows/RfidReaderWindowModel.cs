@@ -89,8 +89,6 @@ namespace Client.Desktop.ViewModels.Windows
             DeleteReaderCommand = new RelayCommand(DeleteReader, () => SelectedRfidReader != null);
             StartStopReaderCommand = new RelayCommand(StartStopReader);
 
-            StartStopReaderCommand.CanExecute(false);
-
             StartStopButton = "Start";
 
             GetData();
@@ -204,7 +202,7 @@ namespace Client.Desktop.ViewModels.Windows
             {
 
                 ReaderService.Reader.TagsReported += DisplayTag;
-
+                Tags = new ObservableCollection<Tuple<int, string>>();
                 ReaderService.StartRead();
                 StartStopButton = "Stop";
                 return;

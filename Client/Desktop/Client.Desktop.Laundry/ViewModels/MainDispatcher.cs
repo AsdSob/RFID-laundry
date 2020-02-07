@@ -10,7 +10,7 @@ namespace Client.Desktop.Laundry.ViewModels
     {
         public void RunInMainThread(Action action)
         {
-            Application.Current?.Dispatcher.Invoke(DispatcherPriority.Send, action);
+            Application.Current?.Dispatcher.Invoke(action);
         }
 
     }
