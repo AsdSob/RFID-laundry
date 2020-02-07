@@ -216,12 +216,7 @@ namespace Client.Desktop.ViewModels.Content.Master
             {
                 AddSelectedTagCommand.RaiseCanExecuteChanged();
             }            
-            
-            if(e.PropertyName == nameof(_tagData))
-            {
-                UpdateTags();
-            }
-
+          
         }
 
         private ObservableCollection<LinenEntityViewModel> SortLinen()
@@ -383,7 +378,7 @@ namespace Client.Desktop.ViewModels.Content.Master
                 var staff = Staff.FirstOrDefault(x => x.Id == existLinen.StaffId);
 
                 if (!_dialogService.ShowQuestionDialog(
-                    $"Tag {SelectedTag.Item2} already using by {staff.StaffName} in <{existLinen.Id}> linen \n Do you want to shift Tag?")
+                    $"Tag {SelectedTag.Item2} already using by {staff?.StaffName} in <{existLinen.Id}> linen \n Do you want to shift Tag?")
                 ) return;
 
                 existLinen.Tag = null;
@@ -393,28 +388,6 @@ namespace Client.Desktop.ViewModels.Content.Master
 
         }
 
-        private void UpdateTags()
-        {
-            if(_tagData.Count == 0) return;
-            var tags = new List<string>();
-
-
-            foreach (var antenna in _tagData)
-            { 
-                tags.AddRange(antenna.Value.Select(x=> x.Key));
-            }
-
-            foreach (var tag in tags)
-            {
-                if (Tags.Any(x => Equals(x.Item2, tag)))
-                {
-                    continue;
-                }
-
-                Tags.Add(new Tuple<int, string>(1, tag));
-            }
-
-        }
         
     }
 }
