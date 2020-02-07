@@ -9,6 +9,7 @@ using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Common.Windows;
+using Impinj.OctaneSdk;
 using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Windows
@@ -17,6 +18,7 @@ namespace Client.Desktop.ViewModels.Windows
     {
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
+        private readonly IMainDispatcher _dispatcher;
 
         public Action<bool> CloseAction { get; set; }
 
@@ -26,9 +28,13 @@ namespace Client.Desktop.ViewModels.Windows
         private RfidService _readerService;
         private string _connectionStatus;
         private string _startStopButton;
+        private ObservableCollection<Tuple<int, string>> _tags;
 
-        public ObservableCollection<Tuple<int,string>> Tags { get; set; }
-
+        public ObservableCollection<Tuple<int, string>> Tags
+        {
+            get => _tags;
+            set => Set(() => Tags, ref _tags, value);
+        }
         public string StartStopButton
         {
             get => _startStopButton;
@@ -69,10 +75,11 @@ namespace Client.Desktop.ViewModels.Windows
         public RelayCommand CloseCommand { get; }
         public RelayCommand StartStopReaderCommand { get; }
 
-        public RfidReaderWindowModel(ILaundryService laundryService, IDialogService dialogService)
+        public RfidReaderWindowModel(ILaundryService laundryService, IDialogService dialogService, IMainDispatcher dispatcher)
         {
             _laundryService = laundryService ?? throw new ArgumentNullException(nameof(laundryService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
+            _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
             ReaderService = new RfidService();
 
             SaveCommand = new RelayCommand(Save);
@@ -81,6 +88,8 @@ namespace Client.Desktop.ViewModels.Windows
             CloseCommand = new RelayCommand(Close);
             DeleteReaderCommand = new RelayCommand(DeleteReader, () => SelectedRfidReader != null);
             StartStopReaderCommand = new RelayCommand(StartStopReader);
+
+            StartStopReaderCommand.CanExecute(false);
 
             StartStopButton = "Start";
 
@@ -193,6 +202,9 @@ namespace Client.Desktop.ViewModels.Windows
         {
             if (StartStopButton == "Start")
             {
+
+                ReaderService.Reader.TagsReported += DisplayTag;
+
                 ReaderService.StartRead();
                 StartStopButton = "Stop";
                 return;
@@ -201,8 +213,26 @@ namespace Client.Desktop.ViewModels.Windows
             if (StartStopButton == "Stop")
             {
                 ReaderService.StopRead();
+                ReaderService.Reader.TagsReported -= DisplayTag;
+
                 StartStopButton = "Start";
                 Tags = ReaderService.Tags;
+            }
+        }
+
+        private void DisplayTag(ImpinjReader reader, TagReport report)
+        {
+            foreach (Tag tag in report)
+            {
+                if (Tags.Any(x => Equals(x.Item2, tag.Epc.ToString())))
+                {
+                    continue;
+                }
+
+                _dispatcher.RunInMainThread((() =>
+                {
+                    Tags.Add(new Tuple<int, string>(tag.AntennaPortNumber, tag.Epc.ToString()));
+                }));
             }
         }
 

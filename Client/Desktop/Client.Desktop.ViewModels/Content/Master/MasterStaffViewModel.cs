@@ -129,7 +129,7 @@ namespace Client.Desktop.ViewModels.Content.Master
             AddLinenCommand = new RelayCommand(AddLinen, (() => SelectedDepartment != null));
             DeleteLinenCommand = new RelayCommand(DeleteLinen, (() => SelectedLinen != null));
 
-            RfidReaderCommand = new RelayCommand(SHowAntennaTags);
+            RfidReaderCommand = new RelayCommand(RfidReader);
             AddSelectedTagCommand = new RelayCommand(AddSelectedTag, (() => SelectedTag != null));
 
             Task.Factory.StartNew( () => GetData());
