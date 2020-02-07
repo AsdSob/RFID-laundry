@@ -118,7 +118,7 @@
 
                 <DataGrid AutoGenerateColumns="False"
                           Height="NaN"
-                          ItemsSource="{Binding ReaderService.Tags}"
+                          ItemsSource="{Binding Tags}"
                           VerticalScrollBarVisibility="Visible"
                           AllowDrop="True" 
                           HorizontalAlignment="Stretch"

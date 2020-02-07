@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
@@ -128,7 +129,7 @@ namespace Client.Desktop.ViewModels.Content.Master
             AddLinenCommand = new RelayCommand(AddLinen, (() => SelectedDepartment != null));
             DeleteLinenCommand = new RelayCommand(DeleteLinen, (() => SelectedLinen != null));
 
-            RfidReaderCommand = new RelayCommand(RfidReader);
+            RfidReaderCommand = new RelayCommand(SHowAntennaTags);
             AddSelectedTagCommand = new RelayCommand(AddSelectedTag, (() => SelectedTag != null));
 
             Task.Factory.StartNew( () => GetData());
@@ -353,7 +354,7 @@ namespace Client.Desktop.ViewModels.Content.Master
             RfidReaderWindow.ReaderService.StopRead();
 
             var showDialog = _dialogService.ShowDialog(RfidReaderWindow);
-            
+
         }
 
         private void AddSelectedTag()
@@ -390,20 +391,10 @@ namespace Client.Desktop.ViewModels.Content.Master
 
         }
 
-        public void SHowAntennaTags(ImpinjReader reader, TagReport report)
+        public void SHowAntennaTags()
         {
-            foreach (var tag in report.Tags)
-            {
-                if (Tags.Any(x => Equals(x.Item2, tag.Epc.ToString())))
-                {
-                    continue;
-                }
-                
-                _dispatcher.RunInMainThread(() =>
-                {
-                    Tags.Add(new Tuple<int, string>(tag.AntennaPortNumber, tag.Epc.ToString()));
-                });
-            }
+            var thre = Thread.CurrentThread;
+            _dialogService.ShowInfoDialog($"Name ={thre.Name},  Priority={thre.Priority}, ID={thre.ManagedThreadId}");
         }
 
     }

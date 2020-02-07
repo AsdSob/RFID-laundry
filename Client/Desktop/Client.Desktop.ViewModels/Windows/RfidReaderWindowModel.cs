@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
@@ -25,6 +26,8 @@ namespace Client.Desktop.ViewModels.Windows
         private RfidService _readerService;
         private string _connectionStatus;
         private string _startStopButton;
+
+        public ObservableCollection<Tuple<int,string>> Tags { get; set; }
 
         public string StartStopButton
         {
@@ -77,7 +80,7 @@ namespace Client.Desktop.ViewModels.Windows
             AddReaderCommand = new RelayCommand(AddReader);
             CloseCommand = new RelayCommand(Close);
             DeleteReaderCommand = new RelayCommand(DeleteReader, () => SelectedRfidReader != null);
-            StartStopReaderCommand = new RelayCommand(StartStopReader, () => SelectedRfidReader != null);
+            StartStopReaderCommand = new RelayCommand(StartStopReader);
 
             StartStopButton = "Start";
 
@@ -176,12 +179,13 @@ namespace Client.Desktop.ViewModels.Windows
             }
             return antennas;
         }
-
+        
         private void Close()
         {
             if (_dialogService.ShowQuestionDialog($"Do you want to close window ? "))
             {
                 CloseAction?.Invoke(true);
+                
             }
         }
 
@@ -200,7 +204,6 @@ namespace Client.Desktop.ViewModels.Windows
                 StartStopButton = "Start";
             }
         }
-
 
         #region Reader DB Methods
 
