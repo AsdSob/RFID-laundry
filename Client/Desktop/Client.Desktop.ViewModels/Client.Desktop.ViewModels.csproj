@@ -9,12 +9,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="FinsUdp">
-      <HintPath>..\..\..\libs\FinsUdp.dll</HintPath>
-    </Reference>
-    <Reference Include="PlcControl">
-      <HintPath>..\..\..\libs\PlcControl.dll</HintPath>
-    </Reference>
     <Reference Include="PresentationFramework">
       <HintPath>..\..\..\..\..\..\..\..\Program Files\dotnet\packs\Microsoft.WindowsDesktop.App.Ref\3.0.0\ref\netcoreapp3.0\PresentationFramework.dll</HintPath>
     </Reference>

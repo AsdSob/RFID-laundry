@@ -202,6 +202,7 @@ namespace Client.Desktop.ViewModels.Windows
             {
                 ReaderService.StopRead();
                 StartStopButton = "Start";
+                Tags = ReaderService.Tags;
             }
         }
 
