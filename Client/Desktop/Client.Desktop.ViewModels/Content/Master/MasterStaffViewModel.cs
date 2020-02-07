@@ -111,6 +111,7 @@ namespace Client.Desktop.ViewModels.Content.Master
         public RelayCommand AddLinenCommand { get; }
         public RelayCommand DeleteLinenCommand { get; }
         public RelayCommand RfidReaderCommand { get; }
+        public RelayCommand GetReaderTagsCommand { get; }
 
         public RelayCommand AddSelectedTagCommand { get; }
         
@@ -130,6 +131,7 @@ namespace Client.Desktop.ViewModels.Content.Master
             DeleteLinenCommand = new RelayCommand(DeleteLinen, (() => SelectedLinen != null));
 
             RfidReaderCommand = new RelayCommand(RfidReader);
+            GetReaderTagsCommand = new RelayCommand(GetReaderTags);
             AddSelectedTagCommand = new RelayCommand(AddSelectedTag, (() => SelectedTag != null));
 
             Task.Factory.StartNew( () => GetData());
@@ -357,6 +359,11 @@ namespace Client.Desktop.ViewModels.Content.Master
 
         }
 
+        private void GetReaderTags()
+        {
+            Tags = RfidReaderWindow.Tags;
+        }
+
         private void AddSelectedTag()
         {
             if (SelectedLinen == null)
@@ -390,12 +397,6 @@ namespace Client.Desktop.ViewModels.Content.Master
             }
 
         }
-
-        public void SHowAntennaTags()
-        {
-            var thre = Thread.CurrentThread;
-            _dialogService.ShowInfoDialog($"Name ={thre.Name},  Priority={thre.Priority}, ID={thre.ManagedThreadId}");
-        }
-
+        
     }
 }

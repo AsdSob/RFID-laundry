@@ -184,7 +184,7 @@
                         </DataGridComboBoxColumn.EditingElementStyle>
                     </DataGridComboBoxColumn>
 
-                    <DataGridTextColumn Header="Packing Value" Binding="{Binding }" MinWidth="150"/>
+                    <DataGridTextColumn Header="Packing Value" Binding="{Binding PackingValue}"/>
 
                         <DataGridTextColumn Header="Tag" Binding="{Binding Tag}" MinWidth="150"/>
 
@@ -214,19 +214,16 @@
                     </Grid.ColumnDefinitions>
 
                     <DockPanel Grid.Column="0" Grid.Row="0" LastChildFill="False">
-                        <!--<Button Margin = "5" Padding="20,2" Content="Start" Command="{Binding StartReadingCommand}"/>
-                        <Button Margin = "5" Padding="20,2" Content="Stop" Command="{Binding StopReadingCommand}"/>
-                        <Button Margin = "5" Padding="20,2" Content="Add" Command="{Binding AddSelectedTagCommand}"/>-->
-                        <Button Margin = "5" Padding="20,2" Content="Setting" DockPanel.Dock="Left" Command="{Binding RfidReaderCommand}"/>
-                    </DockPanel>
+                        <Button Margin = "5" Padding="20,2" Content="Setting" Command="{Binding RfidReaderCommand}"/>
+                        <Button Margin = "5" Padding="20,2" Content="Add Tag" Command="{Binding AddSelectedTagCommand}"/>
 
-                    <Label Grid.Row="1" Grid.Column="0"  Margin = "5" Padding="20,2" FontWeight="Bold" Content="{Binding RfidReaderWindow.SelectedRfidReader.Name}" />
+                    </DockPanel>
 
                     <GroupBox Grid.Column="0" Grid.Row="2" Header="Tags">
 
                         <DataGrid AutoGenerateColumns="False"
                                   Height="NaN"
-                                  ItemsSource="{Binding Tags}"
+                                  ItemsSource="{Binding RfidReaderWindow.Tags}"
                                   SelectedItem="{Binding SelectedTag, UpdateSourceTrigger=PropertyChanged}"
                                   
                                   VerticalScrollBarVisibility="Visible"

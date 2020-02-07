@@ -127,6 +127,8 @@ namespace Client.Desktop.ViewModels.Windows
                 RaisePropertyChanged(()=> SortedAntennas);
                 DeleteReaderCommand.RaiseCanExecuteChanged();
 
+                StartStopReaderCommand.CanExecute(false);
+
                 ConnectReaderCommand.RaiseCanExecuteChanged();
             }
         }
