@@ -223,15 +223,17 @@ namespace Client.Desktop.ViewModels.Content.Master
         {
             var linens = new ObservableCollection<LinenEntityViewModel>();
 
-            if (SelectedStaff == null)
-            {
-                if (SelectedDepartment == null) return linens;
+            if (SelectedDepartment == null) return linens;
 
-                return Linens?.Where(x => x.DepartmentId == SelectedDepartment?.Id).ToObservableCollection();
-            }
+            return Linens?.Where(x => x.DepartmentId == SelectedDepartment?.Id).ToObservableCollection();
 
-            linens = Linens.Where(x => x.OriginalObject.ClientStaffEntity == SelectedStaff.OriginalObject).ToObservableCollection();
-            return linens;
+            //if (SelectedStaff == null)
+            //{
+                
+            //}
+
+            //linens = Linens.Where(x => x.OriginalObject.ClientStaffEntity == SelectedStaff.OriginalObject).ToObservableCollection();
+            //return linens;
         }
 
         private void Save()
@@ -322,6 +324,7 @@ namespace Client.Desktop.ViewModels.Content.Master
             if (SelectedStaff != null)
             {
                 newLinen.OriginalObject.ClientStaffEntity = SelectedStaff.OriginalObject;
+                newLinen.StaffId = SelectedStaff.Id;
             }
 
             Linens.Add(newLinen);

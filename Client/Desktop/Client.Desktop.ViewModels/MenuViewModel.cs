@@ -32,7 +32,7 @@ namespace Client.Desktop.ViewModels
             MasterLinenCommand = new RelayCommand(() => Select(typeof(MasterLinenViewModel)));
 
 
-            Select(typeof(MasterClientViewModel));
+            Select(typeof(MasterStaffViewModel));
         }
 
         private void Select(Type type)
