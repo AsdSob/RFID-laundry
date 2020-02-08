@@ -6,7 +6,7 @@
              xmlns:windows="clr-namespace:Client.Desktop.ViewModels.Windows;assembly=Client.Desktop.ViewModels"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance windows:RfidReaderWindowModel}"
-             Window.Width="600" Window.Height="450">
+             Window.Width="700" Window.Height="450">
     <Grid >
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>

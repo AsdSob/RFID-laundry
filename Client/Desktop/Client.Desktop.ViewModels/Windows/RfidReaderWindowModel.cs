@@ -202,6 +202,8 @@ namespace Client.Desktop.ViewModels.Windows
         {
             if (StartStopButton == "Start")
             {
+                if(ConnectionStatus != "Connected") return;
+
                 Tags = new ObservableCollection<Tuple<int, string>>();
 
                 ReaderService.Reader.TagsReported += DisplayTag;

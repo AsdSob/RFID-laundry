@@ -216,7 +216,7 @@
                     <DockPanel Grid.Column="0" Grid.Row="0" LastChildFill="False">
                         <Button Margin = "5" Padding="20,2" Content="Setting" Command="{Binding RfidReaderCommand}"/>
                         <Button Margin = "5" Padding="20,2" Content="Add Tag" Command="{Binding AddSelectedTagCommand}"/>
-
+                        <Button Margin = "5" Padding="20,2" Content="{Binding RfidReaderWindow.StartStopButton}" Command="{Binding RfidReaderWindow.StartStopReaderCommand}"/>
                     </DockPanel>
 
                     <GroupBox Grid.Column="0" Grid.Row="2" Header="Tags">
