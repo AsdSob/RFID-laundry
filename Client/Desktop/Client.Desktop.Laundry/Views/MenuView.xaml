@@ -9,12 +9,6 @@
              d:DataContext="{d:DesignInstance viewModels:MenuViewModel}"
              >
 
-    <b:Interaction.Triggers>
-        <b:EventTrigger EventName="Loaded">
-            <b:InvokeCommandAction Command="{Binding ClientCommand}" />
-        </b:EventTrigger>
-    </b:Interaction.Triggers>
-
     <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
                 <MenuItem Header="_New" Command="{Binding NewCommand}"/>

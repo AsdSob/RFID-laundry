@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Threading;
 using System.Windows.Input;
+using Client.Desktop.ViewModels.Common.Identity;
+using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Content;
 using Client.Desktop.ViewModels.Content.Master;
@@ -8,6 +11,7 @@ namespace Client.Desktop.ViewModels
 {
     public class MenuViewModel : ViewModelBase
     {
+        private readonly IAuthorizationService _authorizationService;
         private Type _selectedItem;
 
         public Type SelectedItem
@@ -23,16 +27,22 @@ namespace Client.Desktop.ViewModels
         public ICommand StaffCommand { get; }
         public ICommand MasterLinenCommand { get; }
 
-        public MenuViewModel()
+        public MenuViewModel(IAuthorizationService authorizationService)
         {
+            _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
+            
             NewCommand = new RelayCommand(() => Select(typeof(DataViewModel)));
             ExitCommand = new RelayCommand(() => Select(typeof(ExitViewModel)));
             ClientCommand = new RelayCommand(() => Select(typeof(MasterClientViewModel)));
-            StaffCommand = new RelayCommand(() => Select(typeof(MasterStaffViewModel)));
+            StaffCommand = new RelayCommand(() => Select(typeof(MasterStaffViewModel)), StaffCommandCanExecute);
             MasterLinenCommand = new RelayCommand(() => Select(typeof(MasterLinenViewModel)));
 
+            _selectedItem = typeof(MasterClientViewModel);
+        }
 
-            Select(typeof(MasterStaffViewModel));
+        private bool StaffCommandCanExecute()
+        {
+            return _authorizationService.CurrentPrincipal?.IsInRole(Roles.Administrator) == true;
         }
 
         private void Select(Type type)

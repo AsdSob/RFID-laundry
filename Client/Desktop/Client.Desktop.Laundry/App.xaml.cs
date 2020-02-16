@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Threading;
 using Autofac;
 using Client.Desktop.Laundry.ViewModels;
+using Client.Desktop.ViewModels.Common.Identity;
 using Client.Desktop.ViewModels.Common.Services;
 using Common.Logger;
 
@@ -16,6 +17,15 @@ namespace Client.Desktop.Laundry
         public App()
         {
             DispatcherUnhandledException += OnDispatcherUnhandledException;
+        }
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            //Create a custom principal with an anonymous identity at startup
+            var customPrincipal = new CustomPrincipal();
+            AppDomain.CurrentDomain.SetThreadPrincipal(customPrincipal);
+
+            base.OnStartup(e);
         }
 
         private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
