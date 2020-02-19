@@ -1,3 +1,3 @@
 {
-    "dbConnectionString": "Host=49.12.11.211;Port=6432;Database=laundry;User Id=postgres;Password=Nga77RisBda!;Timeout=100;Command Timeout=300;"
+    "dbConnectionString": "Host=127.0.0.1;Port=5432;Database=laundry_;User Id=postgres;Password=admin;Timeout=100;Command Timeout=300;"
 }

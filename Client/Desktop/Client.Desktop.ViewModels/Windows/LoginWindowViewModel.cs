@@ -49,8 +49,8 @@ namespace Client.Desktop.ViewModels.Windows
 
         public string Status
         {
-            get { return _status; }
-            set { Set(() => Status, ref _status, value); }
+            get => _status;
+            set => Set(() => Status, ref _status, value);
         }
         #endregion
 
@@ -63,6 +63,9 @@ namespace Client.Desktop.ViewModels.Windows
             string clearTextPassword = parameter?.Password;
             try
             {
+                if (string.IsNullOrEmpty(Username) || string.IsNullOrEmpty(clearTextPassword))
+                    throw new UnauthorizedAccessException();
+
                 //Validate credentials through the authentication service
                 User user = _authenticationService.AuthenticateUser(Username, clearTextPassword);
 
@@ -93,7 +96,7 @@ namespace Client.Desktop.ViewModels.Windows
             }
             catch (Exception ex)
             {
-                Status = string.Format("ERROR: {0}", ex.Message);
+                Status = $"ERROR: {ex.Message}";
             }
         }
 
@@ -121,9 +124,6 @@ namespace Client.Desktop.ViewModels.Windows
             return IsAuthenticated;
         }
 
-        public bool IsAuthenticated
-        {
-            get { return Thread.CurrentPrincipal.Identity.IsAuthenticated; }
-        }
+        public bool IsAuthenticated => Thread.CurrentPrincipal.Identity.IsAuthenticated;
     }
 }

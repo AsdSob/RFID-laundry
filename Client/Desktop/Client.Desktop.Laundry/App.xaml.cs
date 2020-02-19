@@ -6,6 +6,8 @@ using Client.Desktop.Laundry.ViewModels;
 using Client.Desktop.ViewModels.Common.Identity;
 using Client.Desktop.ViewModels.Common.Services;
 using Common.Logger;
+using Microsoft.EntityFrameworkCore;
+using Storage.Core.Abstract;
 
 namespace Client.Desktop.Laundry
 {
@@ -21,9 +23,13 @@ namespace Client.Desktop.Laundry
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            //Create a custom principal with an anonymous identity at startup
+            // create a custom principal with an anonymous identity at startup
             var customPrincipal = new CustomPrincipal();
             AppDomain.CurrentDomain.SetThreadPrincipal(customPrincipal);
+
+            // database migration
+            using (var context = ViewModelLocator.Container.Resolve<IDbContextFactory>().Create())
+                context.Database.Migrate();
 
             base.OnStartup(e);
         }

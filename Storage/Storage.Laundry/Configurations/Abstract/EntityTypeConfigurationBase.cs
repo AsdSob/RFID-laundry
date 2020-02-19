@@ -11,7 +11,7 @@ namespace Storage.Laundry.Configurations.Abstract
     {
         public virtual void Configure(EntityTypeBuilder<T> builder)
         {
-            builder.HasKey(x => x.Id).HasName("pk_laundry");
+            builder.HasKey(x => x.Id).HasName("pk_laundry"); //TODO: need this name?
 
             builder.Property(x => x.Id).HasColumnName("id");
             builder.Property(x => x.CreatedDateUtc).HasColumnName("created_date_utc");

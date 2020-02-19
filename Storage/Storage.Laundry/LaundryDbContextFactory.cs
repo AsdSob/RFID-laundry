@@ -7,7 +7,6 @@ namespace Storage.Laundry
 {
     public class LaundryDbContextFactory : IDbContextFactory
     {
-        private bool _initialized;
         private readonly DbContextOptions<LaundryDbContext> _options;
 
         public LaundryDbContextFactory(IDbConfiguration dbConfiguration)
@@ -26,24 +25,12 @@ namespace Storage.Laundry
         {
             var context = new LaundryDbContext(_options);
 
-            if (!_initialized)
-            {
-                await context.Database.EnsureCreatedAsync();
-                _initialized = true;
-            }
-
             return context;
         }
 
         public DbContext Create()
         {
             var context = new LaundryDbContext(_options);
-
-            if (!_initialized)
-            {
-                context.Database.EnsureCreated();
-                _initialized = true;
-            }
 
             return context;
         }

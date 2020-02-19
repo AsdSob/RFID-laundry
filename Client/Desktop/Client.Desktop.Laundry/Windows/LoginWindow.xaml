@@ -6,16 +6,16 @@
               xmlns:local="clr-namespace:Client.Desktop.Laundry.Windows"
               xmlns:windows="clr-namespace:Client.Desktop.ViewModels.Windows;assembly=Client.Desktop.ViewModels"
               mc:Ignorable="d"
-              Title="LoginWindow"
-              Height="350"
-              Width="500"
+              Title="Login"
+              Height="250"
+              Width="400"
               WindowStartupLocation="CenterOwner"
               WindowStyle="ToolWindow"
               d:DataContext="{d:DesignInstance windows:LoginWindowViewModel}">
     <Window.Resources>
-        <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter"/>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverterKey"/>
     </Window.Resources>
-    <Grid>
+    <Grid Margin="5">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
@@ -37,28 +37,32 @@
                    TextWrapping="Wrap"
                    FontWeight="Bold"
                    Margin="2,2,2,2"/>
-        <TextBlock Text="Username:" Grid.Row="1" Grid.Column="0" />
-        <TextBlock Text="Password:" Grid.Row="2" Grid.Column="0" />
-        <TextBox Text="{Binding Username}" Grid.Row="1" Grid.Column="1" />
-        <PasswordBox x:Name="passwordBox" Grid.Row="2" Grid.Column="1" />
-        <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="1">
+        <TextBlock Text="Username:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"/>
+        <TextBlock Text="Password:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center"/>
+        <TextBox Text="{Binding Username}" Grid.Row="1" Grid.Column="1" Margin="5"/>
+        <PasswordBox x:Name="PasswordBox" Grid.Row="2" Grid.Column="1" Margin="5"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right">
             <Button Content="Log in"
                     Width="80"
                     Command="{Binding LoginCommand, Mode=OneTime}"
-                    CommandParameter="{Binding ElementName=passwordBox}"
-                    HorizontalAlignment="Center"/>
+                    CommandParameter="{Binding ElementName=PasswordBox}"
+                    HorizontalAlignment="Center"
+                    IsDefault="True"
+                    Margin="5"/>
             <Button Content="Log out"
                     Command="{Binding LogoutCommand, Mode=OneTime}"
-                    Visibility="{Binding IsAuthenticated, Converter={StaticResource booleanToVisibilityConverter}}"
+                    Visibility="{Binding IsAuthenticated, Converter={StaticResource BooleanToVisibilityConverterKey}}"
                     HorizontalAlignment="Center" 
-                    Margin="2,0,0,0"/>
+                    Margin="5"/>
         </StackPanel>
         <TextBlock Text="{Binding Status}"
                    Grid.Row="4"
-                   Grid.Column="1"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="2"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"
                    Foreground="Red"
-                   TextWrapping="Wrap" />
+                   TextWrapping="Wrap"
+                   ToolTip="{Binding Status}"/>
     </Grid>
 </local:CustomWindow>

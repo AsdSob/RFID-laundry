@@ -4,7 +4,7 @@ using Client.Desktop.ViewModels.Common.Identity;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 
-namespace Client.Desktop.Views.Services
+namespace Client.Desktop.ViewModels.Services
 {
     public class AuthorizationService : ViewModelBase, IAuthorizationService
     {
