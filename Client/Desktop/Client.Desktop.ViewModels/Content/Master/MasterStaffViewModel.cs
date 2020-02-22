@@ -245,14 +245,14 @@ namespace Client.Desktop.ViewModels.Content.Master
             {
                 item.AcceptChanges();
 
-                _laundryService.AddOrUpdate(item.OriginalObject);
+                _laundryService.AddOrUpdateAsync(item.OriginalObject);
             }
 
             foreach (var item in linens)
             {
                 item.AcceptChanges();
 
-                _laundryService.AddOrUpdate(item.OriginalObject);
+                _laundryService.AddOrUpdateAsync(item.OriginalObject);
             }
 
             _dialogService.ShowInfoDialog("All changes saved");
@@ -260,7 +260,7 @@ namespace Client.Desktop.ViewModels.Content.Master
 
         private void SaveEntity<T>(T entity) where T : EntityBase
         {
-            _laundryService.AddOrUpdate(entity);
+            _laundryService.AddOrUpdateAsync(entity);
         }
 
         private void DeleteEntity<T>(T entity) where T : EntityBase

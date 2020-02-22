@@ -3,6 +3,7 @@ using Client.Desktop.Laundry.Module;
 using Client.Desktop.ViewModels;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Content;
+using Client.Desktop.ViewModels.Content.Administration;
 using Client.Desktop.ViewModels.Content.Master;
 using Client.Desktop.ViewModels.Services;
 using Client.Desktop.ViewModels.Windows;
@@ -41,6 +42,8 @@ namespace Client.Desktop.Laundry.ViewModels
             builder.RegisterType<MasterLinenViewModel>().SingleInstance();
 
             builder.RegisterType<RfidReaderWindowModel>().SingleInstance();
+
+            builder.RegisterType<AuthManageViewModel>();
         }
 
         private void RegisterModules(ContainerBuilder builder)
@@ -54,6 +57,7 @@ namespace Client.Desktop.Laundry.ViewModels
         private void RegisterServices(ContainerBuilder builder)
         {
             builder.RegisterType<LaundryService>().As<ILaundryService>().SingleInstance();
+            builder.RegisterType<AccountService>().As<IAccountService>();
             builder.RegisterType<DialogService>().As<IDialogService>().SingleInstance();
             builder.RegisterType<MainDispatcher>().As<IMainDispatcher>().SingleInstance();
             builder.RegisterType<AuthenticationService>().As<IAuthenticationService>().SingleInstance();

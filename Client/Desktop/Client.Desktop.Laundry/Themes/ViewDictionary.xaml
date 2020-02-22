@@ -6,7 +6,9 @@
                     xmlns:contentModel="clr-namespace:Client.Desktop.ViewModels.Content.Master;assembly=Client.Desktop.ViewModels"
                     xmlns:master="clr-namespace:Client.Desktop.Laundry.Views.Master"
                     xmlns:windows="clr-namespace:Client.Desktop.ViewModels.Windows;assembly=Client.Desktop.ViewModels"
-                    xmlns:windows1="clr-namespace:Client.Desktop.Laundry.Windows">
+                    xmlns:windows1="clr-namespace:Client.Desktop.Laundry.Windows"
+                    xmlns:views1="clr-namespace:Client.Desktop.Views;assembly=Client.Desktop.Views"
+                    xmlns:administration="clr-namespace:Client.Desktop.ViewModels.Content.Administration;assembly=Client.Desktop.ViewModels">
 
     <DataTemplate DataType="{x:Type viewModels:MenuViewModel}">
         <views:MenuView/>
@@ -30,6 +32,10 @@
 
     <DataTemplate DataType="{x:Type windows:RfidReaderWindowModel}">
         <windows1:RfidReaderWindow/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type administration:AuthManageViewModel}">
+        <views1:AuthManageView/>
     </DataTemplate>
 
 </ResourceDictionary>

@@ -4,21 +4,16 @@ using Microsoft.EntityFrameworkCore;
 using Storage.Core.Abstract;
 using Storage.Laundry.Models.Abstract;
 
-namespace Client.Desktop.ViewModels.Common.Services
+namespace Client.Desktop.ViewModels.Services
 {
-    public interface ILaundryService : IBaseService
-    {
-    }
-
-    public class LaundryService : ILaundryService
+    public abstract class BaseService
     {
         private readonly IDbContextFactory _contextFactory;
 
-        public LaundryService(IDbContextFactory contextFactory)
+        protected BaseService(IDbContextFactory contextFactory)
         {
             _contextFactory = contextFactory;
         }
-
         public async Task<ICollection<T>> GetAllAsync<T>() where T : class, IEntity<int>
         {
             using (var context = await _contextFactory.CreateAsync())
@@ -29,26 +24,27 @@ namespace Client.Desktop.ViewModels.Common.Services
             }
         }
 
-        public async Task DeleteAsync<T>(T entity) where T : class, IEntity<int>
+        public virtual async Task DeleteAsync<T>(T entity) where T : class, IEntity<int>
         {
-            if(entity.Id == 0) return;
+            if (entity.Id == 0) return;
 
+            await DeleteAsync(new T[] {entity});
+        }
+
+        public virtual async Task DeleteAsync<T>(IEnumerable<T> entities) where T : class, IEntity<int>
+        {
             using (var context = await _contextFactory.CreateAsync())
             {
-                context.Remove(entity);
+                foreach (var entity in entities)
+                {
+                    context.Remove(entity);
+                }
+
                 context.SaveChanges();
             }
         }
 
-        public async Task DeleteAsync<T>(IEnumerable<T> entities) where T : class, IEntity<int>
-        {
-            foreach (var entity in entities)
-            {
-                await DeleteAsync(entity);
-            }
-        }
-
-        public async Task AddOrUpdateAsync<T>(T entity) where T : class, IEntity<int>
+        public virtual async Task AddOrUpdateAsync<T>(T entity) where T : class, IEntity<int>
         {
             using (var context = await _contextFactory.CreateAsync())
             {
@@ -64,8 +60,5 @@ namespace Client.Desktop.ViewModels.Common.Services
                 context.SaveChanges();
             }
         }
-
-
     }
 }
-

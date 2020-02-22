@@ -87,7 +87,7 @@ namespace Client.Desktop.ViewModels.Content.Master
             {
                 masterLinen.AcceptChanges();
 
-                _laundryService.AddOrUpdate(masterLinen.OriginalObject);
+                _laundryService.AddOrUpdateAsync(masterLinen.OriginalObject);
             }
 
             _dialogService.ShowInfoDialog("All changes saved");
@@ -101,7 +101,7 @@ namespace Client.Desktop.ViewModels.Content.Master
             if (!_dialogService.ShowQuestionDialog($"Do you want to DELETE {masterLinen.Name} ?"))
                 return;
             
-            _laundryService.Delete(masterLinen.OriginalObject);
+            _laundryService.DeleteAsync(masterLinen.OriginalObject);
 
             MasterLinens.Remove(masterLinen);
             SelectedMasterLinen = MasterLinens?.FirstOrDefault();

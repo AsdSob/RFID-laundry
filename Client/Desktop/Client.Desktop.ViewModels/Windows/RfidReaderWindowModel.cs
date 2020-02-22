@@ -248,14 +248,14 @@ namespace Client.Desktop.ViewModels.Windows
             {
                 item.AcceptChanges();
 
-                _laundryService.AddOrUpdate(item.OriginalObject);
+                _laundryService.AddOrUpdateAsync(item.OriginalObject);
             }
 
             foreach (var item in antennas)
             {
                 item.AcceptChanges();
 
-                _laundryService.AddOrUpdate(item.OriginalObject);
+                _laundryService.AddOrUpdateAsync(item.OriginalObject);
             }
 
             _dialogService.ShowInfoDialog("All changes saved");
@@ -303,8 +303,8 @@ namespace Client.Desktop.ViewModels.Windows
 
             if(!_dialogService.ShowQuestionDialog($"Do you want to DELETE {reader.Name} ?")) return;
 
-            _laundryService.Delete(reader.OriginalObject);
-            _laundryService.Delete(antennas.Select(x=> x.OriginalObject));
+            _laundryService.DeleteAsync(reader.OriginalObject);
+            _laundryService.DeleteAsync(antennas.Select(x=> x.OriginalObject));
 
             antennas.ForEach(x=> RfidAntennas.Remove(x));
             RfidReaders.Remove(reader);

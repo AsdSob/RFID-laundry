@@ -168,7 +168,7 @@ namespace Client.Desktop.ViewModels.Content.Master
             var client = SelectedClient;
             SelectedClient = null;
 
-            _laundryService.Delete(client.OriginalObject);
+            _laundryService.DeleteAsync(client.OriginalObject);
 
             Clients.Remove(client);
         }
@@ -204,7 +204,7 @@ namespace Client.Desktop.ViewModels.Content.Master
             var department = SelectedDepartment;
             SelectedDepartment = null;
 
-            _laundryService.Delete(department.OriginalObject);
+            _laundryService.DeleteAsync(department.OriginalObject);
 
             Departments.Remove(department);
         }
@@ -221,12 +221,12 @@ namespace Client.Desktop.ViewModels.Content.Master
 
             foreach (var client in clients)
             {
-                _laundryService.AddOrUpdate(client.OriginalObject);
+                _laundryService.AddOrUpdateAsync(client.OriginalObject);
             }
 
             foreach (var department in departments)
             {
-                _laundryService.AddOrUpdate(department.OriginalObject);
+                _laundryService.AddOrUpdateAsync(department.OriginalObject);
             }
 
             _dialogService.ShowInfoDialog("All changes saved");

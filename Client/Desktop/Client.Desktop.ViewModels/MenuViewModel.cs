@@ -5,6 +5,7 @@ using Client.Desktop.ViewModels.Common.Identity;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Content;
+using Client.Desktop.ViewModels.Content.Administration;
 using Client.Desktop.ViewModels.Content.Master;
 
 namespace Client.Desktop.ViewModels
@@ -26,6 +27,7 @@ namespace Client.Desktop.ViewModels
         public ICommand ClientCommand { get; }
         public ICommand StaffCommand { get; }
         public ICommand MasterLinenCommand { get; }
+        public ICommand AuthManageCommand { get; }
 
         public MenuViewModel(IAuthorizationService authorizationService)
         {
@@ -36,8 +38,14 @@ namespace Client.Desktop.ViewModels
             ClientCommand = new RelayCommand(() => Select(typeof(MasterClientViewModel)));
             StaffCommand = new RelayCommand(() => Select(typeof(MasterStaffViewModel)), StaffCommandCanExecute);
             MasterLinenCommand = new RelayCommand(() => Select(typeof(MasterLinenViewModel)));
+            AuthManageCommand = new RelayCommand(() => Select(typeof(AuthManageViewModel)), AuthManageCommandCanExecute);
 
             _selectedItem = typeof(MasterClientViewModel);
+        }
+
+        private bool AuthManageCommandCanExecute()
+        {
+            return _authorizationService.CurrentPrincipal?.IsInRole(Roles.Administrator) == true;
         }
 
         private bool StaffCommandCanExecute()

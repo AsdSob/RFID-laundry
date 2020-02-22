@@ -7,7 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.19" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Client.Desktop.ViewModels.Common\Client.Desktop.ViewModels.Common.csproj" />
+    <ProjectReference Include="..\Client.Desktop.ViewModels\Client.Desktop.ViewModels.csproj" />
   </ItemGroup>
 
 </Project>
