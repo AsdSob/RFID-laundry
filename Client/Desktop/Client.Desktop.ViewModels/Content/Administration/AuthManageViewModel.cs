@@ -1,17 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Client.Desktop.ViewModels.Common;
+using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
+using Org.LLRP.LTK.LLRPV1;
 using Storage.Core.Abstract;
 using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Content.Administration
 {
-    public class AuthManageViewModel : ViewModelBase
+    public class AuthManageViewModel : ViewModelBase, ISelectedItem
     {
         private readonly IDialogService _dialogService;
         private readonly IMainDispatcher _mainDispatcher;
@@ -31,7 +35,8 @@ namespace Client.Desktop.ViewModels.Content.Administration
             set => Set(ref _selectedAccount, value);
         }
 
-        public RelayCommand SaveCommand { get; }
+        public RelayCommand<string[]> SaveCommand { get; }
+        public RelayCommand AddCommand { get; }
         public RelayCommand DeleteCommand { get; }
         public RelayCommand InitilizeCommand { get; }
 
@@ -42,31 +47,46 @@ namespace Client.Desktop.ViewModels.Content.Administration
             _mainDispatcher = mainDispatcher ?? throw new ArgumentNullException(nameof(mainDispatcher));
             _accountService = accountService ?? throw new ArgumentNullException(nameof(accountService));
 
-            SaveCommand = new RelayCommand(Save, SaveCommandCanExecute);
+            SaveCommand = new RelayCommand<string[]>(Save, SaveCommandCanExecute);
+            AddCommand = new RelayCommand(Add, AddCommandCanExecute);
             DeleteCommand = new RelayCommand(Delete, DeleteCommandCanExecute);
             InitilizeCommand = new RelayCommand(Initialize);
+
+            PropertyChanged += OnPropertyChanged;
+        }
+
+        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(SelectedAccount))
+            {
+                SaveCommand?.RaiseCanExecuteChanged();
+                DeleteCommand?.RaiseCanExecuteChanged();
+            }
+        }
+
+        private void Add()
+        {
+            var accountViewModel = new AccountViewModel();
+            Accounts.Add(accountViewModel);
+            SelectedAccount = accountViewModel;
+        }
+
+        private bool AddCommandCanExecute()
+        {
+            return true;
         }
 
         private async void Initialize()
         {
-            await Task.Factory.StartNew(() =>
+            var accounts = await _accountService.GetAllAsync<AccountEntity>();
+
+            foreach (var accountEntity in accounts)
             {
-                foreach (var i in Enumerable.Range(1, 100))
-                {
-                    _mainDispatcher.RunInMainThread(() => Accounts.Add(new AccountViewModel
-                    {
-                        UserName = $"user {i}",
-                        Login = $"user{i}"
-                        , Description = $"{i} yeap yeap very busy"
-                    }));
-
-                    Thread.Sleep(100);
-                }
-            });
-
+                Accounts.Add(new AccountViewModel(accountEntity));
+            }
         }
 
-        private async void Save()
+        private async void Save(string[] passwords)
         {
             if (!_dialogService.ShowQuestionDialog("Save changes?") == false)
                 return;
@@ -85,9 +105,33 @@ namespace Client.Desktop.ViewModels.Content.Administration
 
         }
 
-        private bool SaveCommandCanExecute()
+        private bool Validate(out string error)
         {
-            return true;
+            error = null;
+
+            if (string.IsNullOrWhiteSpace(SelectedAccount.UserName))
+            {
+                error = $"{nameof(SelectedAccount.UserName)} is required";
+            }
+            else if (string.IsNullOrWhiteSpace(SelectedAccount.Login))
+            {
+                error = $"{nameof(SelectedAccount.Login)} is required";
+            }
+            else if (string.IsNullOrWhiteSpace(SelectedAccount.Password))
+            {
+                error = $"{nameof(SelectedAccount.Login)} is required";
+            }
+            else if (string.IsNullOrWhiteSpace(SelectedAccount.Email))
+            {
+                error = $"{nameof(SelectedAccount.Login)} is required";
+            }
+
+            return string.IsNullOrEmpty(error);
+        }
+
+        private bool SaveCommandCanExecute(string[] passwords)
+        {
+            return SelectedAccount != null;
         }
 
         private async void Delete()
@@ -112,9 +156,14 @@ namespace Client.Desktop.ViewModels.Content.Administration
         {
             return SelectedAccount != null;
         }
+
+        public object GetSelected()
+        {
+            return SelectedAccount;
+        }
     }
 
-    public class AccountViewModel : ViewModelBase
+    public class AccountViewModel : ViewModelBase, IPassword
     {
         private string _userName;
         private string _login;
@@ -178,7 +227,7 @@ namespace Client.Desktop.ViewModels.Content.Administration
             UserName = OriginalObject.UserName;
             Login = OriginalObject.Login;
             Email = OriginalObject.Email;
-            Roles = OriginalObject.Roles;
+            Roles = OriginalObject.Roles?.Split(",").ToObservableCollection() ?? new ObservableCollection<string>();
         }
 
         public void AcceptChanges()

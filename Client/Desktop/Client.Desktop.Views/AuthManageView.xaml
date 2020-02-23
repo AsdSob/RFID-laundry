@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:administration="clr-namespace:Client.Desktop.ViewModels.Content.Administration;assembly=Client.Desktop.ViewModels"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:behaviors="clr-namespace:Client.Desktop.Views.Behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance administration:AuthManageViewModel}">
@@ -29,8 +30,8 @@
         <StackPanel Grid.Row="0"
                     Grid.Column="0"
                     Orientation="Horizontal">
-            <Button Content="Save"
-                    Command="{Binding SaveCommand}"
+            <Button Content="Add"
+                    Command="{Binding AddCommand}"
                     Width="100"
                     Margin = "5"
                     Padding="10,2"
@@ -61,7 +62,7 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="UserName" Binding="{Binding UserName}" />
                 <DataGridTextColumn Header="Login" Binding="{Binding Login}" Width="*" />
-                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="100" />
+                <DataGridTextColumn Header="Description" Binding="{Binding Email}" Width="100" />
             </DataGrid.Columns>
         </DataGrid>
 
@@ -69,6 +70,7 @@
               Grid.Column="1"
               Margin="10">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -87,16 +89,26 @@
             <Label Grid.Row="2" Content="Login"/>
             <TextBox Grid.Row="3" Text="{Binding SelectedAccount.Login}" MaxLength="64"/>
             <Label Grid.Row="4" Content="Password"/>
-            <TextBox Grid.Row="5" Text="{Binding SelectedAccount.Password}" MaxLength="64"/>
+            <PasswordBox Grid.Row="5" x:Name="PasswordBox" MaxLength="64">
+                <b:Interaction.Behaviors>
+                    <behaviors:PasswordBoxBehavior/>
+                </b:Interaction.Behaviors>
+            </PasswordBox>
             <Label Grid.Row="6" Content="Repeat password"/>
-            <TextBox Grid.Row="7" Text="{Binding SelectedAccount.Password}" MaxLength="64"/>
-            <Label Grid.Row="8" Content="Description"/>
-            <TextBox Grid.Row="9"
-                     Text="{Binding SelectedAccount.Description}"
-                     MaxLength="256"
-                     Height="50"
-                     TextWrapping="Wrap"
-                     AcceptsReturn="True"/>
+            <PasswordBox Grid.Row="7" x:Name="RepeatPasswordBox" MaxLength="64"/>
+            <Label Grid.Row="8" Content="E-mail"/>
+            <TextBox Grid.Row="9" Text="{Binding SelectedAccount.Email}" MaxLength="256"/>
+
+            <Button Grid.Row="10"
+                    Content="Save"
+                    Command="{Binding SaveCommand}"
+                    Width="100"
+                    Margin = "5"
+                    Padding="10,2"
+                    HorizontalAlignment="Left"
+                    >
+                
+            </Button>
         </Grid>
     </Grid>
 </UserControl>
