@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using Storage.Laundry.Models;
+using Storage.Laundry.Models.Abstract;
 
 namespace Storage.Laundry
 {
@@ -29,6 +30,19 @@ namespace Storage.Laundry
 
             // load all configurations
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(LaundryDbContext).Assembly);
+        }
+
+        public override int SaveChanges()
+        {
+            foreach (var entityEntry in ChangeTracker.Entries().Where(x => x.State == EntityState.Added))
+            {
+                var entity = entityEntry.Entity as EntityBase;
+                if (entity == null) continue;
+
+                entity.CreatedDateUtc = DateTime.UtcNow;
+            }
+
+            return base.SaveChanges();
         }
     }
 }

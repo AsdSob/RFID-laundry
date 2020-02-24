@@ -6,5 +6,6 @@ namespace Client.Desktop.ViewModels.Common.Services
     {
         User AuthenticateUser(string username, string password);
         string GetSecretPassword(string clearPassword);
+        bool Verify(string clearPassword, string secretPassword);
     }
 }

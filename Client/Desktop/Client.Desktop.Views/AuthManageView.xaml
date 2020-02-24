@@ -10,6 +10,10 @@
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance administration:AuthManageViewModel}">
 
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverterKey"></BooleanToVisibilityConverter>
+    </UserControl.Resources>
+
     <b:Interaction.Triggers>
         <b:EventTrigger EventName="Loaded">
             <b:InvokeCommandAction Command="{Binding InitilizeCommand}"/>
@@ -61,8 +65,8 @@
 
             <DataGrid.Columns>
                 <DataGridTextColumn Header="UserName" Binding="{Binding UserName}" />
-                <DataGridTextColumn Header="Login" Binding="{Binding Login}" Width="*" />
-                <DataGridTextColumn Header="Description" Binding="{Binding Email}" Width="100" />
+                <DataGridTextColumn Header="Login" Binding="{Binding Login}" Width="200" />
+                <DataGridTextColumn Header="Description" Binding="{Binding Email}" Width="*" />
             </DataGrid.Columns>
         </DataGrid>
 
@@ -70,6 +74,8 @@
               Grid.Column="1"
               Margin="10">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -91,28 +97,30 @@
             <Label Grid.Row="4" Content="Password"/>
             <PasswordBox Grid.Row="5" x:Name="PasswordBox" MaxLength="64">
                 <b:Interaction.Behaviors>
-                    <behaviors:PasswordBoxBehavior Password="{Binding SelectedAccount.Password, Mode=TwoWay}"/>
+                    <behaviors:PasswordBoxBehavior Password="{Binding SelectedAccount.Password, Mode=TwoWay}"
+                                                   ResetObject="{Binding SelectedAccount}"/>
                 </b:Interaction.Behaviors>
             </PasswordBox>
             <Label Grid.Row="6" Content="Repeat password"/>
             <PasswordBox Grid.Row="7" x:Name="RepeatPasswordBox" MaxLength="64">
                 <b:Interaction.Behaviors>
-                    <behaviors:PasswordBoxBehavior Password="{Binding SelectedAccount.RepeatPassword, Mode=TwoWay}"/>
+                    <behaviors:PasswordBoxBehavior Password="{Binding SelectedAccount.RepeatPassword, Mode=TwoWay}"
+                                                   ResetObject="{Binding SelectedAccount}"/>
                 </b:Interaction.Behaviors>
             </PasswordBox>
             <Label Grid.Row="8" Content="E-mail"/>
             <TextBox Grid.Row="9" Text="{Binding SelectedAccount.Email}" MaxLength="256"/>
+            <Label Grid.Row="10" Content="Role"/>
+            <ComboBox Grid.Row="11" ItemsSource="{Binding Roles}" SelectedValue="{Binding SelectedAccount.Role}"/>
 
-            <Button Grid.Row="10"
+            <Button Grid.Row="12"
                     Content="Save"
                     Command="{Binding SaveCommand}"
                     Width="100"
                     Margin = "5"
                     Padding="10,2"
                     HorizontalAlignment="Left"
-                    >
-                
-            </Button>
+                    />
         </Grid>
     </Grid>
 </UserControl>

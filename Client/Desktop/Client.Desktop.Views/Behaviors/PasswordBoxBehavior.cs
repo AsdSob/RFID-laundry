@@ -9,10 +9,7 @@ namespace Client.Desktop.Views.Behaviors
         public static readonly DependencyProperty PasswordProperty = DependencyProperty.Register(
             "Password", typeof(string), typeof(PasswordBoxBehavior), new PropertyMetadata(string.Empty));
 
-        private static void PropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            
-        }
+        public static readonly DependencyProperty ResetObjectProperty = DependencyProperty.Register("ResetObject", typeof(object), typeof(PasswordBoxBehavior), new PropertyMetadata(default(object), ResetObjectPropertyChangedCallback));
 
         public string Password
         {
@@ -20,16 +17,29 @@ namespace Client.Desktop.Views.Behaviors
             set => SetValue(PasswordProperty, value);
         }
 
+        public object ResetObject
+        {
+            get { return GetValue(ResetObjectProperty); }
+            set { SetValue(ResetObjectProperty, value); }
+        }
+
         protected override void OnAttached()
         {
-            AssociatedObject.PasswordChanged += OnPasswordChanged; 
+            AssociatedObject.PasswordChanged += OnPasswordChanged;
+            AssociatedObject.Loaded += OnLoaded; 
 
             base.OnAttached();
+        }
+
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            Password = null;
         }
 
         protected override void OnDetaching()
         {
             AssociatedObject.PasswordChanged -= OnPasswordChanged;
+            AssociatedObject.Loaded -= OnLoaded;
 
             base.OnDetaching();
         }
@@ -37,6 +47,13 @@ namespace Client.Desktop.Views.Behaviors
         private void OnPasswordChanged(object sender, RoutedEventArgs e)
         {
             Password = AssociatedObject.Password;
+        }
+
+        private static void ResetObjectPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (!(d is PasswordBoxBehavior behavior)) return;
+
+            behavior.AssociatedObject.Password = string.Empty;
         }
     }
 }

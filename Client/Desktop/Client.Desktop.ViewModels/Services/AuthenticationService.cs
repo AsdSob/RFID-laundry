@@ -55,6 +55,11 @@ namespace Client.Desktop.ViewModels.Services
             return CalculateHash(clearPassword);
         }
 
+        public bool Verify(string clearPassword, string secretPassword)
+        {
+            return VerifyPassword(clearPassword, secretPassword);
+        }
+
         private string CalculateHash(string clearTextPassword)
         {
             //Store a password hash:
@@ -68,25 +73,6 @@ namespace Client.Desktop.ViewModels.Services
         {
             PasswordHash hash = new PasswordHash(Convert.FromBase64String(password));
             return hash.Verify(clearTextPassword);
-        }
-
-        private class InternalUserData
-        {
-            public string Username { get; }
-
-            public string Email { get; }
-
-            public string HashedPassword { get; }
-
-            public string[] Roles { get; }
-
-            public InternalUserData(string username, string email, string hashedPassword, string[] roles)
-            {
-                Username = username;
-                Email = email;
-                HashedPassword = hashedPassword;
-                Roles = roles;
-            }
         }
     }
 

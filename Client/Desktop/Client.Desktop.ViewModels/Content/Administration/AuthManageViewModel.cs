@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using Client.Desktop.ViewModels.Common.Extensions;
+using System.Linq;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Storage.Laundry.Models;
@@ -12,8 +12,11 @@ namespace Client.Desktop.ViewModels.Content.Administration
     {
         private readonly IDialogService _dialogService;
         private readonly IAccountService _accountService;
+        private readonly IAuthenticationService _authenticationService;
         private ObservableCollection<AccountViewModel> _accounts;
         private AccountViewModel _selectedAccount;
+        private ObservableCollection<string> _roles;
+        private bool _isAdmin;
 
         public ObservableCollection<AccountViewModel> Accounts
         {
@@ -26,16 +29,27 @@ namespace Client.Desktop.ViewModels.Content.Administration
             set => Set(ref _selectedAccount, value);
         }
 
+        public ObservableCollection<string> Roles
+        {
+            get { return _roles ??= new ObservableCollection<string>(); }
+        }
+
+        public bool IsAdmin
+        {
+            get => _isAdmin;
+            set => Set(ref _isAdmin, value);
+        }
+
         public RelayCommand SaveCommand { get; }
         public RelayCommand AddCommand { get; }
         public RelayCommand DeleteCommand { get; }
         public RelayCommand InitilizeCommand { get; }
 
-
-        public AuthManageViewModel(IDialogService dialogService, IAccountService accountService)
+        public AuthManageViewModel(IDialogService dialogService, IAccountService accountService, IAuthenticationService authenticationService)
         {
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _accountService = accountService ?? throw new ArgumentNullException(nameof(accountService));
+            _authenticationService = authenticationService ?? throw new ArgumentNullException(nameof(authenticationService));
 
             SaveCommand = new RelayCommand(Save, SaveCommandCanExecute);
             AddCommand = new RelayCommand(Add, AddCommandCanExecute);
@@ -70,26 +84,31 @@ namespace Client.Desktop.ViewModels.Content.Administration
         {
             var accounts = await _accountService.GetAllAsync<AccountEntity>();
 
-            foreach (var accountEntity in accounts)
+            foreach (var accountEntity in accounts.OrderBy(x => x.Id))
             {
                 Accounts.Add(new AccountViewModel(accountEntity));
             }
+
+            SelectedAccount = Accounts.FirstOrDefault();
+
+            Roles.Add(Common.Identity.Roles.Administrator);
+            Roles.Add(Common.Identity.Roles.Manager);
         }
 
         private async void Save()
         {
             if (!Validate(out var error))
             {
-                _dialogService.ShowWarnigDialog($"Validation error:{Environment.NewLine}{Environment.NewLine}" +
-                                                $"{error}");
+                _dialogService.ShowWarnigDialog($"{error}");
 
                 return;
             }
 
+            if (!SelectedAccount.HasChanges(_authenticationService.Verify)) return;
+
             SelectedAccount.AcceptChanges();
 
             await _accountService.AddOrUpdateAsync(SelectedAccount.OriginalObject);
-
         }
 
         private bool Validate(out string error)
@@ -98,7 +117,7 @@ namespace Client.Desktop.ViewModels.Content.Administration
 
             if (string.IsNullOrWhiteSpace(SelectedAccount.UserName))
             {
-                error = $"{nameof(SelectedAccount.UserName)} is required";
+                error = "user name is required";
             }
             else if (string.IsNullOrWhiteSpace(SelectedAccount.Login))
             {
@@ -106,11 +125,15 @@ namespace Client.Desktop.ViewModels.Content.Administration
             }
             else if (string.IsNullOrWhiteSpace(SelectedAccount.Password))
             {
-                error = $"{nameof(SelectedAccount.Login)} is required";
+                error = $"{nameof(SelectedAccount.Password)} is required";
+            }
+            else if (string.IsNullOrWhiteSpace(SelectedAccount.RepeatPassword))
+            {
+                error = "repeat password is required";
             }
             else if (string.IsNullOrWhiteSpace(SelectedAccount.Email))
             {
-                error = $"{nameof(SelectedAccount.Login)} is required";
+                error = $"{nameof(SelectedAccount.Email)} is required";
             }
             else if (!Equals(SelectedAccount.Password, SelectedAccount.RepeatPassword))
             {
@@ -137,104 +160,15 @@ namespace Client.Desktop.ViewModels.Content.Administration
             var needSave = SelectedAccount.OriginalObject != null &&
                            SelectedAccount.OriginalObject.IsNew == false;
 
-            Accounts.Remove(SelectedAccount);
-
             if (needSave)
                 await _accountService.DeleteAsync(SelectedAccount.OriginalObject);
+
+            Accounts.Remove(SelectedAccount);
         }
 
         private bool DeleteCommandCanExecute()
         {
             return SelectedAccount != null;
-        }
-
-        public object GetSelected()
-        {
-            return SelectedAccount;
-        }
-    }
-
-    public class AccountViewModel : ViewModelBase
-    {
-        private string _userName;
-        private string _login;
-        private string _password;
-        private string _description;
-        private string _email;
-        private ObservableCollection<string> _roles;
-        private string _repeatPassword;
-
-        public AccountEntity OriginalObject { get; private set; }
-
-        public string UserName
-        {
-            get => _userName;
-            set => Set(ref _userName, value);
-        }
-
-        public string Login
-        {
-            get => _login;
-            set => Set(ref _login, value);
-        }
-
-        public string Password
-        {
-            get => _password;
-            set => Set(ref _password, value);
-        }
-
-        public string RepeatPassword
-        {
-            get => _repeatPassword;
-            set => Set(ref _repeatPassword, value);
-        }
-
-        public string Email
-        {
-            get => _email;
-            set => Set(ref _email, value);
-        }
-
-        public string Description
-        {
-            get => _description;
-            set => Set(ref _description, value);
-        }
-
-        public ObservableCollection<string> Roles
-        {
-            get => _roles;
-            set => Set(ref _roles, value);
-        }
-
-        public AccountViewModel()
-        {
-            OriginalObject = new AccountEntity();
-        }
-
-        public AccountViewModel(AccountEntity originalObject)
-        {
-            Update(originalObject);
-        }
-
-        private void Update(AccountEntity originalObject)
-        {
-            OriginalObject = originalObject;
-
-            UserName = OriginalObject.UserName;
-            Login = OriginalObject.Login;
-            Email = OriginalObject.Email;
-            Roles = OriginalObject.Roles?.Split(",").ToObservableCollection() ?? new ObservableCollection<string>();
-        }
-
-        public void AcceptChanges()
-        {
-            OriginalObject.UserName = UserName;
-            OriginalObject.Login = Login;
-            OriginalObject.Email = Email;
-            OriginalObject.Password = Password;
-            OriginalObject.Roles = string.Join(",", Roles ?? new ObservableCollection<string>());
         }
     }
 }
