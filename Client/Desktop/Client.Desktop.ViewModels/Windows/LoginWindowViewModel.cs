@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Client.Desktop.ViewModels.Common.Identity;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
@@ -10,6 +11,7 @@ namespace Client.Desktop.ViewModels.Windows
     public class LoginWindowViewModel : ViewModelBase, IWindowDialogViewModel
     {
         private readonly IAuthenticationService _authenticationService;
+        private readonly IMainDispatcher _mainDispatcher;
         private readonly IAuthorizationService _authorizationService;
         private string _username;
         private string _status;
@@ -17,9 +19,10 @@ namespace Client.Desktop.ViewModels.Windows
         public Action<bool> CloseAction { get; set; }
 
 
-        public LoginWindowViewModel(IAuthenticationService authenticationService, IAuthorizationService authorizationService)
+        public LoginWindowViewModel(IAuthenticationService authenticationService, IMainDispatcher mainDispatcher, IAuthorizationService authorizationService)
         {
             _authenticationService = authenticationService ?? throw new ArgumentNullException(nameof(authenticationService));
+            _mainDispatcher = mainDispatcher ?? throw new ArgumentNullException(nameof(mainDispatcher));
             _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
             
             LoginCommand = new RelayCommand<object>(Login, CanLogin);
@@ -38,10 +41,7 @@ namespace Client.Desktop.ViewModels.Windows
             get
             {
                 if (IsAuthenticated)
-                    return string.Format("Signed in as {0}. {1}",
-                          Thread.CurrentPrincipal.Identity.Name,
-                          Thread.CurrentPrincipal.IsInRole("Administrators") ? "You are an administrator!"
-                              : "You are NOT a member of the administrators group.");
+                    return $"Signed in as {Thread.CurrentPrincipal.Identity.Name}";
 
                 return "Not authenticated!";
             }
@@ -88,7 +88,12 @@ namespace Client.Desktop.ViewModels.Windows
 
                 _authorizationService.CurrentPrincipal = customPrincipal;
 
-                CloseAction?.Invoke(true);
+                RaisePropertyChanged(() => AuthenticatedUser);
+
+                Task.Delay(2000).ContinueWith(x =>
+                {
+                    _mainDispatcher.RunInMainThread(() => CloseAction?.Invoke(true));
+                });
             }
             catch (UnauthorizedAccessException)
             {
