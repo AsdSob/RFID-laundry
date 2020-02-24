@@ -4,6 +4,28 @@ using Microsoft.Xaml.Behaviors;
 
 namespace Client.Desktop.Views.Behaviors
 {
+    public class DefaultFocusBehavior : Behavior<FrameworkElement>
+    {
+        protected override void OnAttached()
+        {
+            base.OnAttached();
+
+            AssociatedObject.Loaded += OnLoaded;
+        }
+
+        protected override void OnDetaching()
+        {
+            AssociatedObject.Loaded -= OnLoaded;
+
+            base.OnDetaching();
+        }
+
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            AssociatedObject.Focus();
+        }
+    }
+
     public class PasswordBoxBehavior : Behavior<PasswordBox>
     {
         public static readonly DependencyProperty PasswordProperty = DependencyProperty.Register(

@@ -5,6 +5,8 @@
               xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
               xmlns:local="clr-namespace:Client.Desktop.Laundry.Windows"
               xmlns:windows="clr-namespace:Client.Desktop.ViewModels.Windows;assembly=Client.Desktop.ViewModels"
+              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+              xmlns:behaviors="clr-namespace:Client.Desktop.Views.Behaviors;assembly=Client.Desktop.Views"
               mc:Ignorable="d"
               Title="Login"
               Height="250"
@@ -39,7 +41,11 @@
                    Margin="2,2,2,2"/>
         <TextBlock Text="Username:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"/>
         <TextBlock Text="Password:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center"/>
-        <TextBox Text="{Binding Username}" Grid.Row="1" Grid.Column="1" Margin="5"/>
+        <TextBox Text="{Binding Username}" Grid.Row="1" Grid.Column="1" Margin="5">
+            <b:Interaction.Behaviors>
+                <behaviors:DefaultFocusBehavior/>
+            </b:Interaction.Behaviors>
+        </TextBox>
         <PasswordBox x:Name="PasswordBox" Grid.Row="2" Grid.Column="1" Margin="5"/>
         <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right">
             <Button Content="Log in"
