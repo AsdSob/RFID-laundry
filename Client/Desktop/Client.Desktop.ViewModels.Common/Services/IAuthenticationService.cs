@@ -5,5 +5,6 @@ namespace Client.Desktop.ViewModels.Common.Services
     public interface IAuthenticationService
     {
         User AuthenticateUser(string username, string password);
+        string GetSecretPassword(string clearPassword);
     }
 }

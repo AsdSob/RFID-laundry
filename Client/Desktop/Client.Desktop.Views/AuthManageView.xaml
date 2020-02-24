@@ -91,11 +91,15 @@
             <Label Grid.Row="4" Content="Password"/>
             <PasswordBox Grid.Row="5" x:Name="PasswordBox" MaxLength="64">
                 <b:Interaction.Behaviors>
-                    <behaviors:PasswordBoxBehavior/>
+                    <behaviors:PasswordBoxBehavior Password="{Binding SelectedAccount.Password, Mode=TwoWay}"/>
                 </b:Interaction.Behaviors>
             </PasswordBox>
             <Label Grid.Row="6" Content="Repeat password"/>
-            <PasswordBox Grid.Row="7" x:Name="RepeatPasswordBox" MaxLength="64"/>
+            <PasswordBox Grid.Row="7" x:Name="RepeatPasswordBox" MaxLength="64">
+                <b:Interaction.Behaviors>
+                    <behaviors:PasswordBoxBehavior Password="{Binding SelectedAccount.RepeatPassword, Mode=TwoWay}"/>
+                </b:Interaction.Behaviors>
+            </PasswordBox>
             <Label Grid.Row="8" Content="E-mail"/>
             <TextBox Grid.Row="9" Text="{Binding SelectedAccount.Email}" MaxLength="256"/>
 

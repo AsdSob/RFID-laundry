@@ -50,6 +50,11 @@ namespace Client.Desktop.ViewModels.Services
             }
         }
 
+        public string GetSecretPassword(string clearPassword)
+        {
+            return CalculateHash(clearPassword);
+        }
+
         private string CalculateHash(string clearTextPassword)
         {
             //Store a password hash:

@@ -1,12 +1,25 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using Client.Desktop.ViewModels.Common;
 using Microsoft.Xaml.Behaviors;
 
 namespace Client.Desktop.Views.Behaviors
 {
     public class PasswordBoxBehavior : Behavior<PasswordBox>
     {
+        public static readonly DependencyProperty PasswordProperty = DependencyProperty.Register(
+            "Password", typeof(string), typeof(PasswordBoxBehavior), new PropertyMetadata(string.Empty));
+
+        private static void PropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            
+        }
+
+        public string Password
+        {
+            get => (string)GetValue(PasswordProperty);
+            set => SetValue(PasswordProperty, value);
+        }
+
         protected override void OnAttached()
         {
             AssociatedObject.PasswordChanged += OnPasswordChanged; 
@@ -23,13 +36,7 @@ namespace Client.Desktop.Views.Behaviors
 
         private void OnPasswordChanged(object sender, RoutedEventArgs e)
         {
-            var dataContext = AssociatedObject.DataContext as ISelectedItem;
-            if (dataContext == null) return;
-
-            var passwordDataContext = dataContext.GetSelected() as IPassword;
-            if (passwordDataContext == null) return;
-
-            passwordDataContext.Password = AssociatedObject.Password;
+            Password = AssociatedObject.Password;
         }
     }
 }

@@ -1,26 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Client.Desktop.ViewModels.Common;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
-using Org.LLRP.LTK.LLRPV1;
-using Storage.Core.Abstract;
 using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Content.Administration
 {
-    public class AuthManageViewModel : ViewModelBase, ISelectedItem
+    public class AuthManageViewModel : ViewModelBase
     {
         private readonly IDialogService _dialogService;
-        private readonly IMainDispatcher _mainDispatcher;
         private readonly IAccountService _accountService;
-        private readonly IDbContextFactory _dbContextFactory;
         private ObservableCollection<AccountViewModel> _accounts;
         private AccountViewModel _selectedAccount;
 
@@ -35,19 +26,18 @@ namespace Client.Desktop.ViewModels.Content.Administration
             set => Set(ref _selectedAccount, value);
         }
 
-        public RelayCommand<string[]> SaveCommand { get; }
+        public RelayCommand SaveCommand { get; }
         public RelayCommand AddCommand { get; }
         public RelayCommand DeleteCommand { get; }
         public RelayCommand InitilizeCommand { get; }
 
 
-        public AuthManageViewModel(IDialogService dialogService, IMainDispatcher mainDispatcher, IAccountService accountService)
+        public AuthManageViewModel(IDialogService dialogService, IAccountService accountService)
         {
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
-            _mainDispatcher = mainDispatcher ?? throw new ArgumentNullException(nameof(mainDispatcher));
             _accountService = accountService ?? throw new ArgumentNullException(nameof(accountService));
 
-            SaveCommand = new RelayCommand<string[]>(Save, SaveCommandCanExecute);
+            SaveCommand = new RelayCommand(Save, SaveCommandCanExecute);
             AddCommand = new RelayCommand(Add, AddCommandCanExecute);
             DeleteCommand = new RelayCommand(Delete, DeleteCommandCanExecute);
             InitilizeCommand = new RelayCommand(Initialize);
@@ -86,11 +76,8 @@ namespace Client.Desktop.ViewModels.Content.Administration
             }
         }
 
-        private async void Save(string[] passwords)
+        private async void Save()
         {
-            if (!_dialogService.ShowQuestionDialog("Save changes?") == false)
-                return;
-
             if (!Validate(out var error))
             {
                 _dialogService.ShowWarnigDialog($"Validation error:{Environment.NewLine}{Environment.NewLine}" +
@@ -125,11 +112,15 @@ namespace Client.Desktop.ViewModels.Content.Administration
             {
                 error = $"{nameof(SelectedAccount.Login)} is required";
             }
+            else if (!Equals(SelectedAccount.Password, SelectedAccount.RepeatPassword))
+            {
+                error = "Passwords do not match";
+            }
 
             return string.IsNullOrEmpty(error);
         }
 
-        private bool SaveCommandCanExecute(string[] passwords)
+        private bool SaveCommandCanExecute()
         {
             return SelectedAccount != null;
         }
@@ -163,7 +154,7 @@ namespace Client.Desktop.ViewModels.Content.Administration
         }
     }
 
-    public class AccountViewModel : ViewModelBase, IPassword
+    public class AccountViewModel : ViewModelBase
     {
         private string _userName;
         private string _login;
@@ -171,6 +162,7 @@ namespace Client.Desktop.ViewModels.Content.Administration
         private string _description;
         private string _email;
         private ObservableCollection<string> _roles;
+        private string _repeatPassword;
 
         public AccountEntity OriginalObject { get; private set; }
 
@@ -190,6 +182,12 @@ namespace Client.Desktop.ViewModels.Content.Administration
         {
             get => _password;
             set => Set(ref _password, value);
+        }
+
+        public string RepeatPassword
+        {
+            get => _repeatPassword;
+            set => Set(ref _repeatPassword, value);
         }
 
         public string Email
