@@ -4,9 +4,17 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:windows="clr-namespace:Client.Desktop.ViewModels.Windows;assembly=Client.Desktop.ViewModels"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance windows:RfidReaderWindowModel}"
              Window.Width="700" Window.Height="450">
+
+    <b:Interaction.Triggers>
+        <b:EventTrigger EventName="Loaded">
+            <b:InvokeCommandAction Command="{Binding InitializeCommand}"/>
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
+
     <Grid >
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>

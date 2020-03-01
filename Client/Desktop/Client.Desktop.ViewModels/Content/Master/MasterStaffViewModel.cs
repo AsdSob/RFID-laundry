@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Windows;
-using Impinj.OctaneSdk;
 using Storage.Laundry.Models;
 using Storage.Laundry.Models.Abstract;
 
@@ -22,7 +19,6 @@ namespace Client.Desktop.ViewModels.Content.Master
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
         private readonly IResolver _resolverService;
-        private readonly IMainDispatcher _dispatcher;
 
         private List<ClientEntityViewModel> _clients;
         private ClientEntityViewModel _selectedClient;
@@ -35,9 +31,6 @@ namespace Client.Desktop.ViewModels.Content.Master
         private LinenEntityViewModel _selectedLinen;
         private ObservableCollection<Tuple<int, string>> _tags;
         private Tuple<int, string> _selectedTag;
-
-        private ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>> _tagData =
-            new ConcurrentDictionary<int, ConcurrentDictionary<string, Tuple<DateTime?, DateTime?>>>();
 
         public RfidReaderWindowModel RfidReaderWindow { get; set; }
 
@@ -121,7 +114,6 @@ namespace Client.Desktop.ViewModels.Content.Master
             _laundryService = dataService ?? throw new ArgumentNullException(nameof(dataService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _resolverService = resolver ?? throw new ArgumentNullException(nameof(resolver));
-            _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
 
             SaveCommand = new RelayCommand(Save);
             AddStaffCommand = new RelayCommand(AddStaff, (() => SelectedDepartment != null));
@@ -226,14 +218,6 @@ namespace Client.Desktop.ViewModels.Content.Master
             if (SelectedDepartment == null) return linens;
 
             return Linens?.Where(x => x.DepartmentId == SelectedDepartment?.Id).ToObservableCollection();
-
-            //if (SelectedStaff == null)
-            //{
-                
-            //}
-
-            //linens = Linens.Where(x => x.OriginalObject.ClientStaffEntity == SelectedStaff.OriginalObject).ToObservableCollection();
-            //return linens;
         }
 
         private void Save()

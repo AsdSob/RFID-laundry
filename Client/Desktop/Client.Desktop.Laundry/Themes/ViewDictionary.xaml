@@ -35,6 +35,10 @@
         <windows1:RfidReaderWindow/>
     </DataTemplate>
 
+    <DataTemplate DataType="{x:Type windows:StaffChangeWindowModel}">
+        <windows1:StaffChangeWindow/>
+    </DataTemplate>
+
     <DataTemplate DataType="{x:Type administration:AuthManageViewModel}">
         <views1:AuthManageView/>
     </DataTemplate>

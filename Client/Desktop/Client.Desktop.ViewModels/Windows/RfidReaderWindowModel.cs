@@ -2,8 +2,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
@@ -29,11 +27,17 @@ namespace Client.Desktop.ViewModels.Windows
         private string _connectionStatus;
         private string _startStopButton;
         private ObservableCollection<Tuple<int, string>> _tags;
+        private string _connectDisconnectButton;
 
         public ObservableCollection<Tuple<int, string>> Tags
         {
             get => _tags;
             set => Set(() => Tags, ref _tags, value);
+        }
+        public string ConnectDisconnectButton
+        {
+            get => _connectDisconnectButton;
+            set => Set(() => ConnectDisconnectButton, ref _connectDisconnectButton, value);
         }
         public string StartStopButton
         {
@@ -74,6 +78,7 @@ namespace Client.Desktop.ViewModels.Windows
         public RelayCommand AddReaderCommand { get; }
         public RelayCommand CloseCommand { get; }
         public RelayCommand StartStopReaderCommand { get; }
+        public RelayCommand InitializeCommand { get; }
 
         public RfidReaderWindowModel(ILaundryService laundryService, IDialogService dialogService, IMainDispatcher dispatcher)
         {
@@ -87,14 +92,15 @@ namespace Client.Desktop.ViewModels.Windows
             AddReaderCommand = new RelayCommand(AddReader);
             CloseCommand = new RelayCommand(Close);
             DeleteReaderCommand = new RelayCommand(DeleteReader, () => SelectedRfidReader != null);
-            StartStopReaderCommand = new RelayCommand(StartStopReader);
+            StartStopReaderCommand = new RelayCommand(StartStopReader, CheckConnection);
 
+            InitializeCommand = new RelayCommand(Initialize);
             StartStopButton = "Start";
+            ConnectDisconnectButton = "Connect";
 
-            GetData();
         }
 
-        private async Task GetData()
+        private async void Initialize()
         {
             _dialogService.ShowBusy();
 
@@ -145,12 +151,16 @@ namespace Client.Desktop.ViewModels.Windows
             {
                 StartStopReaderCommand.CanExecute(true);
                 ConnectionStatus = "Connected";
+                ConnectDisconnectButton = "Disconnect";
             }
             else
             {
                 StartStopReaderCommand.CanExecute(false);
                 ConnectionStatus = "NOT Connected";
+                ConnectDisconnectButton = "Connect";
             }
+
+            StartStopReaderCommand?.RaiseCanExecuteChanged();
         }
 
         private ObservableCollection<RfidAntennaEntityViewModel> GetReaderAntennas()
@@ -219,6 +229,11 @@ namespace Client.Desktop.ViewModels.Windows
 
                 StartStopButton = "Start";
             }
+        }
+
+        private bool CheckConnection()
+        {
+            return ReaderService.Reader.IsConnected;
         }
 
         private void DisplayTag(ImpinjReader reader, TagReport report)
