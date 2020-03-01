@@ -13,8 +13,14 @@
     </UserControl.Resources>
 
     <Menu DockPanel.Dock="Top">
-            <MenuItem Header="_File">
+
+        <MenuItem Header="_File">
                 <MenuItem Header="_New" Command="{Binding NewCommand}"/>
+
+                <MenuItem Header="_Tag registration"
+                          Command="{Binding TagRegistrationCommand}"
+                          Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverterKey}}"/>
+
 
                 <MenuItem Header="_Admin"
                           Command="{Binding AuthManageCommand}"

@@ -4,6 +4,7 @@ using Client.Desktop.ViewModels;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Content;
 using Client.Desktop.ViewModels.Content.Administration;
+using Client.Desktop.ViewModels.Content.File;
 using Client.Desktop.ViewModels.Content.Master;
 using Client.Desktop.ViewModels.Services;
 using Client.Desktop.ViewModels.Windows;
@@ -44,6 +45,7 @@ namespace Client.Desktop.Laundry.ViewModels
             builder.RegisterType<RfidReaderWindowModel>().SingleInstance();
 
             builder.RegisterType<AuthManageViewModel>();
+            builder.RegisterType<TagRegistrationViewModel>().SingleInstance();
         }
 
         private void RegisterModules(ContainerBuilder builder)
