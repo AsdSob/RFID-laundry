@@ -1,12 +1,12 @@
-﻿<UserControl x:Class="Client.Desktop.Laundry.Views.Master.MasterLinenView"
+﻿<UserControl x:Class="Client.Desktop.Views.Content.MasterLinenView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:master="clr-namespace:Client.Desktop.ViewModels.Content.Master;assembly=Client.Desktop.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:content="clr-namespace:Client.Desktop.ViewModels.Content;assembly=Client.Desktop.ViewModels"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance master:MasterLinenViewModel}">
+             d:DataContext="{d:DesignInstance content:MasterLinenViewModel}">
 
 
     <Grid>

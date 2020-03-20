@@ -88,6 +88,8 @@
                       IsReadOnly="False"
                       HorizontalAlignment="Stretch"
                       AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
                       IsTextSearchEnabled="True"
                       IsTextSearchCaseSensitive="False">
 

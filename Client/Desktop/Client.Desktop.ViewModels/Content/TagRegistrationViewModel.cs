@@ -10,7 +10,7 @@ using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Windows;
 using Storage.Laundry.Models;
 
-namespace Client.Desktop.ViewModels.Content.File
+namespace Client.Desktop.ViewModels.Content
 {
     public class TagRegistrationViewModel :ViewModelBase
     {

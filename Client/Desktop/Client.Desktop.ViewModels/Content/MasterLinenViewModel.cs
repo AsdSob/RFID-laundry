@@ -9,7 +9,7 @@ using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Storage.Laundry.Models;
 
-namespace Client.Desktop.ViewModels.Content.Master
+namespace Client.Desktop.ViewModels.Content
 {
     public class MasterLinenViewModel :ViewModelBase
     {

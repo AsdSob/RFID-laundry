@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace Client.Desktop.Laundry.Views
+namespace Client.Desktop.Views.Content
 {
     /// <summary>
     /// Interaction logic for AddView.xaml

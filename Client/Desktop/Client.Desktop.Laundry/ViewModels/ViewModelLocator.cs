@@ -4,8 +4,6 @@ using Client.Desktop.ViewModels;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Content;
 using Client.Desktop.ViewModels.Content.Administration;
-using Client.Desktop.ViewModels.Content.File;
-using Client.Desktop.ViewModels.Content.Master;
 using Client.Desktop.ViewModels.Services;
 using Client.Desktop.ViewModels.Windows;
 using Client.Desktop.Views.Services;
@@ -47,6 +45,7 @@ namespace Client.Desktop.Laundry.ViewModels
 
             builder.RegisterType<AuthManageViewModel>();
             builder.RegisterType<TagRegistrationViewModel>().SingleInstance();
+            builder.RegisterType<BinSoilCollectionViewModel>().SingleInstance();
         }
 
         private void RegisterModules(ContainerBuilder builder)

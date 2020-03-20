@@ -1,34 +1,32 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:viewModels="clr-namespace:Client.Desktop.ViewModels;assembly=Client.Desktop.ViewModels"
-                    xmlns:views="clr-namespace:Client.Desktop.Laundry.Views"
                     xmlns:content="clr-namespace:Client.Desktop.ViewModels.Content;assembly=Client.Desktop.ViewModels"
-                    xmlns:contentModel="clr-namespace:Client.Desktop.ViewModels.Content.Master;assembly=Client.Desktop.ViewModels"
-                    xmlns:master="clr-namespace:Client.Desktop.Laundry.Views.Master"
                     xmlns:windows="clr-namespace:Client.Desktop.ViewModels.Windows;assembly=Client.Desktop.ViewModels"
-                    xmlns:windows1="clr-namespace:Client.Desktop.Laundry.Windows"
-                    xmlns:views1="clr-namespace:Client.Desktop.Views;assembly=Client.Desktop.Views"
                     xmlns:administration="clr-namespace:Client.Desktop.ViewModels.Content.Administration;assembly=Client.Desktop.ViewModels"
-                    xmlns:file="clr-namespace:Client.Desktop.ViewModels.Content.File;assembly=Client.Desktop.ViewModels">
+                    xmlns:views="clr-namespace:Client.Desktop.Laundry.Views"
+                    xmlns:contentView="clr-namespace:Client.Desktop.Views.Content;assembly=Client.Desktop.Views"
+                    xmlns:windows1="clr-namespace:Client.Desktop.Laundry.Windows"
+                    xmlns:views1="clr-namespace:Client.Desktop.Views;assembly=Client.Desktop.Views">
 
     <DataTemplate DataType="{x:Type viewModels:MenuViewModel}">
         <views:MenuView/>
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type content:AddViewModel}">
-        <views:AddView/>
+        <contentView:AddView/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type contentModel:MasterClientViewModel}">
-        <master:ClientView/>
+    <DataTemplate DataType="{x:Type content:MasterClientViewModel}">
+        <contentView:MasterClientView/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type contentModel:MasterStaffViewModel}">
-        <master:StaffView/>
+    <DataTemplate DataType="{x:Type content:MasterStaffViewModel}">
+        <contentView:MasterStaffView/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type contentModel:MasterLinenViewModel}">
-        <master:MasterLinenView/>
+    <DataTemplate DataType="{x:Type content:MasterLinenViewModel}">
+        <contentView:MasterLinenView/>
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type windows:RfidReaderWindowModel}">
@@ -43,8 +41,12 @@
         <views1:AuthManageView/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type file:TagRegistrationViewModel}">
-        <views1:TagRegistrationView/>
+    <DataTemplate DataType="{x:Type content:TagRegistrationViewModel}">
+        <contentView:TagRegistrationView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type content:BinSoilCollectionViewModel}">
+        <contentView:BinSoilCollectionView/>
     </DataTemplate>
 
 </ResourceDictionary>

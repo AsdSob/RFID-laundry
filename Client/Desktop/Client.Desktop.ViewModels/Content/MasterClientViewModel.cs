@@ -10,9 +10,8 @@ using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Storage.Laundry.Models;
-using Storage.Laundry.Models.Abstract;
 
-namespace Client.Desktop.ViewModels.Content.Master
+namespace Client.Desktop.ViewModels.Content
 {
     public class MasterClientViewModel : ViewModelBase
     {

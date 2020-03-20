@@ -12,7 +12,7 @@ using Client.Desktop.ViewModels.Windows;
 using Storage.Laundry.Models;
 using Storage.Laundry.Models.Abstract;
 
-namespace Client.Desktop.ViewModels.Content.Master
+namespace Client.Desktop.ViewModels.Content
 {
     public class MasterStaffViewModel : ViewModelBase
     {

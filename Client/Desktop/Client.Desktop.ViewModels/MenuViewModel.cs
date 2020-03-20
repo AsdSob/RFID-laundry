@@ -5,8 +5,6 @@ using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Content;
 using Client.Desktop.ViewModels.Content.Administration;
-using Client.Desktop.ViewModels.Content.File;
-using Client.Desktop.ViewModels.Content.Master;
 
 namespace Client.Desktop.ViewModels
 {
@@ -30,6 +28,8 @@ namespace Client.Desktop.ViewModels
         public ICommand AuthManageCommand { get; }
         public ICommand TagRegistrationCommand { get; }
 
+        public ICommand BinSoilCollectionCommand { get; }
+
         public MenuViewModel(IAuthorizationService authorizationService)
         {
             _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
@@ -43,14 +43,21 @@ namespace Client.Desktop.ViewModels
 
             TagRegistrationCommand = new RelayCommand(() => Select(typeof(TagRegistrationViewModel)), TagRegistrationCommandCanExecute);
 
+            BinSoilCollectionCommand = new RelayCommand(() => Select(typeof(BinSoilCollectionViewModel)), BinSoilCollectionCommandCanExecute);
+
             _selectedItem = typeof(MasterClientViewModel);
         }
 
         private bool AuthManageCommandCanExecute()
         {
             return _authorizationService.CurrentPrincipal?.IsInRole(Roles.Administrator) == true;
-        }        
-        
+        }
+
+        private bool BinSoilCollectionCommandCanExecute()
+        {
+            return _authorizationService.CurrentPrincipal?.IsInRole(Roles.Administrator) == true;
+        }
+
         private bool TagRegistrationCommandCanExecute()
         {
             return _authorizationService.CurrentPrincipal?.IsInRole(Roles.Administrator) == true;
