@@ -11,6 +11,7 @@ namespace Storage.Laundry.Models
         public int TagPopulation { get; set; }
 
         public virtual ICollection<RfidAntennaEntity> RfidAntennaEntities { get; set; }
+        public virtual ICollection<AccountDetailsEntity> AccountDetailsEntities { get; set; }
 
     }
 }

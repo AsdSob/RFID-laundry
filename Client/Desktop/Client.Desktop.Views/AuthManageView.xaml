@@ -87,6 +87,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
@@ -113,7 +114,24 @@
             <Label Grid.Row="10" Content="Role"/>
             <ComboBox Grid.Row="11" ItemsSource="{Binding Roles}" SelectedValue="{Binding SelectedAccount.Role}"/>
 
-            <Button Grid.Row="12"
+            <DockPanel Grid.Row="12" LastChildFill="True">
+
+                <Button DockPanel.Dock="Right" 
+                        Content="Settings" 
+                        Command="{Binding ReaderSettingCommand}"/>
+
+                <ComboBox DockPanel.Dock="Left" 
+                          ItemsSource="{Binding RfidReaders}" 
+                          SelectedValue="{Binding SelectedAccount.ReaderId}" 
+                          DisplayMemberPath="Name" 
+                          SelectedValuePath="Id" 
+                          IsEditable="False">
+                </ComboBox>
+
+            </DockPanel>
+
+
+            <Button Grid.Row="13"
                     Content="Save"
                     Command="{Binding SaveCommand}"
                     Width="100"

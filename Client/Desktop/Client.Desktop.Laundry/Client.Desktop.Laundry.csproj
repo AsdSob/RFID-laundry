@@ -7,6 +7,10 @@
     <ApplicationIcon>LLMS.ico</ApplicationIcon>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath></OutputPath>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Remove="Module\Pictures\LLMS.ico" />
     <None Remove="Module\Pictures\LLMS_logo.jpg" />

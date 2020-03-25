@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
+using Client.Desktop.ViewModels.Windows;
 using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Content.Administration
@@ -13,16 +15,29 @@ namespace Client.Desktop.ViewModels.Content.Administration
         private readonly IDialogService _dialogService;
         private readonly IAccountService _accountService;
         private readonly IAuthenticationService _authenticationService;
+        private readonly IResolver _resolverService;
         private ObservableCollection<AccountViewModel> _accounts;
         private AccountViewModel _selectedAccount;
         private ObservableCollection<string> _roles;
         private bool _isAdmin;
+        private List<RfidReaderEntity> _rfidReaders;
+        private RfidReaderEntity _selectedRfidReader;
 
         public ObservableCollection<AccountViewModel> Accounts
         {
             get { return _accounts ??= new ObservableCollection<AccountViewModel>(); }
         }
 
+        public RfidReaderEntity SelectedRfidReader
+        {
+            get => _selectedRfidReader;
+            set => Set(ref _selectedRfidReader, value);
+        }
+        public List<RfidReaderEntity> RfidReaders
+        {
+            get => _rfidReaders;
+            set => Set(ref _rfidReaders, value);
+        }
         public AccountViewModel SelectedAccount
         {
             get => _selectedAccount;
@@ -44,17 +59,20 @@ namespace Client.Desktop.ViewModels.Content.Administration
         public RelayCommand AddCommand { get; }
         public RelayCommand DeleteCommand { get; }
         public RelayCommand InitilizeCommand { get; }
+        public RelayCommand ReaderSettingCommand { get; }
 
-        public AuthManageViewModel(IDialogService dialogService, IAccountService accountService, IAuthenticationService authenticationService)
+        public AuthManageViewModel(IDialogService dialogService, IAccountService accountService, IAuthenticationService authenticationService, IResolver resolver)
         {
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _accountService = accountService ?? throw new ArgumentNullException(nameof(accountService));
+            _resolverService = resolver ?? throw new ArgumentNullException(nameof(resolver));
             _authenticationService = authenticationService ?? throw new ArgumentNullException(nameof(authenticationService));
 
             SaveCommand = new RelayCommand(Save, SaveCommandCanExecute);
             AddCommand = new RelayCommand(Add, AddCommandCanExecute);
             DeleteCommand = new RelayCommand(Delete, DeleteCommandCanExecute);
             InitilizeCommand = new RelayCommand(Initialize);
+            ReaderSettingCommand = new RelayCommand(ReaderSetting);
 
             PropertyChanged += OnPropertyChanged;
         }
@@ -82,6 +100,9 @@ namespace Client.Desktop.ViewModels.Content.Administration
 
         private async void Initialize()
         {
+            var reader = await _accountService.GetAllAsync<RfidReaderEntity>();
+            RfidReaders = reader.ToList();
+
             var accounts = await _accountService.GetAllAsync<AccountEntity>();
 
             foreach (var accountEntity in accounts.OrderBy(x => x.Id))
@@ -109,6 +130,21 @@ namespace Client.Desktop.ViewModels.Content.Administration
             SelectedAccount.AcceptChanges();
 
             await _accountService.AddOrUpdateAsync(SelectedAccount.OriginalObject);
+        }
+
+        private async void ReaderSetting()
+        {
+           var rfidReaderWindow = _resolverService.Resolve<RfidReaderWindowModel>();
+
+           var showDialog = _dialogService.ShowDialog(rfidReaderWindow);
+
+           if (!_dialogService.ShowDialog(rfidReaderWindow))
+               return;
+
+           RfidReaders.Clear();
+
+           var reader = await _accountService.GetAllAsync<RfidReaderEntity>();
+           RfidReaders = reader.ToList();
         }
 
         private bool Validate(out string error)
