@@ -14,8 +14,12 @@ namespace Storage.Laundry.Configurations
             builder.Property(x => x.AccountId).HasColumnName("accountId").IsRequired();
             builder.Property(x => x.ReaderId).HasColumnName("readerId");
 
-            builder.HasOne(x => x.AccountEntity).WithOne(x => x.AccountDetailsEntity).HasForeignKey(x => x.AccountId);
-            builder.HasOne(x => x.RfidReaderEntity).WithMany(x => x.AccountDetailsEntities).HasForeignKey(x => x.ReaderId);
+            builder.HasOne(x => x.AccountEntity)
+                .WithOne(x => x.AccountDetailsEntity)
+                .HasForeignKey<AccountDetailsEntity>(x => x.AccountId);
+            builder.HasOne(x => x.RfidReaderEntity)
+                .WithMany(x => x.AccountDetailsEntities)
+                .HasForeignKey(x => x.ReaderId);
 
         }
     }
