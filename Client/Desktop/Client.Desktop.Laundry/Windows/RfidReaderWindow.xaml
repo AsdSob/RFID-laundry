@@ -28,10 +28,12 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-        <!-- Commands -->
+            <!-- Commands -->
             <DockPanel LastChildFill="False" Grid.Row="0">
                 <Button Margin = "5" Padding="10,2" DockPanel.Dock="Left"  Content="New" Command="{Binding AddReaderCommand}" />
                 <Button Margin = "5" Padding="10,2" DockPanel.Dock="Left"  Content="Delete" Command="{Binding DeleteReaderCommand}"/>
@@ -79,33 +81,36 @@
             </Grid>
             </GroupBox>
 
-        <!-- Antenna Settings -->
-        <GroupBox Grid.Row="2" Header="Antenna">
-            <DataGrid Height="Auto"
-                      ItemsSource="{Binding SortedAntennas}"
-                      VerticalScrollBarVisibility="Visible"
-                      AllowDrop="True" 
-                      IsReadOnly="False"
-                      HorizontalAlignment="Stretch"
-                      AutoGenerateColumns="False"
-                      CanUserAddRows="False"
-                      CanUserDeleteRows="False"
-                      IsTextSearchEnabled="True"
-                      IsTextSearchCaseSensitive="False">
+            <!-- Antenna Settings -->
+            <GroupBox Grid.Row="2" Header="Antenna">
+                <DataGrid Height="Auto"
+                          ItemsSource="{Binding SortedAntennas}"
+                          VerticalScrollBarVisibility="Visible"
+                          AllowDrop="True" 
+                          IsReadOnly="False"
+                          HorizontalAlignment="Stretch"
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          IsTextSearchEnabled="True"
+                          IsTextSearchCaseSensitive="False">
 
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Id" Binding="{Binding AntennaNumb}" Width="0.1*" IsReadOnly="True"/>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Id" Binding="{Binding AntennaNumb}" Width="0.1*" IsReadOnly="True"/>
 
-                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
+                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
 
-                    <DataGridTextColumn Header="TxPower" Binding="{Binding TxPower, ValidatesOnDataErrors=True , UpdateSourceTrigger=PropertyChanged}" Width="0.2*"/>
+                        <DataGridTextColumn Header="TxPower" Binding="{Binding TxPower, ValidatesOnDataErrors=True , UpdateSourceTrigger=PropertyChanged}" Width="0.2*"/>
 
-                    <DataGridTextColumn Header="RxSensitivity" Binding="{Binding RxSensitivity, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" Width="0.2*"/>
-                </DataGrid.Columns>
-            </DataGrid>
-        </GroupBox>
+                        <DataGridTextColumn Header="RxSensitivity" Binding="{Binding RxSensitivity, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" Width="0.2*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </GroupBox>
 
-    </Grid>
+            <Label Grid.Row="3" Margin="0.5" Content="Tx(Transmit Power) 0.0 | 30.0" HorizontalContentAlignment="Left"/>
+            <Label Grid.Row="3" Content="Rx(Receive Power) 0 | -80" HorizontalContentAlignment="Right"/>
+
+        </Grid>
 
         <!-- Tags -->
         <Grid Grid.Column="1" Grid.Row="0" Margin="10,0,0,0">

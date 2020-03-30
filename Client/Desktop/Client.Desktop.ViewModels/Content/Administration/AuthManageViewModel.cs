@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using Client.Desktop.ViewModels.Common.EntityViewModels;
+using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Windows;
@@ -21,18 +23,24 @@ namespace Client.Desktop.ViewModels.Content.Administration
         private ObservableCollection<string> _roles;
         private bool _isAdmin;
         private List<RfidReaderEntity> _rfidReaders;
-        private RfidReaderEntity _selectedRfidReader;
+        private ObservableCollection<AccountDetailEntityViewModel> _accountDetails;
+        private AccountDetailEntityViewModel _selectedAccountDetails;
 
+        public AccountDetailEntityViewModel SelectedAccountDetails
+        {
+            get => _selectedAccountDetails;
+            set => Set(() => SelectedAccountDetails, ref _selectedAccountDetails, value);
+        }
+        public ObservableCollection<AccountDetailEntityViewModel> AccountDetails
+        {
+            get => _accountDetails;
+            set => Set(() => AccountDetails, ref _accountDetails, value);
+        }
         public ObservableCollection<AccountViewModel> Accounts
         {
             get { return _accounts ??= new ObservableCollection<AccountViewModel>(); }
         }
 
-        public RfidReaderEntity SelectedRfidReader
-        {
-            get => _selectedRfidReader;
-            set => Set(ref _selectedRfidReader, value);
-        }
         public List<RfidReaderEntity> RfidReaders
         {
             get => _rfidReaders;
@@ -83,6 +91,18 @@ namespace Client.Desktop.ViewModels.Content.Administration
             {
                 SaveCommand?.RaiseCanExecuteChanged();
                 DeleteCommand?.RaiseCanExecuteChanged();
+
+                SelectedAccountDetails = AccountDetails?.FirstOrDefault(x => x.OriginalObject.AccountEntity == SelectedAccount?.OriginalObject);
+
+                if (SelectedAccountDetails == null)
+                {
+                    var accountDetail = new AccountDetailEntityViewModel();
+                    accountDetail.OriginalObject.AccountEntity = SelectedAccount.OriginalObject;
+                    AccountDetails.Add(accountDetail);
+                }
+
+                SelectedAccountDetails = AccountDetails?.FirstOrDefault(x => x.OriginalObject.AccountEntity == SelectedAccount?.OriginalObject);
+
             }
         }
 
@@ -91,6 +111,12 @@ namespace Client.Desktop.ViewModels.Content.Administration
             var accountViewModel = new AccountViewModel();
             Accounts.Add(accountViewModel);
             SelectedAccount = accountViewModel;
+
+            var accountDetails = new AccountDetailEntityViewModel();
+            accountDetails.OriginalObject.AccountEntity = accountViewModel.OriginalObject;
+
+            AccountDetails.Add(accountDetails);
+            SelectedAccountDetails = accountDetails;
         }
 
         private bool AddCommandCanExecute()
@@ -102,6 +128,10 @@ namespace Client.Desktop.ViewModels.Content.Administration
         {
             var reader = await _accountService.GetAllAsync<RfidReaderEntity>();
             RfidReaders = reader.ToList();
+
+            var accountDetail = await _accountService.GetAllAsync<AccountDetailsEntity>();
+            var accountDetails = accountDetail.Select(x => new AccountDetailEntityViewModel(x));
+            AccountDetails = accountDetails.ToObservableCollection();
 
             var accounts = await _accountService.GetAllAsync<AccountEntity>();
 
@@ -125,18 +155,19 @@ namespace Client.Desktop.ViewModels.Content.Administration
                 return;
             }
 
-            if (!SelectedAccount.HasChanges(_authenticationService.Verify)) return;
-
+            if (!SelectedAccount.HasChanges(_authenticationService.Verify) && !SelectedAccountDetails.HasChanges()) return;
             SelectedAccount.AcceptChanges();
-
             await _accountService.AddOrUpdateAsync(SelectedAccount.OriginalObject);
+
+            SelectedAccountDetails.AcceptChanges();
+            await _accountService.AddOrUpdateAsync(SelectedAccountDetails.OriginalObject);
         }
 
         private async void ReaderSetting()
         {
            var rfidReaderWindow = _resolverService.Resolve<RfidReaderWindowModel>();
 
-           var showDialog = _dialogService.ShowDialog(rfidReaderWindow);
+           //var showDialog = _dialogService.ShowDialog(rfidReaderWindow);
 
            if (!_dialogService.ShowDialog(rfidReaderWindow))
                return;

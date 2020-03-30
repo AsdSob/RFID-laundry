@@ -15,9 +15,15 @@ namespace Client.Desktop.ViewModels.Content.Administration
         private string _email;
         private string _role;
         private string _repeatPassword;
+        private int _id;
 
         public AccountEntity OriginalObject { get; private set; }
 
+        public int Id
+        {
+            get => _id;
+            set => Set(() => Id, ref _id, value);
+        }
         public string UserName
         {
             get => _userName;
@@ -78,6 +84,7 @@ namespace Client.Desktop.ViewModels.Content.Administration
             Login = OriginalObject.Login;
             Email = OriginalObject.Email;
             Role = OriginalObject.Roles;
+            Id = OriginalObject.Id;
         }
 
         public void AcceptChanges()
@@ -87,6 +94,7 @@ namespace Client.Desktop.ViewModels.Content.Administration
             OriginalObject.Email = Email;
             OriginalObject.Password = Password;
             OriginalObject.Roles = Role;
+            OriginalObject.Id = Id;
         }
 
         public bool HasChanges(Func<string, string, bool> verifySecretPasswordFunc)
@@ -99,6 +107,7 @@ namespace Client.Desktop.ViewModels.Content.Administration
                    !Equals(OriginalObject.Login, Login) ||
                    !Equals(OriginalObject.Email, Email) ||
                    !Equals(OriginalObject.Roles, Role) ||
+                   !Equals(OriginalObject.Id, Id) ||
                    !verifySecretPasswordFunc(Password, OriginalObject.Password);
         }
     }

@@ -126,7 +126,7 @@
                 <GroupBox Grid.Row="0" Grid.Column="4" Header="Parent" Margin="5">
                     <ComboBox ItemsSource="{Binding SortedParentClients}" 
                               SelectedIndex="{Binding SelectedClient.ParentId}"
-                              DisplayMemberPath="ShortName"
+                              DisplayMemberPath="Name"
                               SelectedValuePath="Id"
                               IsEditable="False">
                     </ComboBox>

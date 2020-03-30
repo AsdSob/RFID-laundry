@@ -100,7 +100,6 @@ namespace Client.Desktop.ViewModels.Content
         public RelayCommand DeleteLinenCommand { get; }
         public RelayCommand InitializeCommand { get; }
         public RelayCommand SearchTagCommand { get; }
-        public RelayCommand FindTagCommand { get; }
         public RelayCommand UseTagCommand { get; }
 
 
@@ -118,7 +117,6 @@ namespace Client.Desktop.ViewModels.Content
             DeleteLinenCommand = new RelayCommand(DeleteLinen,(() => SelectedLinen !=null));
 
             SearchTagCommand = new RelayCommand(SearchTag);
-            FindTagCommand = new RelayCommand(FindTag, (() => SelectedTag != null));
 
             UseTagCommand = new RelayCommand(UseTag, (() => SelectedTag != null));
 
@@ -174,7 +172,8 @@ namespace Client.Desktop.ViewModels.Content
             if (e.PropertyName == nameof(SelectedTag))
             {
                 UseTagCommand?.RaiseCanExecuteChanged();
-                FindTagCommand?.RaiseCanExecuteChanged();
+
+                SearchingTag = SelectedTag.Item2;
             }
         }
 
@@ -251,12 +250,6 @@ namespace Client.Desktop.ViewModels.Content
             SelectedClient = Clients.FirstOrDefault(x => x.Id == linen?.ClientId);
             SelectedDepartment = SortedDepartments.FirstOrDefault(x => x.Id == linen?.DepartmentId);
             SelectedStaff = SortedStaff.FirstOrDefault(x => x.Id == linen?.StaffId);
-        }
-
-        private void FindTag()
-        {
-            SearchingTag = SelectedTag.Item2;
-            SearchTag();
         }
 
         private void UseTag()

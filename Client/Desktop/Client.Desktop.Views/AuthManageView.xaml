@@ -115,6 +115,8 @@
             <ComboBox Grid.Row="11" ItemsSource="{Binding Roles}" SelectedValue="{Binding SelectedAccount.Role}"/>
 
             <DockPanel Grid.Row="12" LastChildFill="True">
+                
+                <Label DockPanel.Dock="Top" Content="RFID Reader"/>
 
                 <Button DockPanel.Dock="Right" 
                         Content="Settings" 
@@ -122,7 +124,7 @@
 
                 <ComboBox DockPanel.Dock="Left" 
                           ItemsSource="{Binding RfidReaders}" 
-                          SelectedValue="{Binding SelectedAccount.ReaderId}" 
+                          SelectedValue="{Binding SelectedAccountDetails.ReaderId}" 
                           DisplayMemberPath="Name" 
                           SelectedValuePath="Id" 
                           IsEditable="False">

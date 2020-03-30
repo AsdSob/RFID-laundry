@@ -62,7 +62,7 @@ namespace Client.Desktop.ViewModels.Content
         public ObservableCollection<DepartmentEntityViewModel> SortedDepartments => SortDepartments();
 
         public ObservableCollection<ClientEntityViewModel> SortedParentClients =>
-           Clients?.Where(x=> x.ParentId == 0 || x.ParentId == null).ToObservableCollection();
+           Clients?.Where(x=> (x.ParentId == 0 || x.ParentId == null) && x.Id != SelectedClient?.Id).ToObservableCollection();
 
         #endregion
 
