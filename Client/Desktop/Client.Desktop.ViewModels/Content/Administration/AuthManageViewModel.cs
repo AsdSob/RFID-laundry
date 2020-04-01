@@ -16,6 +16,7 @@ namespace Client.Desktop.ViewModels.Content.Administration
     {
         private readonly IDialogService _dialogService;
         private readonly IAccountService _accountService;
+        private readonly ILaundryService _laundryService;
         private readonly IAuthenticationService _authenticationService;
         private readonly IResolver _resolverService;
         private ObservableCollection<AccountViewModel> _accounts;
@@ -69,11 +70,12 @@ namespace Client.Desktop.ViewModels.Content.Administration
         public RelayCommand InitilizeCommand { get; }
         public RelayCommand ReaderSettingCommand { get; }
 
-        public AuthManageViewModel(IDialogService dialogService, IAccountService accountService, IAuthenticationService authenticationService, IResolver resolver)
+        public AuthManageViewModel(IDialogService dialogService, IAccountService accountService, IAuthenticationService authenticationService, IResolver resolver, ILaundryService laundryService)
         {
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _accountService = accountService ?? throw new ArgumentNullException(nameof(accountService));
             _resolverService = resolver ?? throw new ArgumentNullException(nameof(resolver));
+            _laundryService = laundryService ?? throw new ArgumentNullException(nameof(laundryService));
             _authenticationService = authenticationService ?? throw new ArgumentNullException(nameof(authenticationService));
 
             SaveCommand = new RelayCommand(Save, SaveCommandCanExecute);
@@ -92,18 +94,27 @@ namespace Client.Desktop.ViewModels.Content.Administration
                 SaveCommand?.RaiseCanExecuteChanged();
                 DeleteCommand?.RaiseCanExecuteChanged();
 
-                SelectedAccountDetails = AccountDetails?.FirstOrDefault(x => x.OriginalObject.AccountEntity == SelectedAccount?.OriginalObject);
-
-                if (SelectedAccountDetails == null)
-                {
-                    var accountDetail = new AccountDetailEntityViewModel();
-                    accountDetail.OriginalObject.AccountEntity = SelectedAccount.OriginalObject;
-                    AccountDetails.Add(accountDetail);
-                }
-
-                SelectedAccountDetails = AccountDetails?.FirstOrDefault(x => x.OriginalObject.AccountEntity == SelectedAccount?.OriginalObject);
-
+                SelectedAccountDetails = SelectAccoutDetails();
             }
+        }
+
+        private AccountDetailEntityViewModel SelectAccoutDetails()
+        {
+            var accountDetail = AccountDetails?.FirstOrDefault(x =>
+                x.OriginalObject.AccountEntity == SelectedAccount?.OriginalObject ||
+                x.AccountId == SelectedAccount?.Id);
+
+            if (SelectedAccountDetails == null)
+            {
+                accountDetail = new AccountDetailEntityViewModel
+                {
+                    OriginalObject = {AccountEntity = SelectedAccount.OriginalObject}
+                };
+
+                AccountDetails?.Add(accountDetail);
+            }
+
+            return accountDetail;
         }
 
         private void Add()
@@ -126,10 +137,10 @@ namespace Client.Desktop.ViewModels.Content.Administration
 
         private async void Initialize()
         {
-            var reader = await _accountService.GetAllAsync<RfidReaderEntity>();
+            var reader = await _laundryService.GetAllAsync<RfidReaderEntity>();
             RfidReaders = reader.ToList();
 
-            var accountDetail = await _accountService.GetAllAsync<AccountDetailsEntity>();
+            var accountDetail = await _laundryService.GetAllAsync<AccountDetailsEntity>();
             var accountDetails = accountDetail.Select(x => new AccountDetailEntityViewModel(x));
             AccountDetails = accountDetails.ToObservableCollection();
 
@@ -160,7 +171,9 @@ namespace Client.Desktop.ViewModels.Content.Administration
             await _accountService.AddOrUpdateAsync(SelectedAccount.OriginalObject);
 
             SelectedAccountDetails.AcceptChanges();
-            await _accountService.AddOrUpdateAsync(SelectedAccountDetails.OriginalObject);
+            await _laundryService.AddOrUpdateAsync(SelectedAccountDetails.OriginalObject);
+
+            _dialogService.ShowInfoDialog("Saved!");
         }
 
         private async void ReaderSetting()
@@ -169,8 +182,7 @@ namespace Client.Desktop.ViewModels.Content.Administration
 
            //var showDialog = _dialogService.ShowDialog(rfidReaderWindow);
 
-           if (!_dialogService.ShowDialog(rfidReaderWindow))
-               return;
+           _dialogService.ShowDialog(rfidReaderWindow);
 
            RfidReaders.Clear();
 
