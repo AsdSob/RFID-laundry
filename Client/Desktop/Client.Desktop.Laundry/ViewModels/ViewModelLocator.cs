@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Client.Desktop.Laundry.Module;
+using Client.Desktop.Laundry.Services;
 using Client.Desktop.ViewModels;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Content;
@@ -64,6 +65,8 @@ namespace Client.Desktop.Laundry.ViewModels
             builder.RegisterType<MainDispatcher>().As<IMainDispatcher>().SingleInstance();
             builder.RegisterType<AuthenticationService>().As<IAuthenticationService>().SingleInstance();
             builder.RegisterType<AuthorizationService>().As<IAuthorizationService>().SingleInstance();
+            builder.RegisterType<JsonSerializer>().As<ISerializer>();
+            builder.RegisterType<SettingsManagerProvider>().As<ISettingsManagerProvider>();
         }
     }
 }

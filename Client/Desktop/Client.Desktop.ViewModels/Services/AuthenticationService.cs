@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 using Client.Desktop.ViewModels.Common.Identity;
+using Client.Desktop.ViewModels.Common.Model;
 using Client.Desktop.ViewModels.Common.Services;
+using Microsoft.EntityFrameworkCore;
 using Storage.Core.Abstract;
 using Storage.Laundry.Models;
 
@@ -10,11 +13,15 @@ namespace Client.Desktop.ViewModels.Services
 {
     public class AuthenticationService : IAuthenticationService
     {
-        private readonly IDbContextFactory _dbContextFactory;
+        private const string LocalDataFileName = "laundry.settings";
 
-        public AuthenticationService(IDbContextFactory dbContextFactory)
+        private readonly IDbContextFactory _dbContextFactory;
+        private readonly ISettingsManagerProvider _settingsManagerProvider;
+
+        public AuthenticationService(IDbContextFactory dbContextFactory, ISettingsManagerProvider settingsManagerProvider)
         {
             _dbContextFactory = dbContextFactory ?? throw new ArgumentNullException(nameof(dbContextFactory));
+            _settingsManagerProvider = settingsManagerProvider ?? throw new ArgumentNullException(nameof(settingsManagerProvider));
 
             using (var context = _dbContextFactory.Create())
             {
@@ -37,16 +44,60 @@ namespace Client.Desktop.ViewModels.Services
             }
         }
 
-        public User AuthenticateUser(string username, string clearTextPassword)
+        public async Task<User> AuthenticateUserAsync(string username, string clearTextPassword, bool rememberMe = false)
         {
+            AccountEntity account;
+
             using (var context = _dbContextFactory.Create())
             {
                 var login = username.Trim();
-                var account = context.Set<AccountEntity>().FirstOrDefault(x => x.Login.Equals(login));
+                account = await context.Set<AccountEntity>().FirstOrDefaultAsync(x => x.Login.Equals(login));
                 if (account == null || VerifyPassword(clearTextPassword, account.Password) == false)
                     throw new UnauthorizedAccessException("Access denied. Please provide some valid credentials.");
+            }
 
-                return new User(account.UserName, account.Email, account.Roles?.Split(',') ?? new string[]{});
+            if (rememberMe)
+            {
+                // TODO: use decorator
+                var localData = await _settingsManagerProvider.GetAsync<LocalData>(LocalDataFileName);
+                if (localData == null)
+                    localData = new LocalData();
+                if (localData.LastUser == null)
+                    localData.LastUser = new UserData();
+
+                localData.LastUser.Login = account.Login;
+                localData.LastUser.Password = account.Password;
+
+                await _settingsManagerProvider.SaveAsync(localData, LocalDataFileName);
+            }
+            
+
+            return new User(account.UserName, account.Email, account.Roles?.Split(',') ?? new string[] { });
+
+        }
+
+        public async Task<User> AuthenticateLastUserAsync()
+        {
+            var localData = await _settingsManagerProvider.GetAsync<LocalData>(LocalDataFileName);
+
+            if (string.IsNullOrEmpty(localData?.LastUser?.Login) ||
+                string.IsNullOrEmpty(localData.LastUser.Password))
+            {
+                return null;
+            }
+
+            using (var context = _dbContextFactory.Create())
+            {
+                var login = localData.LastUser.Login;
+                var password = localData.LastUser.Password;
+
+                var account = await context.Set<AccountEntity>()
+                    .FirstOrDefaultAsync(x => x.Login.Equals(login) && x.Password == password);
+
+                if (account == null)
+                    throw new UnauthorizedAccessException("Access denied. Please provide some valid credentials.");
+
+                return new User(account.UserName, account.Email, account.Roles?.Split(',') ?? new string[] { });
             }
         }
 
