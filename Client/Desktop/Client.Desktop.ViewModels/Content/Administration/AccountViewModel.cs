@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.ObjectModel;
-using Client.Desktop.ViewModels.Common.Extensions;
+using System.ComponentModel;
+using System.Text.RegularExpressions;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Content.Administration
 {
-    public class AccountViewModel : ViewModelBase
+    public class AccountViewModel : ViewModelBase, IDataErrorInfo
     {
         private string _userName;
         private string _login;
@@ -16,6 +16,7 @@ namespace Client.Desktop.ViewModels.Content.Administration
         private string _role;
         private string _repeatPassword;
         private int _id;
+        private string _error;
 
         public AccountEntity OriginalObject { get; private set; }
 
@@ -66,6 +67,8 @@ namespace Client.Desktop.ViewModels.Content.Administration
             set => Set(ref _role, value);
         }
 
+        public Func<string, string> ValidateUnique { get; set; }
+
         public AccountViewModel()
         {
             OriginalObject = new AccountEntity();
@@ -109,6 +112,78 @@ namespace Client.Desktop.ViewModels.Content.Administration
                    !Equals(OriginalObject.Roles, Role) ||
                    !Equals(OriginalObject.Id, Id) ||
                    !verifySecretPasswordFunc(Password, OriginalObject.Password);
+        }
+
+        public string Error
+        {
+            get => _error;
+            set => Set(ref _error, value);
+        }
+
+        public string this[string columnName] => Validate(columnName);
+
+
+        private string Validate(string columnName)
+        {
+            var error = string.Empty;
+
+            if (columnName == nameof(UserName))
+            {
+                if (string.IsNullOrWhiteSpace(UserName))
+                    error = "User name is required";
+                else
+                    error = ValidateUnique?.Invoke(columnName);
+            }
+            else if (columnName == nameof(Login))
+            {
+                if (string.IsNullOrWhiteSpace(Login))
+                    error = "Login is required";
+                else
+                    error = ValidateUnique?.Invoke(columnName);
+            }
+            else if (columnName == nameof(Password))
+            {
+                if (string.IsNullOrWhiteSpace(Password))
+                {
+                    error = "Password is required";
+                }
+                else if (!string.IsNullOrEmpty(RepeatPassword) && !Equals(Password, RepeatPassword))
+                {
+                    error = "Password not equal Repeat password";
+                }
+                else if (Password.Length < 5)
+                {
+                    error = "Password min length 5";
+                }
+            }
+            else if (columnName == nameof(RepeatPassword))
+            {
+                if (string.IsNullOrWhiteSpace(RepeatPassword))
+                    error = "Repeat password is required";
+                else if (!Equals(Password, RepeatPassword))
+                    error = "Password not equal Repeat password";
+            }
+            else if (columnName == nameof(Email))
+            {
+                if (string.IsNullOrWhiteSpace(Email))
+                {
+                    error = "Email is required";
+                }
+                else
+                {
+                    var regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
+                    var match = regex.Match(Email);
+                    if (!match.Success)
+                        error = "Email not valid";
+                    else
+                        error = ValidateUnique?.Invoke(columnName);
+                }
+            }
+
+
+            Error = error;
+
+            return Error;
         }
     }
 }

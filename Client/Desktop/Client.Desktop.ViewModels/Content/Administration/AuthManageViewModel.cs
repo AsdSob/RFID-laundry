@@ -95,6 +95,9 @@ namespace Client.Desktop.ViewModels.Content.Administration
                 DeleteCommand?.RaiseCanExecuteChanged();
 
                 SelectedAccountDetails = SelectAccoutDetails();
+
+                if (SelectedAccount != null)
+                    SelectedAccount.ValidateUnique = ValidateUnique;
             }
         }
 
@@ -196,7 +199,7 @@ namespace Client.Desktop.ViewModels.Content.Administration
 
             if (string.IsNullOrWhiteSpace(SelectedAccount.UserName))
             {
-                error = "user name is required";
+                error = "User name is required";
             }
             else if (string.IsNullOrWhiteSpace(SelectedAccount.Login))
             {
@@ -208,7 +211,7 @@ namespace Client.Desktop.ViewModels.Content.Administration
             }
             else if (string.IsNullOrWhiteSpace(SelectedAccount.RepeatPassword))
             {
-                error = "repeat password is required";
+                error = "Repeat password is required";
             }
             else if (string.IsNullOrWhiteSpace(SelectedAccount.Email))
             {
@@ -220,6 +223,35 @@ namespace Client.Desktop.ViewModels.Content.Administration
             }
 
             return string.IsNullOrEmpty(error);
+        }
+
+        private string ValidateUnique(string columnName)
+        {
+            var error = string.Empty;
+
+            var prop = SelectedAccount.GetType().GetProperty(columnName);
+            if (prop == null) return null;
+
+            foreach (var account in Accounts)
+            {
+                if (Equals(prop.GetValue(account), prop.GetValue(SelectedAccount)) && !Equals(account, SelectedAccount))
+                {
+                    error = "Email is not unique";
+                    break;
+                }
+                if (Equals(account.Login, SelectedAccount.Login) && !Equals(account, SelectedAccount))
+                {
+                    error = "Login is not unique";
+                    break;
+                }
+                if (Equals(account.UserName, SelectedAccount.UserName) && !Equals(account, SelectedAccount))
+                {
+                    error = "User name is not unique";
+                    break;
+                }
+            }
+
+            return error;
         }
 
         private bool SaveCommandCanExecute()

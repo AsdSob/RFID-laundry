@@ -66,7 +66,7 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="UserName" Binding="{Binding UserName}" />
                 <DataGridTextColumn Header="Login" Binding="{Binding Login}" Width="200" />
-                <DataGridTextColumn Header="Description" Binding="{Binding Email}" Width="*" />
+                <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="*" />
             </DataGrid.Columns>
         </DataGrid>
 
@@ -88,29 +88,30 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
             <Label Grid.Row="0" Content="User name"/>
-            <TextBox Grid.Row="1" Text="{Binding SelectedAccount.UserName}" MaxLength="64"/>
+            <TextBox Grid.Row="1" Text="{Binding SelectedAccount.UserName, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" MaxLength="64"/>
             <Label Grid.Row="2" Content="Login"/>
-            <TextBox Grid.Row="3" Text="{Binding SelectedAccount.Login}" MaxLength="64"/>
+            <TextBox Grid.Row="3" Text="{Binding SelectedAccount.Login, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" MaxLength="64"/>
             <Label Grid.Row="4" Content="Password"/>
             <PasswordBox Grid.Row="5" x:Name="PasswordBox" MaxLength="64">
                 <b:Interaction.Behaviors>
-                    <behaviors:PasswordBoxBehavior Password="{Binding SelectedAccount.Password, Mode=TwoWay}"
+                    <behaviors:PasswordBoxBehavior Password="{Binding SelectedAccount.Password, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
                                                    ResetObject="{Binding SelectedAccount}"/>
                 </b:Interaction.Behaviors>
             </PasswordBox>
             <Label Grid.Row="6" Content="Repeat password"/>
             <PasswordBox Grid.Row="7" x:Name="RepeatPasswordBox" MaxLength="64">
                 <b:Interaction.Behaviors>
-                    <behaviors:PasswordBoxBehavior Password="{Binding SelectedAccount.RepeatPassword, Mode=TwoWay}"
+                    <behaviors:PasswordBoxBehavior Password="{Binding SelectedAccount.RepeatPassword, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
                                                    ResetObject="{Binding SelectedAccount}"/>
                 </b:Interaction.Behaviors>
             </PasswordBox>
             <Label Grid.Row="8" Content="E-mail"/>
-            <TextBox Grid.Row="9" Text="{Binding SelectedAccount.Email}" MaxLength="256"/>
+            <TextBox Grid.Row="9" Text="{Binding SelectedAccount.Email, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" MaxLength="256"/>
             <Label Grid.Row="10" Content="Role"/>
             <ComboBox Grid.Row="11" ItemsSource="{Binding Roles}" SelectedValue="{Binding SelectedAccount.Role}"/>
 
@@ -132,8 +133,12 @@
 
             </DockPanel>
 
+            <Label Grid.Row="13"
+                   Content="{Binding SelectedAccount.Error}"
+                   Foreground="Red"
+                   MinHeight="30"/>
 
-            <Button Grid.Row="13"
+            <Button Grid.Row="14"
                     Content="Save"
                     Command="{Binding SaveCommand}"
                     Width="100"
