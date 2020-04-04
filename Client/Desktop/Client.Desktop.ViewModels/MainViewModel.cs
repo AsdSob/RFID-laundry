@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Threading;
 using System.Windows.Input;
+using Client.Desktop.ViewModels.Common.Identity;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Content;
@@ -12,6 +14,7 @@ namespace Client.Desktop.ViewModels
     {
         private readonly IResolver _resolver;
         private readonly IDialogService _dialogService;
+        private readonly IAuthenticationService _authenticationService;
         private object _content;
         private MenuViewModel _menuViewModel;
         private bool _menuIsVisible;
@@ -38,17 +41,22 @@ namespace Client.Desktop.ViewModels
             set => Set(() => MenuIsVisible, ref _menuIsVisible, value);
         }
 
+        public RelayCommand LogoutCommand { get; }
+
         public MainViewModel(MenuViewModel menuViewModel,
             IResolver resolver,
-            IDialogService dialogService)
+            IDialogService dialogService,
+            IAuthenticationService authenticationService)
         {
             _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
+            _authenticationService = authenticationService ?? throw new ArgumentNullException(nameof(authenticationService));
             MenuViewModel = menuViewModel ?? throw new ArgumentNullException(nameof(menuViewModel));
 
             MenuViewModel.PropertyChanged += MenuViewModelOnPropertyChanged;
 
             InitilizeCommand = new RelayCommand(Initialize);
+            LogoutCommand = new RelayCommand(Logout);
         }
 
         private void Initialize()
@@ -61,6 +69,16 @@ namespace Client.Desktop.ViewModels
             MenuIsVisible = true;
 
             SetMenuContent(MenuViewModel);
+        }
+
+        private async void Logout()
+        {
+            Content = null;
+            MenuIsVisible = false;
+
+            await _authenticationService.LogoutAsync();
+
+            InitilizeCommand.Execute(null);
         }
 
         private void MenuViewModelOnPropertyChanged(object sender, PropertyChangedEventArgs e)

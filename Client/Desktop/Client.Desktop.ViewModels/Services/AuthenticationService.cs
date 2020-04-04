@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 using Client.Desktop.ViewModels.Common.Identity;
 using Client.Desktop.ViewModels.Common.Model;
@@ -109,6 +110,23 @@ namespace Client.Desktop.ViewModels.Services
         public bool Verify(string clearPassword, string secretPassword)
         {
             return VerifyPassword(clearPassword, secretPassword);
+        }
+
+        public async Task LogoutAsync()
+        {
+            if (Thread.CurrentPrincipal is CustomPrincipal customPrincipal)
+            {
+                customPrincipal.Identity = new AnonymousIdentity();
+            }
+
+            var localData = await _settingsManagerProvider.GetAsync<LocalData>(LocalDataFileName);
+
+            if (localData?.LastUser != null && !string.IsNullOrEmpty(localData.LastUser.Password))
+            {
+                localData.LastUser = null;
+
+                await _settingsManagerProvider.SaveAsync(localData, LocalDataFileName);
+            }
         }
 
         private string CalculateHash(string clearTextPassword)

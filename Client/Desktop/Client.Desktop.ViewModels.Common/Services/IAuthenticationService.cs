@@ -9,5 +9,6 @@ namespace Client.Desktop.ViewModels.Common.Services
         Task<User> AuthenticateLastUserAsync();
         string GetSecretPassword(string clearPassword);
         bool Verify(string clearPassword, string secretPassword);
+        Task LogoutAsync();
     }
 }
