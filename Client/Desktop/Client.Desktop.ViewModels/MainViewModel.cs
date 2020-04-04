@@ -15,6 +15,7 @@ namespace Client.Desktop.ViewModels
         private readonly IResolver _resolver;
         private readonly IDialogService _dialogService;
         private readonly IAuthenticationService _authenticationService;
+        private readonly IAuthorizationService _authorizationService;
         private object _content;
         private MenuViewModel _menuViewModel;
         private bool _menuIsVisible;
@@ -46,11 +47,13 @@ namespace Client.Desktop.ViewModels
         public MainViewModel(MenuViewModel menuViewModel,
             IResolver resolver,
             IDialogService dialogService,
-            IAuthenticationService authenticationService)
+            IAuthenticationService authenticationService,
+            IAuthorizationService authorizationService)
         {
             _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _authenticationService = authenticationService ?? throw new ArgumentNullException(nameof(authenticationService));
+            _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
             MenuViewModel = menuViewModel ?? throw new ArgumentNullException(nameof(menuViewModel));
 
             MenuViewModel.PropertyChanged += MenuViewModelOnPropertyChanged;
@@ -76,6 +79,7 @@ namespace Client.Desktop.ViewModels
             Content = null;
             MenuIsVisible = false;
 
+            await _authorizationService.LogoutAsync();
             await _authenticationService.LogoutAsync();
 
             InitilizeCommand.Execute(null);

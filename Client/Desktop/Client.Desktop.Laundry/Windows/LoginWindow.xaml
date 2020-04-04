@@ -58,7 +58,6 @@
 
         <CheckBox Grid.Row="3"
                   Grid.Column="0"
-                  Grid.ColumnSpan="2"
                   IsChecked="{Binding IsRememberMe}"
                   Content="remember me"
                   VerticalAlignment="Center"/>
@@ -70,11 +69,6 @@
                     CommandParameter="{Binding ElementName=PasswordBox}"
                     HorizontalAlignment="Center"
                     IsDefault="True"
-                    Margin="5"/>
-            <Button Content="Log out"
-                    Command="{Binding LogoutCommand, Mode=OneTime}"
-                    Visibility="{Binding IsAuthenticated, Converter={StaticResource BooleanToVisibilityConverterKey}}"
-                    HorizontalAlignment="Center" 
                     Margin="5"/>
         </StackPanel>
         <TextBlock Text="{Binding Status}"

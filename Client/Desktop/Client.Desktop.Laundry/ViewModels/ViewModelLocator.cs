@@ -33,7 +33,7 @@ namespace Client.Desktop.Laundry.ViewModels
         private void RegisterViewModels(ContainerBuilder builder)
         {
             builder.RegisterType<MainViewModel>().SingleInstance();
-            builder.RegisterType<LoginWindowViewModel>().SingleInstance();
+            builder.RegisterType<LoginWindowViewModel>();
             builder.RegisterType<MenuViewModel>().SingleInstance();
 
             builder.RegisterType<DataViewModel>().SingleInstance();

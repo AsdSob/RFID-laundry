@@ -114,11 +114,6 @@ namespace Client.Desktop.ViewModels.Services
 
         public async Task LogoutAsync()
         {
-            if (Thread.CurrentPrincipal is CustomPrincipal customPrincipal)
-            {
-                customPrincipal.Identity = new AnonymousIdentity();
-            }
-
             var localData = await _settingsManagerProvider.GetAsync<LocalData>(LocalDataFileName);
 
             if (localData?.LastUser != null && !string.IsNullOrEmpty(localData.LastUser.Password))
