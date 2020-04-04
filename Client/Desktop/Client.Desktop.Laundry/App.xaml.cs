@@ -29,7 +29,7 @@ namespace Client.Desktop.Laundry
 
             // database migration
             using (var context = ViewModelLocator.Container.Resolve<IDbContextFactory>().Create())
-                context.Database.Migrate();
+                context.Database.Migrate(); // TODO: move to IoC callback
 
             base.OnStartup(e);
         }

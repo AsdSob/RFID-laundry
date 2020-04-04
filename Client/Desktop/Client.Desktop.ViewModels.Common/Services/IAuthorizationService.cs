@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Client.Desktop.ViewModels.Common.Identity;
 
 namespace Client.Desktop.ViewModels.Common.Services
@@ -7,5 +8,6 @@ namespace Client.Desktop.ViewModels.Common.Services
     {
         CustomPrincipal CurrentPrincipal { get; set; }
         EventHandler CurrentPrincipalChanged { get; set; }
+        Task LogoutAsync();
     }
 }

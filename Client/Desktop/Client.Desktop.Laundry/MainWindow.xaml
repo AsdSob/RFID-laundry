@@ -28,7 +28,18 @@
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0" Background="Transparent" Visibility="{Binding MenuIsVisible, Converter={StaticResource BooleanToVisibilityHiddenConverterKey}}">
-            <ContentPresenter Content="{Binding MenuViewModel}"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <ContentPresenter Content="{Binding MenuViewModel}"/>
+
+                <Button Grid.Column="1"
+                        Content="LogOut"
+                        Command="{Binding LogoutCommand}"/>
+            </Grid>
         </Border>
 
         <Image Grid.Row="1"  Source="/Module/Pictures/LLMS_logo.png"

@@ -15,25 +15,45 @@ namespace Client.Desktop.ViewModels.Windows
         private readonly IAuthorizationService _authorizationService;
         private string _username;
         private string _status;
+        private bool _isRememberMe;
 
         public Action<bool> CloseAction { get; set; }
 
+        public RelayCommand InitilizeCommand { get; }
 
-        public LoginWindowViewModel(IAuthenticationService authenticationService, IMainDispatcher mainDispatcher, IAuthorizationService authorizationService)
+        public LoginWindowViewModel(
+            IAuthenticationService authenticationService,
+            IMainDispatcher mainDispatcher,
+            IAuthorizationService authorizationService)
         {
             _authenticationService = authenticationService ?? throw new ArgumentNullException(nameof(authenticationService));
             _mainDispatcher = mainDispatcher ?? throw new ArgumentNullException(nameof(mainDispatcher));
             _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
-            
+
+            InitilizeCommand = new RelayCommand(Initialize);
             LoginCommand = new RelayCommand<object>(Login, CanLogin);
-            LogoutCommand = new RelayCommand(Logout, CanLogout);
+        }
+
+        private async void Initialize()
+        {
+            var user = await _authenticationService.AuthenticateLastUserAsync();
+            if (user == null) return;
+
+            await LoginAsync(() => Task.FromResult(user));
         }
 
         #region Properties
+
         public string Username
         {
-            get { return _username; }
+            get => _username;
             set { Set(() => Username, ref _username, value); }
+        }
+
+        public bool IsRememberMe
+        {
+            get => _isRememberMe;
+            set => Set(ref _isRememberMe, value);
         }
 
         public string AuthenticatedUser
@@ -41,7 +61,7 @@ namespace Client.Desktop.ViewModels.Windows
             get
             {
                 if (IsAuthenticated)
-                    return $"Signed in as {Thread.CurrentPrincipal.Identity.Name}";
+                    return $"Signed in as {_authorizationService.CurrentPrincipal.Identity.Name}";
 
                 return "Not authenticated!";
             }
@@ -52,27 +72,43 @@ namespace Client.Desktop.ViewModels.Windows
             get => _status;
             set => Set(() => Status, ref _status, value);
         }
+
+        public bool IsAuthenticated => _authorizationService.CurrentPrincipal?.Identity?.IsAuthenticated == true;
+
         #endregion
 
         public RelayCommand<object> LoginCommand { get; }
 
-        public RelayCommand LogoutCommand { get; }
-
-        private void Login(dynamic parameter)
+        private async void Login(dynamic parameter)
         {
             string clearTextPassword = parameter?.Password;
-            try
+
+            Task<User> GetUserFunc()
             {
                 if (string.IsNullOrEmpty(Username) || string.IsNullOrEmpty(clearTextPassword))
                     throw new UnauthorizedAccessException();
 
                 //Validate credentials through the authentication service
-                User user = _authenticationService.AuthenticateUser(Username, clearTextPassword);
+                return _authenticationService.AuthenticateUserAsync(Username, clearTextPassword, IsRememberMe);
+            }
+
+            await LoginAsync(GetUserFunc);
+        }
+
+        private async Task LoginAsync(Func<Task<User>> getUserFunc)
+        {
+            try
+            {
+                //Validate credentials through the authentication service
+                User user = await getUserFunc();
 
                 //Get the current principal object
-                CustomPrincipal customPrincipal = Thread.CurrentPrincipal as CustomPrincipal;
+                CustomPrincipal customPrincipal = Thread.CurrentPrincipal as CustomPrincipal ?? _authorizationService.CurrentPrincipal;
                 if (customPrincipal == null)
-                    throw new ArgumentException("The application's default thread principal must be set to a CustomPrincipal object on startup.");
+                {
+                    throw new ArgumentException(
+                        "The application's default thread principal must be set to a CustomPrincipal object on startup.");
+                }
 
                 //Authenticate the user
                 customPrincipal.Identity = new CustomIdentity(user.Username, user.Email, user.Roles);
@@ -81,19 +117,13 @@ namespace Client.Desktop.ViewModels.Windows
                 RaisePropertyChanged(() => AuthenticatedUser);
                 RaisePropertyChanged(() => IsAuthenticated);
                 LoginCommand.RaiseCanExecuteChanged();
-                LogoutCommand.RaiseCanExecuteChanged();
-                //Username = string.Empty; //reset
-                //passwordBox.Password = string.Empty; //reset
                 Status = string.Empty;
 
                 _authorizationService.CurrentPrincipal = customPrincipal;
 
                 RaisePropertyChanged(() => AuthenticatedUser);
 
-                Task.Delay(2000).ContinueWith(x =>
-                {
-                    _mainDispatcher.RunInMainThread(() => CloseAction?.Invoke(true));
-                });
+                await Task.Delay(1000).ContinueWith(x => { _mainDispatcher.RunInMainThread(() => CloseAction?.Invoke(true)); });
             }
             catch (UnauthorizedAccessException)
             {
@@ -104,6 +134,7 @@ namespace Client.Desktop.ViewModels.Windows
                 Status = $"ERROR: {ex.Message}";
             }
         }
+
 
         private bool CanLogin(object password)
         {
@@ -119,16 +150,8 @@ namespace Client.Desktop.ViewModels.Windows
                 RaisePropertyChanged(() => AuthenticatedUser);
                 RaisePropertyChanged(() => IsAuthenticated);
                 LoginCommand.RaiseCanExecuteChanged();
-                LogoutCommand.RaiseCanExecuteChanged();
                 Status = string.Empty;
             }
         }
-
-        private bool CanLogout()
-        {
-            return IsAuthenticated;
-        }
-
-        public bool IsAuthenticated => Thread.CurrentPrincipal.Identity.IsAuthenticated;
     }
 }

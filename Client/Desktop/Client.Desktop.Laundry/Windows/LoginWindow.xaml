@@ -14,9 +14,17 @@
               WindowStartupLocation="CenterOwner"
               WindowStyle="ToolWindow"
               d:DataContext="{d:DesignInstance windows:LoginWindowViewModel}">
+
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverterKey"/>
     </Window.Resources>
+
+    <b:Interaction.Triggers>
+        <b:EventTrigger EventName="Loaded">
+            <b:InvokeCommandAction Command="{Binding InitilizeCommand}"/>
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
+
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -47,6 +55,13 @@
             </b:Interaction.Behaviors>
         </TextBox>
         <PasswordBox x:Name="PasswordBox" Grid.Row="2" Grid.Column="1" Margin="5"/>
+
+        <CheckBox Grid.Row="3"
+                  Grid.Column="0"
+                  IsChecked="{Binding IsRememberMe}"
+                  Content="remember me"
+                  VerticalAlignment="Center"/>
+
         <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right">
             <Button Content="Log in"
                     Width="80"
@@ -54,11 +69,6 @@
                     CommandParameter="{Binding ElementName=PasswordBox}"
                     HorizontalAlignment="Center"
                     IsDefault="True"
-                    Margin="5"/>
-            <Button Content="Log out"
-                    Command="{Binding LogoutCommand, Mode=OneTime}"
-                    Visibility="{Binding IsAuthenticated, Converter={StaticResource BooleanToVisibilityConverterKey}}"
-                    HorizontalAlignment="Center" 
                     Margin="5"/>
         </StackPanel>
         <TextBlock Text="{Binding Status}"
