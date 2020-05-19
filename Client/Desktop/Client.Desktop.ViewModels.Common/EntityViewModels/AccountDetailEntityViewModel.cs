@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Storage.Laundry.Models;
 
@@ -8,7 +9,7 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
     {
         private AccountDetailsEntity _originalObject;
         private int _accountId;
-        private int _readerId;
+        private int? _readerId;
         private int _id;
 
         public int Id
@@ -16,7 +17,7 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             get => _id;
             set => Set(() => Id, ref _id, value);
         }
-        public int ReaderId
+        public int? ReaderId
         {
             get => _readerId;
             set => Set(() => ReaderId, ref _readerId, value);
@@ -81,6 +82,9 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
         {
 
         }
+
+        public Func<string, string> ValidateUnique { get; set; }
+
 
         private string Validate(string columnName)
         {

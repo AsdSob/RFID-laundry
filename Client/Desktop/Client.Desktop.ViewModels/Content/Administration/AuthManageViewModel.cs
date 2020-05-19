@@ -94,20 +94,23 @@ namespace Client.Desktop.ViewModels.Content.Administration
                 SaveCommand?.RaiseCanExecuteChanged();
                 DeleteCommand?.RaiseCanExecuteChanged();
 
-                SelectedAccountDetails = SelectAccoutDetails();
+                SelectedAccountDetails = SelectAccountDetails();
 
                 if (SelectedAccount != null)
                     SelectedAccount.ValidateUnique = ValidateUnique;
             }
+
         }
 
-        private AccountDetailEntityViewModel SelectAccoutDetails()
+        private AccountDetailEntityViewModel SelectAccountDetails()
         {
+            if (SelectedAccount == null) return null;
+
             var accountDetail = AccountDetails?.FirstOrDefault(x =>
                 x.OriginalObject.AccountEntity == SelectedAccount?.OriginalObject ||
                 x.AccountId == SelectedAccount?.Id);
 
-            if (SelectedAccountDetails == null)
+            if (accountDetail == null)
             {
                 accountDetail = new AccountDetailEntityViewModel
                 {
@@ -125,12 +128,6 @@ namespace Client.Desktop.ViewModels.Content.Administration
             var accountViewModel = new AccountViewModel();
             Accounts.Add(accountViewModel);
             SelectedAccount = accountViewModel;
-
-            var accountDetails = new AccountDetailEntityViewModel();
-            accountDetails.OriginalObject.AccountEntity = accountViewModel.OriginalObject;
-
-            AccountDetails.Add(accountDetails);
-            SelectedAccountDetails = accountDetails;
         }
 
         private bool AddCommandCanExecute()
@@ -162,21 +159,26 @@ namespace Client.Desktop.ViewModels.Content.Administration
 
         private async void Save()
         {
-            if (!Validate(out var error))
-            {
-                _dialogService.ShowWarnigDialog($"{error}");
+            var isAccount = SelectedAccount.HasChanges(_authenticationService.Verify) && SelectedAccount.IsValid;
+            var isAccountDetails = SelectedAccountDetails.HasChanges();
 
-                return;
+            if (isAccount)
+            {
+                SelectedAccount.AcceptChanges();
+                await _accountService.AddOrUpdateAsync(SelectedAccount.OriginalObject);
             }
 
-            if (!SelectedAccount.HasChanges(_authenticationService.Verify) && !SelectedAccountDetails.HasChanges()) return;
-            SelectedAccount.AcceptChanges();
-            await _accountService.AddOrUpdateAsync(SelectedAccount.OriginalObject);
+            if (isAccountDetails)
+            {
+                SelectedAccountDetails.AcceptChanges();
+                await _laundryService.AddOrUpdateAsync(SelectedAccountDetails.OriginalObject);
+            }
 
-            SelectedAccountDetails.AcceptChanges();
-            await _laundryService.AddOrUpdateAsync(SelectedAccountDetails.OriginalObject);
+            if (isAccount || isAccountDetails)
+            {
+                _dialogService.ShowInfoDialog("Saved!");
+            }
 
-            _dialogService.ShowInfoDialog("Saved!");
         }
 
         private async void ReaderSetting()
@@ -191,38 +193,6 @@ namespace Client.Desktop.ViewModels.Content.Administration
 
            var reader = await _accountService.GetAllAsync<RfidReaderEntity>();
            RfidReaders = reader.ToList();
-        }
-
-        private bool Validate(out string error)
-        {
-            error = null;
-
-            if (string.IsNullOrWhiteSpace(SelectedAccount.UserName))
-            {
-                error = "User name is required";
-            }
-            else if (string.IsNullOrWhiteSpace(SelectedAccount.Login))
-            {
-                error = $"{nameof(SelectedAccount.Login)} is required";
-            }
-            else if (string.IsNullOrWhiteSpace(SelectedAccount.Password))
-            {
-                error = $"{nameof(SelectedAccount.Password)} is required";
-            }
-            else if (string.IsNullOrWhiteSpace(SelectedAccount.RepeatPassword))
-            {
-                error = "Repeat password is required";
-            }
-            else if (string.IsNullOrWhiteSpace(SelectedAccount.Email))
-            {
-                error = $"{nameof(SelectedAccount.Email)} is required";
-            }
-            else if (!Equals(SelectedAccount.Password, SelectedAccount.RepeatPassword))
-            {
-                error = "Passwords do not match";
-            }
-
-            return string.IsNullOrEmpty(error);
         }
 
         private string ValidateUnique(string columnName)

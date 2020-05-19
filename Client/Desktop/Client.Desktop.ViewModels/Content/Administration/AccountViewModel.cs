@@ -17,9 +17,20 @@ namespace Client.Desktop.ViewModels.Content.Administration
         private string _repeatPassword;
         private int _id;
         private string _error;
+        private bool _isValid;
 
         public AccountEntity OriginalObject { get; private set; }
 
+        public bool IsValid
+        {
+            get => _isValid;
+            set => Set(ref _isValid, value);
+        }
+        public string Error
+        {
+            get => _error;
+            set => Set(ref _error, value);
+        }
         public int Id
         {
             get => _id;
@@ -114,11 +125,7 @@ namespace Client.Desktop.ViewModels.Content.Administration
                    !verifySecretPasswordFunc(Password, OriginalObject.Password);
         }
 
-        public string Error
-        {
-            get => _error;
-            set => Set(ref _error, value);
-        }
+
 
         public string this[string columnName] => Validate(columnName);
 
@@ -180,9 +187,8 @@ namespace Client.Desktop.ViewModels.Content.Administration
                 }
             }
 
-
             Error = error;
-
+            IsValid = String.IsNullOrEmpty(Error);
             return Error;
         }
     }

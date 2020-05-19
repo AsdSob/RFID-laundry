@@ -19,7 +19,7 @@ namespace Storage.Laundry.Configurations
                 .HasForeignKey<AccountDetailsEntity>(x => x.AccountId);
             builder.HasOne(x => x.RfidReaderEntity)
                 .WithMany(x => x.AccountDetailsEntities)
-                .HasForeignKey(x => x.ReaderId);
+                .HasForeignKey(x => x.ReaderId).IsRequired(false);
 
         }
     }

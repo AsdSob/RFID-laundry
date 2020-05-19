@@ -45,12 +45,18 @@ namespace Client.Desktop.ViewModels
 
             BinSoilCollectionCommand = new RelayCommand(() => Select(typeof(BinSoilCollectionViewModel)), BinSoilCollectionCommandCanExecute);
 
-            _selectedItem = typeof(MasterClientViewModel);
+            _selectedItem = typeof(AuthManageViewModel);
         }
 
         private bool AuthManageCommandCanExecute()
         {
-            return _authorizationService.CurrentPrincipal?.IsInRole(Roles.Administrator) == true;
+            if (_authorizationService.CurrentPrincipal?.IsInRole(Roles.Administrator) is true)
+                return true;
+
+            if (_authorizationService.CurrentPrincipal?.IsInRole(Roles.Manager) is true)
+                return false;
+
+            return false;
         }
 
         private bool BinSoilCollectionCommandCanExecute()

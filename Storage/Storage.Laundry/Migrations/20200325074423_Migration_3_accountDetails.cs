@@ -16,7 +16,7 @@ namespace Storage.Laundry.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     CreatedDateUtc = table.Column<DateTime>(nullable: false),
                     accountId = table.Column<int>(nullable: false),
-                    readerId = table.Column<int>(nullable: false)
+                    readerId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
