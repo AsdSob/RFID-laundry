@@ -32,15 +32,21 @@
 
         <MenuItem Header="_Master">
 
-            <MenuItem Header="_Clients" Command="{Binding ClientCommand}"/>
-            <MenuItem Header="_Staff" Command="{Binding StaffCommand}"/>
-            <MenuItem Header="_Master Linen" Command="{Binding MasterLinenCommand}"/>
+            <MenuItem Header="_Clients" Command="{Binding ClientCommand}"
+                      Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverterKey}}"/>
+
+            <MenuItem Header="_Staff" Command="{Binding StaffCommand}"
+                      Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverterKey}}"/>
+
+            <MenuItem Header="_Master Linen" Command="{Binding MasterLinenCommand}"
+                      Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverterKey}}"/>
 
         </MenuItem>
 
         <MenuItem Header="_Linen Bin">
 
-            <MenuItem Header="_Bin Load" Command="{Binding BinSoilCollectionCommand}"/>
+            <MenuItem Header="_Bin Load" Command="{Binding BinSoilCollectionCommand}" 
+                      Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverterKey}}"/>
 
         </MenuItem>
     </Menu>

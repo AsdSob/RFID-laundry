@@ -42,6 +42,7 @@ namespace Client.Desktop.Laundry.ViewModels
             builder.RegisterType<MasterLinenViewModel>().SingleInstance();
 
             builder.RegisterType<RfidReaderWindowModel>().SingleInstance();
+            builder.RegisterType<MasterLinenWindowModel>().SingleInstance();
             builder.RegisterType<StaffChangeWindowModel>();
 
             builder.RegisterType<AuthManageViewModel>();

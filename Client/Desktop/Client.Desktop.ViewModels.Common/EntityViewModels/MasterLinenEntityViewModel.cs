@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Text.RegularExpressions;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Storage.Laundry.Models;
@@ -12,7 +13,19 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
         private int _id;
         private string _name;
         private int _packingValue;
+        private bool _isValid;
+        private string _error;
 
+        public string Error
+        {
+            get => _error;
+            set => Set(ref _error, value);
+        }
+        public bool IsValid
+        {
+            get => _isValid;
+            set => Set(ref _isValid, value);
+        }
         public int PackingValue
         {
             get => _packingValue;
@@ -38,6 +51,8 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
         public MasterLinenEntityViewModel()
         {
             OriginalObject = new MasterLinenEntity();
+
+            PropertyChanged += OnPropertyChanged;
         }
 
         public MasterLinenEntityViewModel(MasterLinenEntity entity) : this()
@@ -68,39 +83,49 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
                                     !Equals(Name, OriginalObject.Name) ||
                                     !Equals(PackingValue, OriginalObject.PackingValue);
 
-        public string Error { get; set; }
         public string this[string columnName] => Validate(columnName);
 
-        public Func<MasterLinenEntityViewModel, string, bool> NameUniqueValidationFunc { get; set; }
 
         private string Validate(string columnName)
         {
-            string error;
-
-            if (columnName == nameof(PackingValue))
-            {
-                if (!PackingValue.ValidateRequired(out error) ||
-                    !PackingValue.ValidateMinAmount(out error))
-                {
-                    return error;
-                }
-
-            }
+            var error = String.Empty;
 
             if (columnName == nameof(Name))
             {
-                if (!Name.ValidateRequired(out error) ||
-                    !Name.ValidateBySpaces(out error))
-                {
-                    return error;
-                }
+                Name.ValidateRequired(ref error);
+                Name.ValidateByNameMaxLength(ref error);
+            }
+            
+            else if (columnName == nameof(PackingValue))
+            {
+                PackingValue.ValidateRequired(ref error);
+                PackingValue.ValidateMinAmount(ref error);
+            }
 
-                if (NameUniqueValidationFunc != null && !NameUniqueValidationFunc(this, nameof(Name)))
+            Error = error;
+            return Error;
+        }
+
+        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Error))
+            {
+                IsValid = String.IsNullOrWhiteSpace(Error);
+            }
+
+            if (e.PropertyName == nameof(Name))
+            {
+                if (!String.IsNullOrEmpty(Name))
                 {
-                    return "Staff Id is already exist";
+                    var regex = new Regex(@"\s+");
+                    Name = regex.Replace(Name, " ");
                 }
             }
-            return null;
+
+            if (e.PropertyName == nameof(PackingValue))
+            {
+                PackingValue = Convert.ToInt32(Regex.Replace(PackingValue.ToString(), "[^0-9]", ""));
+            }
         }
     }
 }

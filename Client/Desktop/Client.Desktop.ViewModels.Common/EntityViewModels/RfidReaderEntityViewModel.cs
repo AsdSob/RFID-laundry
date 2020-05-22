@@ -94,40 +94,40 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
 
         private string Validate(string columnName)
         {
-            string error;
+            //string error;
 
-            if (columnName == nameof(Name))
-            {
-                if (!Name.ValidateRequired(out error) ||
-                    !Name.ValidateBySpaces(out error))
-                {
-                    return error;
-                }
+            //if (columnName == nameof(Name))
+            //{
+            //    if (!Name.ValidateRequired(out error) ||
+            //        !Name.ValidateBySpaces(out error))
+            //    {
+            //        return error;
+            //    }
 
-            }
+            //}
 
-            if (columnName == nameof(ReaderPort))
-            {
-                if (!ReaderPort.ValidateRequired(out error))
-                {
-                    return error;
-                }
+            //if (columnName == nameof(ReaderPort))
+            //{
+            //    if (!ReaderPort.ValidateRequired(out error))
+            //    {
+            //        return error;
+            //    }
 
-            }
+            //}
 
-            if (columnName == nameof(ReaderIp))
-            {
-                if (!ReaderIp.ValidateRequired(out error) ||
-                    !ReaderIp.ValidateBySpaces(out error))
-                {
-                    return error;
-                }
+            //if (columnName == nameof(ReaderIp))
+            //{
+            //    if (!ReaderIp.ValidateRequired(out error) ||
+            //        !ReaderIp.ValidateBySpaces(out error))
+            //    {
+            //        return error;
+            //    }
 
-                if (NameUniqueValidationFunc != null && !NameUniqueValidationFunc(this, nameof(ReaderIp)))
-                {
-                    return "Ip already exist";
-                }
-            }
+            //    if (NameUniqueValidationFunc != null && !NameUniqueValidationFunc(this, nameof(ReaderIp)))
+            //    {
+            //        return "Ip already exist";
+            //    }
+            //}
             return null;
         }
 

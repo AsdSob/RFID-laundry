@@ -90,25 +90,25 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
 
         private string Validate(string columnName)
         {
-            string error;
+            //string error;
 
-            if (columnName == nameof(Name))
-            {
-                if (!Name.ValidateRequired(out error) ||
-                    !Name.ValidateBySpaces(out error))
-                {
-                    return error;
-                }
+            //if (columnName == nameof(Name))
+            //{
+            //    if (!Name.ValidateRequired(out error) ||
+            //        !Name.ValidateBySpaces(out error))
+            //    {
+            //        return error;
+            //    }
 
-            }
+            //}
 
-            if (columnName == nameof(DepartmentTypeId))
-            {
-                if (!DepartmentTypeId.ValidateRequired(out error))
-                {
-                    return error;
-                }
-            }
+            //if (columnName == nameof(DepartmentTypeId))
+            //{
+            //    if (!DepartmentTypeId.ValidateRequired(out error))
+            //    {
+            //        return error;
+            //    }
+            //}
             return null;
         }
     }

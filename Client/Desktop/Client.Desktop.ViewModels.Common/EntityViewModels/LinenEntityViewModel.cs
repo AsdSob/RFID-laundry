@@ -117,26 +117,26 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
 
         private string Validate(string columnName)
         {
-            string error;
+            //string error;
 
-            if (columnName == nameof(PackingValue))
-            {
-                if (!PackingValue.ValidateRequired(out error) ||
-                    (!PackingValue.ValidateMinAmount(out error)))
-                {
-                    return Error = error;
-                }
-            }
+            //if (columnName == nameof(PackingValue))
+            //{
+            //    if (!PackingValue.ValidateRequired(out error) ||
+            //        (!PackingValue.ValidateMinAmount(out error)))
+            //    {
+            //        return Error = error;
+            //    }
+            //}
 
-            if (columnName == nameof(MasterLinenId))
-            {
-                if (!MasterLinenId.ValidateRequired(out error))
-                {
-                    return Error = error;
-                }
+            //if (columnName == nameof(MasterLinenId))
+            //{
+            //    if (!MasterLinenId.ValidateRequired(out error))
+            //    {
+            //        return Error = error;
+            //    }
 
-            }
-            Error = String.Empty;
+            //}
+            //Error = String.Empty;
             return null;
         }
     }

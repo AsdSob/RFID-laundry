@@ -38,14 +38,14 @@ namespace Client.Desktop.ViewModels
             ExitCommand = new RelayCommand(() => Select(typeof(ExitViewModel)));
             ClientCommand = new RelayCommand(() => Select(typeof(MasterClientViewModel)));
             StaffCommand = new RelayCommand(() => Select(typeof(MasterStaffViewModel)), StaffCommandCanExecute);
-            MasterLinenCommand = new RelayCommand(() => Select(typeof(MasterLinenViewModel)));
+            MasterLinenCommand = new RelayCommand(() => Select(typeof(MasterLinenViewModel)), MasterLinenCommandCanExecute);
             AuthManageCommand = new RelayCommand(() => Select(typeof(AuthManageViewModel)), AuthManageCommandCanExecute);
 
             TagRegistrationCommand = new RelayCommand(() => Select(typeof(TagRegistrationViewModel)), TagRegistrationCommandCanExecute);
 
             BinSoilCollectionCommand = new RelayCommand(() => Select(typeof(BinSoilCollectionViewModel)), BinSoilCollectionCommandCanExecute);
 
-            _selectedItem = typeof(AuthManageViewModel);
+            _selectedItem = typeof(MasterLinenViewModel);
         }
 
         private bool AuthManageCommandCanExecute()
@@ -72,6 +72,17 @@ namespace Client.Desktop.ViewModels
         private bool StaffCommandCanExecute()
         {
             return _authorizationService.CurrentPrincipal?.IsInRole(Roles.Administrator) == true;
+        }
+        
+        private bool MasterLinenCommandCanExecute()
+        {
+            //if (_authorizationService.CurrentPrincipal?.IsInRole(Roles.Administrator) is true)
+            //    return true;
+
+            //if (_authorizationService.CurrentPrincipal?.IsInRole(Roles.Manager) is true)
+            //    return false;
+
+            return true;
         }
 
         private void Select(Type type)

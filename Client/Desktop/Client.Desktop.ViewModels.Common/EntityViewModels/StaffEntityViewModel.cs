@@ -107,31 +107,31 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
 
         private string Validate(string columnName)
         {
-            string error;
+            //string error;
 
-            if (columnName == nameof(StaffName))
-            {
-                if (!StaffName.ValidateRequired(out error) ||
-                    !StaffName.ValidateBySpaces(out error))
-                {
-                    return error;
-                }
+            //if (columnName == nameof(StaffName))
+            //{
+            //    if (!StaffName.ValidateRequired(out error) ||
+            //        !StaffName.ValidateBySpaces(out error))
+            //    {
+            //        return error;
+            //    }
 
-            }
+            //}
 
-            if (columnName == nameof(StaffId))
-            {
-                if (!StaffId.ValidateRequired(out error) ||
-                    !StaffId.ValidateBySpaces(out error) )
-                {
-                    return error;
-                }
+            //if (columnName == nameof(StaffId))
+            //{
+            //    if (!StaffId.ValidateRequired(out error) ||
+            //        !StaffId.ValidateBySpaces(out error) )
+            //    {
+            //        return error;
+            //    }
 
-                if (NameUniqueValidationFunc != null && !NameUniqueValidationFunc(this, nameof(StaffId)))
-                {
-                    return "Staff Id is already exist";
-                }
-            }
+            //    if (NameUniqueValidationFunc != null && !NameUniqueValidationFunc(this, nameof(StaffId)))
+            //    {
+            //        return "Staff Id is already exist";
+            //    }
+            //}
             return null;
         }
     }

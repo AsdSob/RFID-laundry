@@ -7,6 +7,7 @@ using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
+using Client.Desktop.ViewModels.Windows;
 using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Content
@@ -15,35 +16,37 @@ namespace Client.Desktop.ViewModels.Content
     {
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
+        private readonly IResolver _resolverService;
 
-        private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
-        private MasterLinenEntityViewModel _selectedMasterLinen;
+        private ObservableCollection<MasterLinenEntity> _masterLinens;
+        private MasterLinenEntity _selectedMasterLinen;
 
-        public MasterLinenEntityViewModel SelectedMasterLinen
+        public MasterLinenEntity SelectedMasterLinen
         {
             get => _selectedMasterLinen;
             set => Set(() => SelectedMasterLinen, ref _selectedMasterLinen, value);
         }
-        public ObservableCollection<MasterLinenEntityViewModel> MasterLinens
+        public ObservableCollection<MasterLinenEntity> MasterLinens
         {
             get => _masterLinens;
             set => Set(() => MasterLinens, ref _masterLinens, value);
         }
 
-        public RelayCommand SaveCommand { get; }
-        public RelayCommand AddMasterLinenCommand { get; }
+        public RelayCommand EditCommand { get; }
+        public RelayCommand NewCommand { get; }
         public RelayCommand DeleteMasterLinenCommand { get; }
 
-        public MasterLinenViewModel(ILaundryService dataService, IDialogService dialogService)
+        public MasterLinenViewModel(ILaundryService dataService, IDialogService dialogService, IResolver resolver)
         {
             _laundryService = dataService ?? throw new ArgumentNullException(nameof(dataService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
+            _resolverService = resolver ?? throw new ArgumentNullException(nameof(resolver));
 
-            SaveCommand = new RelayCommand(Save);
-            AddMasterLinenCommand = new RelayCommand(AddMasterLinen);
+            EditCommand = new RelayCommand(Edit,(()=> SelectedMasterLinen != null));
+            NewCommand = new RelayCommand(AddMasterLinen);
             DeleteMasterLinenCommand = new RelayCommand(DeleteMasterLinen, (() => SelectedMasterLinen != null));
 
-            MasterLinens = new ObservableCollection<MasterLinenEntityViewModel>();
+            MasterLinens = new ObservableCollection<MasterLinenEntity>();
             Task.Factory.StartNew(() => GetData());
         }
 
@@ -54,8 +57,7 @@ namespace Client.Desktop.ViewModels.Content
             try
             {
                 var master = await _laundryService.GetAllAsync<MasterLinenEntity>();
-                var masters = master.Select(x => new MasterLinenEntityViewModel(x));
-                MasterLinens = masters.ToObservableCollection();
+                MasterLinens = master.ToObservableCollection();
 
             }
             catch (Exception e)
@@ -76,21 +78,8 @@ namespace Client.Desktop.ViewModels.Content
             if (e.PropertyName == nameof(SelectedMasterLinen))
             {
                 DeleteMasterLinenCommand.RaiseCanExecuteChanged();
+                EditCommand.RaiseCanExecuteChanged();
             }
-        }
-
-        private void Save()
-        {
-            var masterLinens = MasterLinens.Where(x => x.HasChanges());
-
-            foreach (var masterLinen in masterLinens)
-            {
-                masterLinen.AcceptChanges();
-
-                _laundryService.AddOrUpdateAsync(masterLinen.OriginalObject);
-            }
-
-            _dialogService.ShowInfoDialog("All changes saved");
         }
 
         private void DeleteMasterLinen()
@@ -101,20 +90,34 @@ namespace Client.Desktop.ViewModels.Content
             if (!_dialogService.ShowQuestionDialog($"Do you want to DELETE {masterLinen.Name} ?"))
                 return;
             
-            _laundryService.DeleteAsync(masterLinen.OriginalObject);
+            _laundryService.DeleteAsync(masterLinen);
 
             MasterLinens.Remove(masterLinen);
             SelectedMasterLinen = MasterLinens?.FirstOrDefault();
         }
 
+        private void Edit()
+        {
+            MasterLinenWindow(new MasterLinenEntityViewModel(SelectedMasterLinen));
+        }
+
         private void AddMasterLinen()
         {
-            var masterLinen = new MasterLinenEntityViewModel()
-            {
-                PackingValue = 1,
-            };
+            MasterLinenWindow(null);
+        }
 
-            MasterLinens.Add(masterLinen);
+        private async void MasterLinenWindow(MasterLinenEntityViewModel masterLinen)
+        {
+            var masterLinenWindow = _resolverService.Resolve<MasterLinenWindowModel>();
+
+            masterLinenWindow.SetSelectedLinen(masterLinen);
+
+            if (_dialogService.ShowDialog(masterLinenWindow))
+            {
+                MasterLinens.Clear();
+
+                await GetData();
+            }
         }
     }
 }

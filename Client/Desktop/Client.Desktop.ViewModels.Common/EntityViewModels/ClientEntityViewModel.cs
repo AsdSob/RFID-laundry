@@ -129,36 +129,36 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
 
         private string Validate(string columnName)
         {
-            string error;
+            //string error;
 
-            if (columnName == nameof(Name))
-            {
-                if (!Name.ValidateRequired(out error) ||
-                    !Name.ValidateBySpaces(out error))
-                {
-                    return Error = error;
-                }
+            //if (columnName == nameof(Name))
+            //{
+            //    if (!Name.ValidateRequired(out error) ||
+            //        !Name.ValidateBySpaces(out error))
+            //    {
+            //        return Error = error;
+            //    }
 
-                if (NameUniqueValidationFunc != null && !NameUniqueValidationFunc(this, nameof(Name)))
-                {
-                    return Error = "Name is already exist";
-                }
-            }
+            //    if (NameUniqueValidationFunc != null && !NameUniqueValidationFunc(this, nameof(Name)))
+            //    {
+            //        return Error = "Name is already exist";
+            //    }
+            //}
 
-            if (columnName == nameof(ShortName))
-            {
-                if (!ShortName.ValidateRequired(out error) ||
-                    !ShortName.ValidateBySpaces(out error))
-                {
-                    return Error = error;
-                }
+            //if (columnName == nameof(ShortName))
+            //{
+            //    if (!ShortName.ValidateRequired(out error) ||
+            //        !ShortName.ValidateBySpaces(out error))
+            //    {
+            //        return Error = error;
+            //    }
 
-                if (NameUniqueValidationFunc != null && !NameUniqueValidationFunc(this, nameof(ShortName)))
-                {
-                    return Error = "Name is already exist";
-                }
-            }
-            Error = String.Empty;
+            //    if (NameUniqueValidationFunc != null && !NameUniqueValidationFunc(this, nameof(ShortName)))
+            //    {
+            //        return Error = "Name is already exist";
+            //    }
+            //}
+            //Error = String.Empty;
             return null;
         }
     }

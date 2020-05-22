@@ -37,6 +37,10 @@
         <windows1:StaffChangeWindow/>
     </DataTemplate>
 
+    <DataTemplate DataType="{x:Type windows:MasterLinenWindowModel}">
+        <windows1:MasterLinenWindow/>
+    </DataTemplate>
+
     <DataTemplate DataType="{x:Type administration:AuthManageViewModel}">
         <views1:AuthManageView/>
     </DataTemplate>

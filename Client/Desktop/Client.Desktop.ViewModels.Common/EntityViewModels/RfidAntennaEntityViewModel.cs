@@ -99,23 +99,23 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
 
         private string Validate(string columnName)
         {
-            string error;
+            //string error;
 
-            if (columnName == nameof(RxSensitivity))
-            {
-                if (!RxSensitivity.ValidateRequired(out error))
-                {
-                    return error;
-                }
-            }
+            //if (columnName == nameof(RxSensitivity))
+            //{
+            //    if (!RxSensitivity.ValidateRequired(out error))
+            //    {
+            //        return error;
+            //    }
+            //}
 
-            if (columnName == nameof(TxPower))
-            {
-                if (!TxPower.ValidateRequired(out error) )
-                {
-                    return error;
-                }
-            }
+            //if (columnName == nameof(TxPower))
+            //{
+            //    if (!TxPower.ValidateRequired(out error) )
+            //    {
+            //        return error;
+            //    }
+            //}
             return null;
         }
     }
