@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Text.RegularExpressions;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Storage.Laundry.Models;
@@ -16,7 +17,19 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
         private bool _active;
         private string _address;
         private int _cityId;
+        private string _error;
+        private bool _isValid;
 
+        public bool IsValid
+        {
+            get => _isValid;
+            set => Set(ref _isValid, value);
+        }
+        public string Error
+        {
+            get => _error;
+            set => Set(ref _error, value);
+        }
         public int CityId
         {
             get => _cityId;
@@ -114,52 +127,71 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
 
 
 
+        public Func<ClientEntityViewModel, string, bool> NameUniqueValidationFunc { get; set; }
+
+        public string this[string columnName] => Validate(columnName);
+
+
+        private string Validate(string columnName)
+        {
+            var error = String.Empty;
+
+            if (columnName == nameof(Name))
+            {
+                Name.ValidateRequired(ref error);
+                Name.ValidateByNameMaxLength(ref error);
+            }else 
+            
+            if (columnName == nameof(ShortName))
+            {
+                ShortName.ValidateRequired(ref error);
+                ShortName.ValidateByNameMaxLength(ref error);
+            }
+
+            FullValidate(columnName);
+
+            return error;
+        }
+
+        private void FullValidate(string columnName)
+        {
+            var error = String.Empty;
+            
+            Name.ValidateRequired(ref error);
+            Name.ValidateByNameMaxLength(ref error);
+
+            ShortName.ValidateRequired(ref error);
+            ShortName.ValidateByNameMaxLength(ref error);
+
+            Error = error;
+        }
+
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            if (e.PropertyName == nameof(Error))
+            {
+                IsValid = String.IsNullOrWhiteSpace(Error);
+            }else
+
             if (e.PropertyName == nameof(Name))
             {
-                ShortName = Name;
+                if (!String.IsNullOrEmpty(Name))
+                {
+                    var regex = new Regex(@"\s+");
+                    Name = regex.Replace(Name, " ");
+                }
+            }else
+
+            if (e.PropertyName == nameof(ShortName))
+            {
+                if (!String.IsNullOrEmpty(ShortName))
+                {
+                    var regex = new Regex(@"\s+");
+                    ShortName = regex.Replace(ShortName, " ");
+                }
             }
 
         }
 
-        public string Error { get; set; }
-        public string this[string columnName] => Validate(columnName);
-        public Func<ClientEntityViewModel, string, bool> NameUniqueValidationFunc { get; set; }
-
-        private string Validate(string columnName)
-        {
-            //string error;
-
-            //if (columnName == nameof(Name))
-            //{
-            //    if (!Name.ValidateRequired(out error) ||
-            //        !Name.ValidateBySpaces(out error))
-            //    {
-            //        return Error = error;
-            //    }
-
-            //    if (NameUniqueValidationFunc != null && !NameUniqueValidationFunc(this, nameof(Name)))
-            //    {
-            //        return Error = "Name is already exist";
-            //    }
-            //}
-
-            //if (columnName == nameof(ShortName))
-            //{
-            //    if (!ShortName.ValidateRequired(out error) ||
-            //        !ShortName.ValidateBySpaces(out error))
-            //    {
-            //        return Error = error;
-            //    }
-
-            //    if (NameUniqueValidationFunc != null && !NameUniqueValidationFunc(this, nameof(ShortName)))
-            //    {
-            //        return Error = "Name is already exist";
-            //    }
-            //}
-            //Error = String.Empty;
-            return null;
-        }
     }
 }

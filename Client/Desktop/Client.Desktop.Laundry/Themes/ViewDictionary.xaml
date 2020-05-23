@@ -29,18 +29,6 @@
         <contentView:MasterLinenView/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type windows:RfidReaderWindowModel}">
-        <windows1:RfidReaderWindow/>
-    </DataTemplate>
-
-    <DataTemplate DataType="{x:Type windows:StaffChangeWindowModel}">
-        <windows1:StaffChangeWindow/>
-    </DataTemplate>
-
-    <DataTemplate DataType="{x:Type windows:MasterLinenWindowModel}">
-        <windows1:MasterLinenWindow/>
-    </DataTemplate>
-
     <DataTemplate DataType="{x:Type administration:AuthManageViewModel}">
         <views1:AuthManageView/>
     </DataTemplate>
@@ -51,6 +39,23 @@
 
     <DataTemplate DataType="{x:Type content:BinSoilCollectionViewModel}">
         <contentView:BinSoilCollectionView/>
+    </DataTemplate>
+
+
+    <DataTemplate DataType="{x:Type windows:RfidReaderWindowModel}">
+        <windows1:RfidReaderWindow/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type windows:StaffChangeWindowModel}">
+        <windows1:StaffChangeWindow/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type windows:MasterLinenWindowModel}">
+        <windows1:MasterLinenWindow/>
+    </DataTemplate>    
+    
+    <DataTemplate DataType="{x:Type windows:MasterClientWindowModel}">
+        <windows1:MasterClientWindow/>
     </DataTemplate>
 
 </ResourceDictionary>

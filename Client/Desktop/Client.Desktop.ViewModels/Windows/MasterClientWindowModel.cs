@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
@@ -10,34 +12,43 @@ using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Windows
 {
-    public class MasterLinenWindowModel : ViewModelBase, IWindowDialogViewModel
+    public class MasterClientWindowModel : ViewModelBase, IWindowDialogViewModel
     {
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
         private readonly IMainDispatcher _dispatcher;
-        private ObservableCollection<MasterLinenEntity> _masterLinens;
-        private MasterLinenEntityViewModel _selectedMasterLinen;
+        private ObservableCollection<ClientEntity> _clients;
+        private ClientEntityViewModel _selectedClient;
+        private List<UnitViewModel> _cities;
 
-        public Action<bool> CloseAction { get; set; }
-
-        public MasterLinenEntityViewModel SelectedMasterLinen
+        public List<UnitViewModel> Cities
         {
-            get => _selectedMasterLinen;
-            set => Set(ref _selectedMasterLinen, value);
+            get => _cities;
+            set => Set(ref _cities, value);
+        }
+        public ClientEntityViewModel SelectedClient
+        {
+            get => _selectedClient;
+            set => Set(ref _selectedClient, value);
+        }
+        public ObservableCollection<ClientEntity> Clients
+        {
+            get => _clients;
+            set => Set(ref _clients, value);
         }
 
-        public ObservableCollection<MasterLinenEntity> MasterLinens
-        {
-            get => _masterLinens;
-            set => Set(ref _masterLinens, value);
-        }
+        public ObservableCollection<ClientEntity> SortedParentClients =>
+            Clients?.Where(x => (x.ParentId == 0 || x.ParentId == null) && x.Id != SelectedClient?.Id).ToObservableCollection();
+
 
         public RelayCommand SaveCommand { get; }
         public RelayCommand CloseCommand { get; }
+        public RelayCommand ClearParentIdCommand { get; }
         public RelayCommand InitializeCommand { get; }
 
+        public Action<bool> CloseAction { get; set; }
 
-        public MasterLinenWindowModel(ILaundryService laundryService, IDialogService dialogService, IMainDispatcher dispatcher)
+        public MasterClientWindowModel(ILaundryService laundryService, IDialogService dialogService, IMainDispatcher dispatcher)
         {
             _laundryService = laundryService ?? throw new ArgumentNullException(nameof(laundryService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
@@ -45,23 +56,26 @@ namespace Client.Desktop.ViewModels.Windows
 
             SaveCommand = new RelayCommand(Save);
             CloseCommand = new RelayCommand(Close);
+            ClearParentIdCommand = new RelayCommand(ClearParentId);
             InitializeCommand = new RelayCommand(Initialize);
 
+            Cities = EnumExtensions.GetValues<CitiesEnum>();
         }
 
-        public void SetSelectedLinen(MasterLinenEntityViewModel linen)
+        public void SetSelectedClient(ClientEntityViewModel client)
         {
-            SelectedMasterLinen = null;
+            SelectedClient = null;
 
-            if (linen != null)
+            if (client != null)
             {
-                SelectedMasterLinen = linen;
+                SelectedClient = client;
                 return;
             }
 
-            SelectedMasterLinen = new MasterLinenEntityViewModel(new MasterLinenEntity()
+            SelectedClient = new ClientEntityViewModel(new ClientEntity()
             {
-                PackingValue = 1
+                Active = true,
+                CityId = (int)CitiesEnum.AbuDhabi,
             });
         }
 
@@ -71,8 +85,8 @@ namespace Client.Desktop.ViewModels.Windows
 
             try
             {
-                var linens = await _laundryService.GetAllAsync<MasterLinenEntity>();
-                MasterLinens = linens.ToObservableCollection();
+                var clients = await _laundryService.GetAllAsync<ClientEntity>();
+                Clients = clients.ToObservableCollection();
 
             }
             catch (Exception e)
@@ -85,11 +99,12 @@ namespace Client.Desktop.ViewModels.Windows
             }
 
             PropertyChanged += OnPropertyChanged;
+            RaisePropertyChanged((() => SortedParentClients));
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(SelectedMasterLinen))
+            if (e.PropertyName == nameof(SelectedClient))
             {
                 SaveCommand.RaiseCanExecuteChanged();
             }
@@ -97,19 +112,29 @@ namespace Client.Desktop.ViewModels.Windows
 
         private void Save()
         {
-            if (!SelectedMasterLinen.HasChanges() || !SelectedMasterLinen.IsValid)
+            if (!SelectedClient.HasChanges() || !SelectedClient.IsValid)
             {
                 return;
             }
-            
-            SelectedMasterLinen.AcceptChanges();
 
-            _laundryService.AddOrUpdateAsync(SelectedMasterLinen.OriginalObject);
+            SelectedClient.AcceptChanges();
+
+            _laundryService.AddOrUpdateAsync(SelectedClient.OriginalObject);
 
             if (_dialogService.ShowQuestionDialog("Saved! \n Do you want to close window ? "))
             {
                 CloseAction?.Invoke(true);
             }
+        }
+
+        private void ClearParentId()
+        {
+            SelectedClient.ParentId = null;
+        }
+
+        private bool CanExecuteParentIdClearCommand()
+        {
+            return SelectedClient.ParentId.HasValue;
         }
 
         private void Close()
@@ -119,5 +144,7 @@ namespace Client.Desktop.ViewModels.Windows
                 CloseAction?.Invoke(false);
             }
         }
+
+
     }
 }

@@ -9,6 +9,7 @@ using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
+using Client.Desktop.ViewModels.Windows;
 using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Content
@@ -21,8 +22,8 @@ namespace Client.Desktop.ViewModels.Content
 
         #region Parameters
 
-        private ObservableCollection<ClientEntityViewModel> _clients;
-        private ClientEntityViewModel _selectedClient;
+        private ObservableCollection<ClientEntity> _clients;
+        private ClientEntity _selectedClient;
         private ObservableCollection<DepartmentEntityViewModel> _departments;
         private List<UnitViewModel> _cities;
         private DepartmentEntityViewModel _selectedDepartment;
@@ -48,12 +49,12 @@ namespace Client.Desktop.ViewModels.Content
             get => _departments;
             set => Set(() => Departments, ref _departments, value);
         }
-        public ClientEntityViewModel SelectedClient
+        public ClientEntity SelectedClient
         {
             get => _selectedClient;
             set => Set(() => SelectedClient, ref _selectedClient, value);
         }
-        public ObservableCollection<ClientEntityViewModel> Clients
+        public ObservableCollection<ClientEntity> Clients
         {
             get => _clients;
             set => Set(() => Clients, ref _clients, value);
@@ -61,12 +62,10 @@ namespace Client.Desktop.ViewModels.Content
 
         public ObservableCollection<DepartmentEntityViewModel> SortedDepartments => SortDepartments();
 
-        public ObservableCollection<ClientEntityViewModel> SortedParentClients =>
-           Clients?.Where(x=> (x.ParentId == 0 || x.ParentId == null) && x.Id != SelectedClient?.Id).ToObservableCollection();
-
         #endregion
 
         public RelayCommand AddClientCommand { get; }
+        public RelayCommand EditClientCommand { get; }
         public RelayCommand DeleteClientCommand { get; }
         public RelayCommand SaveCommand { get; }
 
@@ -81,12 +80,12 @@ namespace Client.Desktop.ViewModels.Content
             _resolverService = resolver ?? throw new ArgumentNullException(nameof(resolver));
 
             AddClientCommand = new RelayCommand(AddNewClient);
+            EditClientCommand = new RelayCommand(EditClient, (() => SelectedClient != null));
             DeleteClientCommand = new RelayCommand(DeleteClient, () => SelectedClient !=null);
             SaveCommand = new RelayCommand(Save);
 
             AddDepartmentCommand = new RelayCommand(AddNewDepartment, () => SelectedClient != null);
             DeleteDepartmentCommand = new RelayCommand(DeleteDepartment, (() => SelectedDepartment != null));
-
 
             GetData();
             PropertyChanged += OnPropertyChanged;
@@ -96,8 +95,7 @@ namespace Client.Desktop.ViewModels.Content
         private async Task GetData()
         {
             var client = await _laundryService.GetAllAsync<ClientEntity>();
-            var clients = client.Select(x => new ClientEntityViewModel(x));
-            Clients = clients.ToObservableCollection();
+            Clients = client.ToObservableCollection();
 
             var department = await _laundryService.GetAllAsync<DepartmentEntity>();
             var departments = department.Select(x => new DepartmentEntityViewModel(x));
@@ -115,8 +113,8 @@ namespace Client.Desktop.ViewModels.Content
 
                 AddDepartmentCommand.RaiseCanExecuteChanged();
                 DeleteClientCommand.RaiseCanExecuteChanged();
+                EditClientCommand.RaiseCanExecuteChanged();
                 RaisePropertyChanged((() =>  SortedDepartments));
-                RaisePropertyChanged((() =>  SortedParentClients));
             }
 
             if (e.PropertyName == nameof(SelectedDepartment))
@@ -133,7 +131,7 @@ namespace Client.Desktop.ViewModels.Content
 
             if (SelectedClient.IsNew)
             {
-                departments.AddRange(Departments.Where(x=> x.OriginalObject.ClientEntity == SelectedClient.OriginalObject));
+                //departments.AddRange(Departments.Where(x=> x.OriginalObject.ClientEntity == SelectedClient.OriginalObject));
             }
             else
             {
@@ -143,19 +141,28 @@ namespace Client.Desktop.ViewModels.Content
             return departments;
         }
 
+        private void EditClient()
+        {
+            ClientWindow(new ClientEntityViewModel(SelectedClient));
+        }
+
         private void AddNewClient()
         {
-            if(!_dialogService.ShowQuestionDialog("Do you want add new client?")) 
-                return;
+           ClientWindow(null);
+        }
 
-            var newClient = new ClientEntityViewModel()
+        private async void ClientWindow(ClientEntityViewModel client)
+        {
+            var clientWindow = _resolverService.Resolve<MasterClientWindowModel>();
+
+            clientWindow.SetSelectedClient(client);
+
+            if (_dialogService.ShowDialog(clientWindow))
             {
-                Active = true,
-                CityId = (int) CitiesEnum.AbuDhabi,
-            };
+                Clients.Clear();
 
-            Clients.Add(newClient);
-            SelectedClient = newClient;
+                await GetData();
+            }
         }
 
         private void DeleteClient()
@@ -167,7 +174,7 @@ namespace Client.Desktop.ViewModels.Content
             var client = SelectedClient;
             SelectedClient = null;
 
-            _laundryService.DeleteAsync(client.OriginalObject);
+            _laundryService.DeleteAsync(client);
 
             Clients.Remove(client);
         }
@@ -182,7 +189,7 @@ namespace Client.Desktop.ViewModels.Content
 
             if (SelectedClient.IsNew)
             {
-                newDepartment.OriginalObject.ClientEntity = SelectedClient.OriginalObject;
+                //newDepartment.OriginalObject.ClientEntity = SelectedClient.OriginalObject;
             }
             else
             {
@@ -212,16 +219,9 @@ namespace Client.Desktop.ViewModels.Content
         {
             ArrayList entities = new ArrayList();
 
-            var clients = Clients.Where(x => x.HasChanges() && String.IsNullOrWhiteSpace(x.Error)).ToList();
             var departments = Departments.Where(x => x.HasChanges()).ToList();
 
-            clients?.ForEach(x=> x.AcceptChanges());
             departments?.ForEach(x => x.AcceptChanges());
-
-            foreach (var client in clients)
-            {
-                _laundryService.AddOrUpdateAsync(client.OriginalObject);
-            }
 
             foreach (var department in departments)
             {

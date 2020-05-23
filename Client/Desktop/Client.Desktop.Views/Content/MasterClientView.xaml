@@ -40,6 +40,7 @@
 
                 <StackPanel Grid.Row="0" Orientation="Horizontal" >
                     <Button Margin = "5" Padding="10,2"  Content="New" Command="{Binding AddClientCommand}"/>
+                    <Button Margin = "5" Padding="10,2"  Content="Edit" Command="{Binding EditClientCommand}"/>
                     <Button Margin = "5" Padding="10,2"  Content="Delete" Command="{Binding DeleteClientCommand}"/>
                     <Button Margin = "5" Padding="10,2"  Content="Save" Command="{Binding SaveCommand}"/>
                 </StackPanel>

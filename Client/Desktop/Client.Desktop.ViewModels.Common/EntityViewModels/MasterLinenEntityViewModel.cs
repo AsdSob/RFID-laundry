@@ -95,15 +95,30 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
                 Name.ValidateRequired(ref error);
                 Name.ValidateByNameMaxLength(ref error);
             }
-            
-            else if (columnName == nameof(PackingValue))
+            else
+
+            if (columnName == nameof(PackingValue))
             {
                 PackingValue.ValidateRequired(ref error);
                 PackingValue.ValidateMinAmount(ref error);
             }
 
+            FullValidate(columnName);
+
+            return error;
+        }
+
+        private void FullValidate(string columnName)
+        {
+            var error = String.Empty;
+
+            Name.ValidateRequired(ref error);
+            Name.ValidateByNameMaxLength(ref error);
+
+            PackingValue.ValidateRequired(ref error);
+            PackingValue.ValidateMinAmount(ref error);
+
             Error = error;
-            return Error;
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -122,10 +137,10 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
                 }
             }
 
-            if (e.PropertyName == nameof(PackingValue))
-            {
-                PackingValue = Convert.ToInt32(Regex.Replace(PackingValue.ToString(), "[^0-9]", ""));
-            }
+            //if (e.PropertyName == nameof(PackingValue))
+            //{
+            //    PackingValue = Convert.ToInt32(Regex.Replace(PackingValue.ToString(), "[^0-9]", ""));
+            //}
         }
     }
 }

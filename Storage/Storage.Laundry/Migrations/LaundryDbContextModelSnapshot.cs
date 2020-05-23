@@ -112,7 +112,7 @@ namespace Storage.Laundry.Migrations
 
                     b.Property<int?>("ParentId")
                         .HasColumnName("parentId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer").IsRequired(false);
 
                     b.Property<string>("ShortName")
                         .HasColumnName("shortName")

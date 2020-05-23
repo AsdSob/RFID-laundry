@@ -16,13 +16,13 @@ namespace Storage.Laundry
         {
         }
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    if (!optionsBuilder.IsConfigured)
-        //    {
-        //        optionsBuilder.UseNpgsql("Host=127.0.0.1;Port=5432;Database=laundry_test;User Id=postgres;Password=2235542;Timeout=100;Command Timeout=300;");
-        //    }
-        //}
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseNpgsql("Host=127.0.0.1;Port=5432;Database=laundry_;User Id=postgres;Password=2235542;Timeout=100;Command Timeout=300;");
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
