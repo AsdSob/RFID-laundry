@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Text.RegularExpressions;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Storage.Laundry.Models;
@@ -13,7 +14,19 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
         private int _id;
         private int _clientId;
         private int _departmentTypeId;
+        private bool _isValid;
+        private string _error;
 
+        public string Error
+        {
+            get => _error;
+            set => Set(ref _error, value);
+        }
+        public bool IsValid
+        {
+            get => _isValid;
+            set => Set(ref _isValid, value);
+        }
         public int DepartmentTypeId
         {
             get => _departmentTypeId;
@@ -79,37 +92,46 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
                                     !Equals(DepartmentTypeId, OriginalObject.DepartmentTypeId) ||
                                     !Equals(ClientId, OriginalObject.ClientId);
 
+        public Func<ClientEntityViewModel, string, bool> NameUniqueValidationFunc { get; set; }
 
-        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-
-        }
-
-        public string Error { get; set; }
         public string this[string columnName] => Validate(columnName);
 
         private string Validate(string columnName)
         {
-            //string error;
+            var error = String.Empty;
 
-            //if (columnName == nameof(Name))
-            //{
-            //    if (!Name.ValidateRequired(out error) ||
-            //        !Name.ValidateBySpaces(out error))
-            //    {
-            //        return error;
-            //    }
+            if (columnName == nameof(Name))
+            {
+                Name.ValidateRequired(ref error);
+                Name.ValidateByNameMaxLength(ref error);
+            }
 
-            //}
+            FullValidate(columnName);
 
-            //if (columnName == nameof(DepartmentTypeId))
-            //{
-            //    if (!DepartmentTypeId.ValidateRequired(out error))
-            //    {
-            //        return error;
-            //    }
-            //}
-            return null;
+            return error;
+        }
+
+        private void FullValidate(string columnName)
+        {
+            var error = String.Empty;
+
+            Name.ValidateRequired(ref error);
+            Name.ValidateByNameMaxLength(ref error);
+
+            Error = error;
+            IsValid = String.IsNullOrWhiteSpace(Error);
+        }
+
+        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Name))
+            {
+                if (!String.IsNullOrEmpty(Name))
+                {
+                    var regex = new Regex(@"\s+");
+                    Name = regex.Replace(Name, " ");
+                }
+            }
         }
     }
 }

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
@@ -12,53 +12,50 @@ using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Windows
 {
-    public class MasterClientWindowModel : ViewModelBase, IWindowDialogViewModel
+    public class MasterDepartmentWindowModel : ViewModelBase, IWindowDialogViewModel
     {
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
         private readonly IMainDispatcher _dispatcher;
-        private ObservableCollection<ClientEntity> _clients;
-        private ClientEntityViewModel _selectedClient;
-        private List<UnitViewModel> _cities;
         private bool _hasChanges;
+        private List<DepartmentEntity> _departments;
+        private List<UnitViewModel> _departmentTypes;
+        private DepartmentEntityViewModel _selectedDepartment;
+        private ClientEntity _selectedClient;
 
+        public ClientEntity SelectedClient
+        {
+            get => _selectedClient;
+            set => Set(ref _selectedClient, value);
+        }
+        public DepartmentEntityViewModel SelectedDepartment
+        {
+            get => _selectedDepartment;
+            set => Set(ref _selectedDepartment, value);
+        }
+        public List<UnitViewModel> DepartmentTypes
+        {
+            get => _departmentTypes;
+            set => Set(ref _departmentTypes, value);
+        }
         public bool HasChanges
         {
             get => _hasChanges;
             set => Set(ref _hasChanges, value);
         }
-        public List<UnitViewModel> Cities
-        {
-            get => _cities;
-            set => Set(ref _cities, value);
-        }
-        public ClientEntityViewModel SelectedClient
-        {
-            get => _selectedClient;
-            set => Set(ref _selectedClient, value);
-        }
-        public ObservableCollection<ClientEntity> Clients
-        {
-            get => _clients;
-            set => Set(ref _clients, value);
-        }
 
-        public List<ClientEntity> SortedParentClients => SortParentClients();
-
-        private List<ClientEntity> SortParentClients()
+        public List<DepartmentEntity> Departments
         {
-            return Clients?.Where(x => (x.ParentId == 0 || x.ParentId == null) && x.Id != SelectedClient?.Id).ToList();
+            get => _departments;
+            set => Set(ref _departments, value);
         }
-
-        public RelayCommand SaveCommand { get; }
-        public RelayCommand CloseCommand { get; }
-        public RelayCommand ClearParentIdCommand { get; }
-        public RelayCommand InitializeCommand { get; }
 
         public Action<bool> CloseAction { get; set; }
+        public RelayCommand SaveCommand { get; }
+        public RelayCommand CloseCommand { get; }
+        public RelayCommand InitializeCommand { get; }
 
-
-        public MasterClientWindowModel(ILaundryService laundryService, IDialogService dialogService, IMainDispatcher dispatcher)
+        public MasterDepartmentWindowModel(ILaundryService laundryService, IDialogService dialogService, IMainDispatcher dispatcher)
         {
             _laundryService = laundryService ?? throw new ArgumentNullException(nameof(laundryService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
@@ -66,26 +63,26 @@ namespace Client.Desktop.ViewModels.Windows
 
             SaveCommand = new RelayCommand(Save);
             CloseCommand = new RelayCommand(Close);
-            ClearParentIdCommand = new RelayCommand(ClearParentId);
             InitializeCommand = new RelayCommand(Initialize);
 
-            Cities = EnumExtensions.GetValues<CitiesEnum>();
+            DepartmentTypes = EnumExtensions.GetValues<DepartmentTypeEnum>();
         }
 
-        public void SetSelectedClient(ClientEntity client)
+        public void SetSelectedDepartment(DepartmentEntity department, ClientEntity selectedClient)
         {
-            SelectedClient = null;
+            SelectedDepartment = null;
+            SelectedClient = selectedClient;
 
-            if (client != null)
+            if (department != null)
             {
-                SelectedClient = new ClientEntityViewModel(client);
+                SelectedDepartment = new DepartmentEntityViewModel(department);
                 return;
             }
 
-            SelectedClient = new ClientEntityViewModel(new ClientEntity()
+            SelectedDepartment = new DepartmentEntityViewModel(new DepartmentEntity()
             {
-                Active = true,
-                CityId = (int)CitiesEnum.AbuDhabi,
+                ClientId = selectedClient.Id,
+                DepartmentTypeId = 1,
             });
         }
 
@@ -95,8 +92,9 @@ namespace Client.Desktop.ViewModels.Windows
 
             try
             {
-                var clients = await _laundryService.GetAllAsync<ClientEntity>();
-                Clients = clients.ToObservableCollection();
+                var department = await _laundryService.GetAllAsync<DepartmentEntity>();
+                var departments = department.Where(x => x.ClientId == SelectedClient.Id);
+                Departments = departments.ToList();
 
             }
             catch (Exception e)
@@ -110,12 +108,11 @@ namespace Client.Desktop.ViewModels.Windows
 
             HasChanges = false;
             PropertyChanged += OnPropertyChanged;
-            RaisePropertyChanged((() => SortedParentClients));
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(SelectedClient))
+            if (e.PropertyName == nameof(SelectedDepartment))
             {
                 SaveCommand.RaiseCanExecuteChanged();
             }
@@ -123,35 +120,24 @@ namespace Client.Desktop.ViewModels.Windows
 
         private void Save()
         {
-            if (!SelectedClient.IsValid)
+            if (!SelectedDepartment.IsValid)
             {
                 return;
             }
 
-            if (!SelectedClient.HasChanges())
+            if (!SelectedDepartment.HasChanges())
             {
                 return;
             }
 
-            SelectedClient.AcceptChanges();
-
-            _laundryService.AddOrUpdateAsync(SelectedClient.OriginalObject);
+            SelectedDepartment.AcceptChanges();
+            _laundryService.AddOrUpdateAsync(SelectedDepartment.OriginalObject);
             HasChanges = true;
 
             if (_dialogService.ShowQuestionDialog("Saved! \n Do you want to close window ? "))
             {
                 CloseWindow();
             }
-        }
-
-        private void ClearParentId()
-        {
-            SelectedClient.ParentId = null;
-        }
-
-        private bool CanExecuteParentIdClearCommand()
-        {
-            return true;
         }
 
         private void Close()

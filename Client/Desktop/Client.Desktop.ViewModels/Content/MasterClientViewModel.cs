@@ -24,9 +24,9 @@ namespace Client.Desktop.ViewModels.Content
 
         private ObservableCollection<ClientEntity> _clients;
         private ClientEntity _selectedClient;
-        private ObservableCollection<DepartmentEntityViewModel> _departments;
+        private ObservableCollection<DepartmentEntity> _departments;
         private List<UnitViewModel> _cities;
-        private DepartmentEntityViewModel _selectedDepartment;
+        private DepartmentEntity _selectedDepartment;
         private List<UnitViewModel> _departmentTypes;
 
         public List<UnitViewModel> DepartmentTypes
@@ -34,7 +34,7 @@ namespace Client.Desktop.ViewModels.Content
             get => _departmentTypes;
             set => Set(() => DepartmentTypes, ref _departmentTypes, value);
         }
-        public DepartmentEntityViewModel SelectedDepartment
+        public DepartmentEntity SelectedDepartment
         {
             get => _selectedDepartment;
             set => Set(() => SelectedDepartment, ref _selectedDepartment, value);
@@ -44,7 +44,7 @@ namespace Client.Desktop.ViewModels.Content
             get => _cities;
             set => Set(() => Cities, ref _cities, value);
         }
-        public ObservableCollection<DepartmentEntityViewModel> Departments
+        public ObservableCollection<DepartmentEntity> Departments
         {
             get => _departments;
             set => Set(() => Departments, ref _departments, value);
@@ -60,14 +60,14 @@ namespace Client.Desktop.ViewModels.Content
             set => Set(() => Clients, ref _clients, value);
         }
 
-        public ObservableCollection<DepartmentEntityViewModel> SortedDepartments => SortDepartments();
+        public ObservableCollection<DepartmentEntity> SortedDepartments => SortDepartments();
 
         #endregion
 
         public RelayCommand AddClientCommand { get; }
         public RelayCommand EditClientCommand { get; }
         public RelayCommand DeleteClientCommand { get; }
-        public RelayCommand SaveCommand { get; }
+        public RelayCommand EditDepartmentCommand { get; }
 
         public RelayCommand AddDepartmentCommand { get; }
         public RelayCommand DeleteDepartmentCommand { get; }
@@ -82,29 +82,17 @@ namespace Client.Desktop.ViewModels.Content
             AddClientCommand = new RelayCommand(AddNewClient);
             EditClientCommand = new RelayCommand(EditClient, (() => SelectedClient != null));
             DeleteClientCommand = new RelayCommand(DeleteClient, () => SelectedClient !=null);
-            SaveCommand = new RelayCommand(Save);
 
             AddDepartmentCommand = new RelayCommand(AddNewDepartment, () => SelectedClient != null);
+            EditDepartmentCommand = new RelayCommand(EditDepartment, () => SelectedDepartment != null);
             DeleteDepartmentCommand = new RelayCommand(DeleteDepartment, (() => SelectedDepartment != null));
-
-            GetData();
-            PropertyChanged += OnPropertyChanged;
-
-        }
-
-        private async Task GetData()
-        {
-            var client = await _laundryService.GetAllAsync<ClientEntity>();
-            Clients = client.ToObservableCollection();
-
-            var department = await _laundryService.GetAllAsync<DepartmentEntity>();
-            var departments = department.Select(x => new DepartmentEntityViewModel(x));
-            Departments = departments.ToObservableCollection();
 
             Cities = EnumExtensions.GetValues<CitiesEnum>();
             DepartmentTypes = EnumExtensions.GetValues<DepartmentTypeEnum>();
-        }
 
+            GetData();
+            PropertyChanged += OnPropertyChanged;
+        }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -114,36 +102,43 @@ namespace Client.Desktop.ViewModels.Content
                 AddDepartmentCommand.RaiseCanExecuteChanged();
                 DeleteClientCommand.RaiseCanExecuteChanged();
                 EditClientCommand.RaiseCanExecuteChanged();
-                RaisePropertyChanged((() =>  SortedDepartments));
+                RaisePropertyChanged((() => SortedDepartments));
             }
 
             if (e.PropertyName == nameof(SelectedDepartment))
             {
                 DeleteDepartmentCommand.RaiseCanExecuteChanged();
+                EditDepartmentCommand.RaiseCanExecuteChanged();
             }
 
         }
 
-        private ObservableCollection<DepartmentEntityViewModel> SortDepartments()
+        private async void GetData()
         {
-            var departments = new ObservableCollection<DepartmentEntityViewModel>();
-            if (SelectedClient == null) return departments;
+            await GetClients();
+            await GetDepartments();
+        }
 
-            if (SelectedClient.IsNew)
-            {
-                //departments.AddRange(Departments.Where(x=> x.OriginalObject.ClientEntity == SelectedClient.OriginalObject));
-            }
-            else
-            {
-                departments.AddRange(Departments.Where(x=> x.ClientId == SelectedClient.Id));
-            }
+        private async Task GetClients()
+        {
+            var client = await _laundryService.GetAllAsync<ClientEntity>();
+            Clients = client.ToObservableCollection();
+        }
 
-            return departments;
+        private async Task GetDepartments()
+        {
+            var departments = await _laundryService.GetAllAsync<DepartmentEntity>();
+            Departments = departments.ToObservableCollection();
+        }
+
+        private ObservableCollection<DepartmentEntity> SortDepartments()
+        {
+            return Departments?.Where(x => x.ClientId == SelectedClient?.Id).ToObservableCollection();
         }
 
         private void EditClient()
         {
-            ClientWindow(new ClientEntityViewModel(SelectedClient));
+            ClientWindow(SelectedClient);
         }
 
         private void AddNewClient()
@@ -151,17 +146,18 @@ namespace Client.Desktop.ViewModels.Content
            ClientWindow(null);
         }
 
-        private async void ClientWindow(ClientEntityViewModel client)
+        private async void ClientWindow(ClientEntity client)
         {
             var clientWindow = _resolverService.Resolve<MasterClientWindowModel>();
 
             clientWindow.SetSelectedClient(client);
 
-            if (_dialogService.ShowDialog(clientWindow))
+            _dialogService.ShowDialog(clientWindow);
+
+            if (clientWindow.HasChanges)
             {
                 Clients.Clear();
-
-                await GetData();
+                await GetClients();
             }
         }
 
@@ -179,26 +175,30 @@ namespace Client.Desktop.ViewModels.Content
             Clients.Remove(client);
         }
 
+        private void EditDepartment()
+        {
+            DepartmentWindow(SelectedDepartment);
+        }
+
         private void AddNewDepartment()
         {
-            if(SelectedClient == null) return;
-            if (!_dialogService.ShowQuestionDialog("Do you want add new department?"))
-                return;
+            DepartmentWindow(null);
+        }
 
-            var newDepartment = new DepartmentEntityViewModel();
+        private async void DepartmentWindow(DepartmentEntity department)
+        {
+            var departmentWindow = _resolverService.Resolve<MasterDepartmentWindowModel>();
 
-            if (SelectedClient.IsNew)
+            departmentWindow.SetSelectedDepartment(department, SelectedClient);
+
+            _dialogService.ShowDialog(departmentWindow);
+
+            if (departmentWindow.HasChanges)
             {
-                //newDepartment.OriginalObject.ClientEntity = SelectedClient.OriginalObject;
+                Departments.Clear();
+                await GetDepartments();
+                RaisePropertyChanged((() => SortedDepartments));
             }
-            else
-            {
-                newDepartment.ClientId = SelectedClient.Id;
-            }
-
-            Departments.Add(newDepartment);
-            SelectedDepartment = newDepartment;
-            RaisePropertyChanged(() => SortedDepartments);
         }
 
         private void DeleteDepartment()
@@ -210,25 +210,9 @@ namespace Client.Desktop.ViewModels.Content
             var department = SelectedDepartment;
             SelectedDepartment = null;
 
-            _laundryService.DeleteAsync(department.OriginalObject);
+            _laundryService.DeleteAsync(department);
 
             Departments.Remove(department);
-        }
-
-        private void Save()
-        {
-            ArrayList entities = new ArrayList();
-
-            var departments = Departments.Where(x => x.HasChanges()).ToList();
-
-            departments?.ForEach(x => x.AcceptChanges());
-
-            foreach (var department in departments)
-            {
-                _laundryService.AddOrUpdateAsync(department.OriginalObject);
-            }
-
-            _dialogService.ShowInfoDialog("All changes saved");
         }
 
     }

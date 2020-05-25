@@ -18,7 +18,9 @@ namespace Storage.Laundry.Configurations
             builder.Property(x => x.ParentId).HasColumnName("parentId");
             builder.Property(x => x.ShortName).HasColumnName("shortName");
 
-            builder.HasOne(x => x.Parent).WithMany(x => x.ChildEntities).HasForeignKey(x=> x.ParentId).IsRequired(false);
+            //builder.HasOne(x => x.Parent)
+            //    .WithMany(x => x.ChildEntities)
+            //    .HasForeignKey(x => x.ParentId).IsRequired(false);
 
         }
     }

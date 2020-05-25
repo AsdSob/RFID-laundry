@@ -31,10 +31,10 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <StackPanel  Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="10,0">
-            <Button Margin = "5" Padding="10,2"  Content="New" Command="{Binding NewCommand}"/>
-            <Button Margin = "5" Padding="10,2"  Content="Edit" Command="{Binding EditCommand}"/>
-            <Button Margin = "5" Padding="10,2"  Content="Delete" Command="{Binding DeleteMasterLinenCommand}"/>
+        <StackPanel  Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="30,10">
+            <Button Margin = "5" Padding="20,5"  Content="New" Command="{Binding NewCommand}"/>
+            <Button Margin = "5" Padding="20,5"  Content="Edit" Command="{Binding EditCommand}"/>
+            <Button Margin = "5" Padding="20,5"  Content="Delete" Command="{Binding DeleteMasterLinenCommand}"/>
         </StackPanel>
 
         <DataGrid Height="Auto"

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 using Storage.Laundry.Models.Abstract;
 
@@ -14,8 +15,6 @@ namespace Storage.Laundry.Models
         public string Address { get; set; }
         public int CityId { get; set; }
 
-        public virtual ClientEntity Parent { get; set; }
-        public virtual ICollection<ClientEntity> ChildEntities { get; set; }
         public virtual ICollection<DepartmentEntity> DepartmentEntities { get; set; }
         public virtual ICollection<ClientLinenEntity> ClientLinenEntities { get; set; }
     }

@@ -33,7 +33,7 @@ namespace Storage.Laundry.Migrations
                     b.Property<DateTime>("CreatedDateUtc")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<int>("ReaderId")
+                    b.Property<int?>("ReaderId")
                         .HasColumnName("readerId")
                         .HasColumnType("integer");
 
@@ -112,15 +112,13 @@ namespace Storage.Laundry.Migrations
 
                     b.Property<int?>("ParentId")
                         .HasColumnName("parentId")
-                        .HasColumnType("integer").IsRequired(false);
+                        .HasColumnType("integer");
 
                     b.Property<string>("ShortName")
                         .HasColumnName("shortName")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ParentId");
 
                     b.ToTable("client");
                 });
@@ -395,16 +393,7 @@ namespace Storage.Laundry.Migrations
 
                     b.HasOne("Storage.Laundry.Models.RfidReaderEntity", "RfidReaderEntity")
                         .WithMany("AccountDetailsEntities")
-                        .HasForeignKey("ReaderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Storage.Laundry.Models.ClientEntity", b =>
-                {
-                    b.HasOne("Storage.Laundry.Models.ClientEntity", "Parent")
-                        .WithMany("ChildEntities")
-                        .HasForeignKey("ParentId");
+                        .HasForeignKey("ReaderId");
                 });
 
             modelBuilder.Entity("Storage.Laundry.Models.ClientLinenEntity", b =>

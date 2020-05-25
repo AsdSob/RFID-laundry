@@ -58,4 +58,8 @@
         <windows1:MasterClientWindow/>
     </DataTemplate>
 
+    <DataTemplate DataType="{x:Type windows:MasterDepartmentWindowModel}">
+        <windows1:MasterDepartmentWindow/>
+    </DataTemplate>
+
 </ResourceDictionary>

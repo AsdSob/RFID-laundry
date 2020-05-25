@@ -164,15 +164,11 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             ShortName.ValidateByNameMaxLength(ref error);
 
             Error = error;
+            IsValid = String.IsNullOrWhiteSpace(Error);
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(Error))
-            {
-                IsValid = String.IsNullOrWhiteSpace(Error);
-            }else
-
             if (e.PropertyName == nameof(Name))
             {
                 if (!String.IsNullOrEmpty(Name))

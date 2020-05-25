@@ -86,13 +86,15 @@
                       Margin="5" 
                       Padding="5">
                 <DockPanel>
-                    <Button Command="{Binding ClearParentIdCommand}" DockPanel.Dock="Right" Content="X" Padding="5"/>
+                    <Button Command="{Binding ClearParentIdCommand}" DockPanel.Dock="Right" Content="X" Padding="5,0" Margin="5,0"/>
+
                     <ComboBox ItemsSource="{Binding SortedParentClients}" 
-                              SelectedIndex="{Binding SelectedClient.ParentId}"
+                              SelectedValue="{Binding SelectedClient.ParentId}"
                               DockPanel.Dock="Left"
-                              DisplayMemberPath="Name"
+                              DisplayMemberPath="ShortName"
                               SelectedValuePath="Id"
-                              IsEditable="False"/>
+                              IsEditable="False">
+                    </ComboBox>
                 </DockPanel>
 
             </GroupBox>
@@ -103,7 +105,7 @@
                       Margin="5"
                       Padding="5">
                 <ComboBox ItemsSource="{Binding Cities}"
-                          SelectedIndex="{Binding SelectedClient.CityId}"
+                          SelectedValue="{Binding SelectedClient.CityId}"
                           DisplayMemberPath="Name"
                           SelectedValuePath="Id"
                           IsEditable="False">
