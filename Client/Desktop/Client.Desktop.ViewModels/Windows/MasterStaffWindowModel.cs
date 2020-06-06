@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
+using System.Text;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
@@ -12,53 +12,37 @@ using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Windows
 {
-    public class MasterClientWindowModel : ViewModelBase, IWindowDialogViewModel
+    public class MasterStaffWindowModel : ViewModelBase, IWindowDialogViewModel
     {
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
         private readonly IMainDispatcher _dispatcher;
-        private ObservableCollection<ClientEntity> _clients;
-        private ClientEntityViewModel _selectedClient;
-        private List<UnitViewModel> _cities;
         private bool _hasChanges;
+        private StaffEntityViewModel _selectedStaff;
+        private ObservableCollection<ClientStaffEntity> _staffs;
 
+        public ObservableCollection<ClientStaffEntity> Staffs
+        {
+            get => _staffs;
+            set => Set(ref _staffs, value);
+        }
+        public StaffEntityViewModel SelectedStaff
+        {
+            get => _selectedStaff;
+            set => Set(ref _selectedStaff, value);
+        }
         public bool HasChanges
         {
             get => _hasChanges;
             set => Set(ref _hasChanges, value);
         }
-        public List<UnitViewModel> Cities
-        {
-            get => _cities;
-            set => Set(ref _cities, value);
-        }
-        public ClientEntityViewModel SelectedClient
-        {
-            get => _selectedClient;
-            set => Set(ref _selectedClient, value);
-        }
-        public ObservableCollection<ClientEntity> Clients
-        {
-            get => _clients;
-            set => Set(ref _clients, value);
-        }
-
-        public List<ClientEntity> SortedParentClients => SortParentClients();
-
-        private List<ClientEntity> SortParentClients()
-        {
-            return Clients?.Where(x => (x.ParentId == 0 || x.ParentId == null) && x.Id != SelectedClient?.Id).ToList();
-        }
-
-        public RelayCommand SaveCommand { get; }
-        public RelayCommand CloseCommand { get; }
-        public RelayCommand ClearParentIdCommand { get; }
-        public RelayCommand InitializeCommand { get; }
 
         public Action<bool> CloseAction { get; set; }
+        public RelayCommand SaveCommand { get; }
+        public RelayCommand CloseCommand { get; }
+        public RelayCommand InitializeCommand { get; }
 
-
-        public MasterClientWindowModel(ILaundryService laundryService, IDialogService dialogService, IMainDispatcher dispatcher)
+        public MasterStaffWindowModel(ILaundryService laundryService, IDialogService dialogService, IMainDispatcher dispatcher)
         {
             _laundryService = laundryService ?? throw new ArgumentNullException(nameof(laundryService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
@@ -66,26 +50,23 @@ namespace Client.Desktop.ViewModels.Windows
 
             SaveCommand = new RelayCommand(Save);
             CloseCommand = new RelayCommand(Close);
-            ClearParentIdCommand = new RelayCommand(ClearParentId);
             InitializeCommand = new RelayCommand(Initialize);
 
-            Cities = EnumExtensions.GetValues<CitiesEnum>();
         }
 
-        public void SetSelectedClient(ClientEntity client)
+        public void SetSelectedStaff(ClientStaffEntity staff, DepartmentEntity department)
         {
-            SelectedClient = null;
+            SelectedStaff = null;
 
-            if (client != null)
+            if (staff != null)
             {
-                SelectedClient = new ClientEntityViewModel(client);
+                SelectedStaff = new StaffEntityViewModel(staff);
                 return;
             }
 
-            SelectedClient = new ClientEntityViewModel(new ClientEntity()
+            SelectedStaff = new StaffEntityViewModel(new ClientStaffEntity()
             {
-                Active = true,
-                CityId = (int)CitiesEnum.AbuDhabi,
+                DepartmentId = department.Id,
             });
         }
 
@@ -95,8 +76,8 @@ namespace Client.Desktop.ViewModels.Windows
 
             try
             {
-                var clients = await _laundryService.GetAllAsync<ClientEntity>();
-                Clients = clients.ToObservableCollection();
+                var staff = await _laundryService.GetAllAsync<ClientStaffEntity>();
+                Staffs = staff.ToObservableCollection();
 
             }
             catch (Exception e)
@@ -110,7 +91,6 @@ namespace Client.Desktop.ViewModels.Windows
 
             HasChanges = false;
             PropertyChanged += OnPropertyChanged;
-            RaisePropertyChanged((() => SortedParentClients));
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -120,30 +100,25 @@ namespace Client.Desktop.ViewModels.Windows
 
         private void Save()
         {
-            if (!SelectedClient.IsValid)
+            if (!SelectedStaff.IsValid)
             {
                 return;
             }
 
-            if (!SelectedClient.HasChanges())
+            if (!SelectedStaff.HasChanges())
             {
                 return;
             }
 
-            SelectedClient.AcceptChanges();
+            SelectedStaff.AcceptChanges();
 
-            _laundryService.AddOrUpdateAsync(SelectedClient.OriginalObject);
+            _laundryService.AddOrUpdateAsync(SelectedStaff.OriginalObject);
             HasChanges = true;
 
             if (_dialogService.ShowQuestionDialog("Saved! \n Do you want to close window ? "))
             {
                 CloseWindow();
             }
-        }
-
-        private void ClearParentId()
-        {
-            SelectedClient.ParentId = null;
         }
 
         private bool CanExecuteParentIdClearCommand()
@@ -171,7 +146,5 @@ namespace Client.Desktop.ViewModels.Windows
         {
             CloseAction?.Invoke(HasChanges);
         }
-
     }
-
 }

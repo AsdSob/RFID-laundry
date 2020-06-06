@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Client.Desktop.ViewModels.Common.Extensions
 {
@@ -8,6 +10,7 @@ namespace Client.Desktop.ViewModels.Common.Extensions
         public static readonly int DefaultMaxLength = 5;
         public static readonly int DefaultMinLength = 2;
         public static readonly int DefaultNameLength = 100;
+        private static readonly List<char> AllowablePhoneChars = new List<char> { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '+' };
 
         public static bool ValidateRequired(this object val, ref string validationError)
         {
@@ -86,6 +89,21 @@ namespace Client.Desktop.ViewModels.Common.Extensions
             return true;
         }
 
+        public static bool ValidateEmail(this string val, ref string validationError)
+        {
+            if (!String.IsNullOrWhiteSpace(val))
+            {
+                var regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
+                var match = regex.Match(val);
+                if (!match.Success)
+                {
+                    validationError += "\n* Email not valid";
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
 
     }

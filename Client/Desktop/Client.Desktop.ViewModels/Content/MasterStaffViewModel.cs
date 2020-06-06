@@ -24,11 +24,11 @@ namespace Client.Desktop.ViewModels.Content
         private ClientEntityViewModel _selectedClient;
         private List<DepartmentEntityViewModel> _departments;
         private DepartmentEntityViewModel _selectedDepartment;
-        private ObservableCollection<StaffEntityViewModel> _staff;
-        private StaffEntityViewModel _selectedStaff;
+        private ObservableCollection<ClientStaffEntity> _staff;
+        private ClientStaffEntity _selectedStaff;
         private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
-        private ObservableCollection<LinenEntityViewModel> _linens;
-        private LinenEntityViewModel _selectedLinen;
+        private ObservableCollection<ClientLinenEntityViewModel> _linens;
+        private ClientLinenEntityViewModel _selectedClientLinen;
         private ObservableCollection<Tuple<int, string>> _tags;
         private Tuple<int, string> _selectedTag;
 
@@ -44,12 +44,12 @@ namespace Client.Desktop.ViewModels.Content
             get => _tags;
             set => Set(() => Tags, ref _tags, value);
         }
-        public LinenEntityViewModel SelectedLinen
+        public ClientLinenEntityViewModel SelectedClientLinen
         {
-            get => _selectedLinen;
-            set => Set(() => SelectedLinen, ref _selectedLinen, value);
+            get => _selectedClientLinen;
+            set => Set(() => SelectedClientLinen, ref _selectedClientLinen, value);
         }
-        public ObservableCollection<LinenEntityViewModel> Linens
+        public ObservableCollection<ClientLinenEntityViewModel> Linens
         {
             get => _linens;
             set => Set(() => Linens, ref _linens, value);
@@ -59,12 +59,12 @@ namespace Client.Desktop.ViewModels.Content
             get => _masterLinens;
             set => Set(() => MasterLinens, ref _masterLinens, value);
         }
-        public StaffEntityViewModel SelectedStaff
+        public ClientStaffEntity SelectedStaff
         {
             get => _selectedStaff;
             set => Set(() => SelectedStaff, ref _selectedStaff, value);
         }
-        public ObservableCollection<StaffEntityViewModel> Staff
+        public ObservableCollection<ClientStaffEntity> Staff
         {
             get => _staff;
             set => Set(() => Staff, ref _staff, value);
@@ -93,10 +93,10 @@ namespace Client.Desktop.ViewModels.Content
         public ObservableCollection<DepartmentEntityViewModel> SortedDepartments =>
             Departments?.Where(x => x.ClientId == SelectedClient?.Id).ToObservableCollection();
 
-        public ObservableCollection<StaffEntityViewModel> SortedStaff =>
+        public ObservableCollection<ClientStaffEntity> SortedStaff =>
             Staff?.Where(x => x.DepartmentId == SelectedDepartment?.Id).ToObservableCollection();
 
-        public ObservableCollection<LinenEntityViewModel> SortedLinens => SortLinen();
+        public ObservableCollection<ClientLinenEntityViewModel> SortedLinens => SortLinen();
 
         public RelayCommand SaveCommand { get; }
         public RelayCommand AddStaffCommand { get; }
@@ -105,6 +105,7 @@ namespace Client.Desktop.ViewModels.Content
         public RelayCommand DeleteLinenCommand { get; }
         public RelayCommand RfidReaderCommand { get; }
         public RelayCommand GetReaderTagsCommand { get; }
+        public RelayCommand EditStaffCommand { get; }
 
         public RelayCommand AddSelectedTagCommand { get; }
         
@@ -116,11 +117,12 @@ namespace Client.Desktop.ViewModels.Content
             _resolverService = resolver ?? throw new ArgumentNullException(nameof(resolver));
 
             SaveCommand = new RelayCommand(Save);
-            AddStaffCommand = new RelayCommand(AddStaff, (() => SelectedDepartment != null));
+            AddStaffCommand = new RelayCommand(AddNewStaff, (() => SelectedDepartment != null));
+            EditStaffCommand = new RelayCommand(EditStaff, (() => SelectedStaff != null));
             DeleteStaffCommand = new RelayCommand(DeleteStaff, (() => SelectedStaff != null));
 
             AddLinenCommand = new RelayCommand(AddLinen, (() => SelectedDepartment != null));
-            DeleteLinenCommand = new RelayCommand(DeleteLinen, (() => SelectedLinen != null));
+            DeleteLinenCommand = new RelayCommand(DeleteLinen, (() => SelectedClientLinen != null));
 
             RfidReaderCommand = new RelayCommand(RfidReader);
             GetReaderTagsCommand = new RelayCommand(GetReaderTags);
@@ -153,13 +155,11 @@ namespace Client.Desktop.ViewModels.Content
                 MasterLinens = masters.ToObservableCollection();
 
                 var linen = await _laundryService.GetAllAsync<ClientLinenEntity>();
-                var linens = linen.Select(x => new LinenEntityViewModel(x));
-                Linens = new ObservableCollection<LinenEntityViewModel>();
+                var linens = linen.Select(x => new ClientLinenEntityViewModel(x));
+                Linens = new ObservableCollection<ClientLinenEntityViewModel>();
                 Linens = linens.ToObservableCollection();
 
-                var staff = await _laundryService.GetAllAsync<ClientStaffEntity>();
-                var staffs = staff.Select(x => new StaffEntityViewModel(x));
-                Staff = staffs.ToObservableCollection();
+                await GetStaffs();
 
             }
             catch (Exception e)
@@ -173,6 +173,12 @@ namespace Client.Desktop.ViewModels.Content
             }
 
             PropertyChanged += OnPropertyChanged;
+        }
+
+        private async Task GetStaffs()
+        {
+            var staff = await _laundryService.GetAllAsync<ClientStaffEntity>();
+            Staff = staff.ToObservableCollection();
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -197,9 +203,10 @@ namespace Client.Desktop.ViewModels.Content
                 RaisePropertyChanged(() => SortedLinens);
 
                 DeleteStaffCommand.RaiseCanExecuteChanged();
+                EditStaffCommand.RaiseCanExecuteChanged();
             }
 
-            if (e.PropertyName == nameof(SelectedLinen))
+            if (e.PropertyName == nameof(SelectedClientLinen))
             {
                 DeleteLinenCommand.RaiseCanExecuteChanged();
             }
@@ -211,9 +218,9 @@ namespace Client.Desktop.ViewModels.Content
           
         }
 
-        private ObservableCollection<LinenEntityViewModel> SortLinen()
+        private ObservableCollection<ClientLinenEntityViewModel> SortLinen()
         {
-            var linens = new ObservableCollection<LinenEntityViewModel>();
+            var linens = new ObservableCollection<ClientLinenEntityViewModel>();
 
             if (SelectedDepartment == null) return linens;
 
@@ -222,15 +229,7 @@ namespace Client.Desktop.ViewModels.Content
 
         private void Save()
         {
-            var staffs = Staff.Where(x => x.HasChanges());
             var linens = Linens.Where(x => x.HasChanges());
-
-            foreach (var item in staffs)
-            {
-                item.AcceptChanges();
-
-                _laundryService.AddOrUpdateAsync(item.OriginalObject);
-            }
 
             foreach (var item in linens)
             {
@@ -242,32 +241,35 @@ namespace Client.Desktop.ViewModels.Content
             _dialogService.ShowInfoDialog("All changes saved");
         }
 
-        private void SaveEntity<T>(T entity) where T : EntityBase
-        {
-            _laundryService.AddOrUpdateAsync(entity);
-        }
-
         private void DeleteEntity<T>(T entity) where T : EntityBase
         {
             //TODO: Delete Entity
         }
 
-        private void AddStaff()
+        private void EditStaff()
         {
-            if(SelectedDepartment == null) return;
-            if (!_dialogService.ShowQuestionDialog("Do you want to add new Staff?"))return;
+            StaffWindow(SelectedStaff);
+        }
 
-            var newStaff = new StaffEntityViewModel()
+        private void AddNewStaff()
+        {
+            StaffWindow(null);
+        }
+
+        private async void StaffWindow(ClientStaffEntity staff)
+        {
+            var staffWindow = _resolverService.Resolve<MasterStaffWindowModel>();
+
+            staffWindow.SetSelectedStaff(staff, SelectedDepartment.OriginalObject);
+
+            _dialogService.ShowDialog(staffWindow);
+
+            if (staffWindow.HasChanges)
             {
-                DepartmentId = SelectedDepartment.Id,
-                PhoneNumber = "+971",
-            };
-
-
-            Staff.Add(newStaff);
-
-            RaisePropertyChanged(()=> SortedStaff);
-            SelectedStaff = newStaff;
+                Staff.Clear();
+                await GetStaffs();
+                RaisePropertyChanged((() => SortedStaff));
+            }
         }
 
         private void DeleteStaff()
@@ -275,12 +277,12 @@ namespace Client.Desktop.ViewModels.Content
             var staff = SelectedStaff;
 
             if (staff == null) return;
-            if (!_dialogService.ShowQuestionDialog($"Do you want to DELETE {staff.StaffName}?")) return;
+            if (!_dialogService.ShowQuestionDialog($"Do you want to DELETE {staff.Name}?")) return;
 
-            DeleteEntity(staff.OriginalObject);
+            DeleteEntity(staff);
             Staff.Remove(staff);
 
-            if (!_dialogService.ShowQuestionDialog($"Do you want to DELETE {staff.StaffName} linens also?")) return;
+            if (!_dialogService.ShowQuestionDialog($"Do you want to DELETE {staff.Name} linens also?")) return;
 
             var linens = Linens.Where(x => x.StaffId == staff.Id).ToList();
 
@@ -297,7 +299,7 @@ namespace Client.Desktop.ViewModels.Content
             if (SelectedDepartment == null) return;
             if (!_dialogService.ShowQuestionDialog("Do you want to add new Linen?")) return;
 
-            var newLinen = new LinenEntityViewModel()
+            var newLinen = new ClientLinenEntityViewModel()
             {
                 ClientId =  SelectedClient.Id,
                 DepartmentId = SelectedDepartment.Id,
@@ -307,23 +309,23 @@ namespace Client.Desktop.ViewModels.Content
 
             if (SelectedStaff != null)
             {
-                newLinen.OriginalObject.ClientStaffEntity = SelectedStaff.OriginalObject;
+                newLinen.OriginalObject.ClientStaffEntity = SelectedStaff;
                 newLinen.StaffId = SelectedStaff.Id;
             }
 
             Linens.Add(newLinen);
 
             RaisePropertyChanged(()=> SortedLinens);
-            SelectedLinen = newLinen;
+            SelectedClientLinen = newLinen;
         }
 
         private void DeleteLinen()
         {
-            var linen = SelectedLinen;
+            var linen = SelectedClientLinen;
 
             if (linen == null) return;
             if (!_dialogService.ShowQuestionDialog(
-                $"Do you want to DELETE {MasterLinens?.FirstOrDefault(x => x.Id == SelectedLinen?.MasterLinenId)?.Name}?")
+                $"Do you want to DELETE {MasterLinens?.FirstOrDefault(x => x.Id == SelectedClientLinen?.MasterLinenId)?.Name}?")
             ) return;
 
             DeleteEntity(linen.OriginalObject);
@@ -348,10 +350,10 @@ namespace Client.Desktop.ViewModels.Content
 
         private void AddSelectedTag()
         {
-            if (SelectedLinen == null)
+            if (SelectedClientLinen == null)
                 AddLinen();
 
-            if (SelectedLinen.Tag != null)
+            if (SelectedClientLinen.Tag != null)
             {
                 if (!_dialogService.ShowQuestionDialog("Linen already has tag \n Do you want to replace it?"))
                 {
@@ -365,13 +367,13 @@ namespace Client.Desktop.ViewModels.Content
                 var staff = Staff.FirstOrDefault(x => x.Id == existLinen.StaffId);
 
                 if (!_dialogService.ShowQuestionDialog(
-                    $"Tag {SelectedTag.Item2} already using by {staff?.StaffName} in <{existLinen.Id}> linen \n Do you want to shift Tag?")
+                    $"Tag {SelectedTag.Item2} already using by {staff?.Name} in <{existLinen.Id}> linen \n Do you want to shift Tag?")
                 ) return;
 
                 existLinen.Tag = null;
             }
 
-            SelectedLinen.Tag = SelectedTag.Item2;
+            SelectedClientLinen.Tag = SelectedTag.Item2;
 
         }
 

@@ -6,7 +6,7 @@ using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Common.EntityViewModels
 {
-    public class LinenEntityViewModel : ViewModelBase, IDataErrorInfo
+    public class ClientLinenEntityViewModel : ViewModelBase, IDataErrorInfo
     {
         private ClientLinenEntity _originalObject; 
         private int _departmentId;
@@ -17,7 +17,19 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
         private int _statusId;
         private int _id;
         private int _packingValue;
+        private bool _isValid;
+        private string _error;
 
+        public string Error
+        {
+            get => _error;
+            set => Set(ref _error, value);
+        }
+        public bool IsValid
+        {
+            get => _isValid;
+            set => Set(ref _isValid, value);
+        }
         public int PackingValue
         {
             get => _packingValue;
@@ -64,12 +76,14 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             set => Set(() => OriginalObject, ref _originalObject, value);
         }
 
-        public LinenEntityViewModel()
+        public ClientLinenEntityViewModel()
         {
             OriginalObject = new ClientLinenEntity();
+
+            PropertyChanged += OnPropertyChanged;
         }
 
-        public LinenEntityViewModel(ClientLinenEntity originalObject) : this()
+        public ClientLinenEntityViewModel(ClientLinenEntity originalObject) : this()
         {
             Update(originalObject);
         }
@@ -111,33 +125,48 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
                                     !Equals(PackingValue, OriginalObject.PackingValue) ||
                                     !Equals(MasterLinenId, OriginalObject.MasterLinenId);
 
-        public string Error { get; set; }
         public string this[string columnName] => Validate(columnName);
         public Func<ClientEntityViewModel, string, bool> NameUniqueValidationFunc { get; set; }
 
         private string Validate(string columnName)
         {
-            //string error;
+            var error = String.Empty;
 
-            //if (columnName == nameof(PackingValue))
+            if (columnName == nameof(MasterLinenId))
+            {
+                MasterLinenId.ValidateRequired(ref error);
+            }
+            else if(columnName == nameof(PackingValue))
+            {
+                PackingValue.ValidateMinAmount(ref error);
+            }
+
+            FullValidate(columnName);
+
+            return error;
+        }
+
+        private void FullValidate(string columnName)
+        {
+            var error = String.Empty;
+
+            MasterLinenId.ValidateRequired(ref error);
+            PackingValue.ValidateMinAmount(ref error);
+
+            Error = error;
+            IsValid = String.IsNullOrWhiteSpace(Error);
+        }
+
+        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            //if (e.PropertyName == nameof(Tag))
             //{
-            //    if (!PackingValue.ValidateRequired(out error) ||
-            //        (!PackingValue.ValidateMinAmount(out error)))
+            //    if (!String.IsNullOrEmpty(Tag))
             //    {
-            //        return Error = error;
+            //        var regex = new Regex(@"\s");
+            //        Tag = regex.Replace(Tag, "");
             //    }
             //}
-
-            //if (columnName == nameof(MasterLinenId))
-            //{
-            //    if (!MasterLinenId.ValidateRequired(out error))
-            //    {
-            //        return Error = error;
-            //    }
-
-            //}
-            //Error = String.Empty;
-            return null;
         }
     }
 }

@@ -19,7 +19,7 @@
         </b:EventTrigger>
     </b:Interaction.Triggers>
 
-    <Grid>
+    <Grid Margin=" 5,20">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="2*"/>
@@ -38,43 +38,22 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
             <!-- Clients -->
-            <GroupBox Grid.Row="0" Grid.Column="0" Header="Client">
+            <GroupBox Grid.Row="0" Grid.Column="0" Header="Client" Padding="10">
 
                 <ComboBox ItemsSource="{Binding Clients}" SelectedValue="{Binding SelectedClient}" DisplayMemberPath="Name"/>
 
             </GroupBox>
 
             <!-- Departments -->
-            <GroupBox Grid.Row="1" Grid.Column="0" Header="Departments">
-
-                <ComboBox ItemsSource="{Binding SortedDepartments}" SelectedValue="{Binding SelectedDepartment}" DisplayMemberPath="Name"/>
-
-            </GroupBox>
-
-            <!-- Staff Commands -->
-            <StackPanel Grid.Row="2"
-                        Grid.Column="0"
-                        Orientation="Horizontal">
-                <Button Content="new"
-                        Command="{Binding NewStaffCommand}"
-                        Width="70"
-                        Margin = "5"
-                        Padding="10,2"
-                />
-            </StackPanel>
-
-            <!-- Staff -->
-            <GroupBox Grid.Row="3" Grid.Column="0" Header="Staff">
+            <GroupBox Grid.Row="1" Grid.Column="0" Header="Departments" Padding="10">
 
                 <DataGrid Height="Auto"
-                          ItemsSource="{Binding SortedStaff}"
-                          SelectedItem="{Binding SelectedStaff}"
+                          ItemsSource="{Binding SortedDepartments}"
+                          SelectedItem="{Binding SelectedDepartment}"
                           SelectionMode="Single"
                           VerticalScrollBarVisibility="Visible"
                           AllowDrop="True" 
@@ -85,10 +64,44 @@
                           IsTextSearchCaseSensitive="False">
 
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Id" Binding="{Binding StaffId}" />
-                        <DataGridTextColumn Header="Staff" Binding="{Binding Name}" />
+                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" />
                     </DataGrid.Columns>
                 </DataGrid>
+
+            </GroupBox>
+
+
+            <!-- Staff -->
+            <GroupBox Grid.Row="2" Grid.Column="0" Header="Staff" Padding="10">
+                
+                <DockPanel>
+
+                    <!-- Staff Commands -->
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                            <Button Margin = "5" Padding="5"  Content="New" Command="{Binding AddStaffCommand}"/>
+                            <Button Margin = "5" Padding="5"  Content="Edit" Command="{Binding EditStaffCommand}"/>
+                            <Button Margin = "5" Padding="5"  Content="Delete" Command="{Binding DeleteStaffCommand}"/>
+                    </StackPanel>
+
+                    <DataGrid Height="Auto"
+                              DockPanel.Dock="Bottom"
+                              ItemsSource="{Binding SortedStaff}"
+                              SelectedItem="{Binding SelectedStaff}"
+                              SelectionMode="Single"
+                              VerticalScrollBarVisibility="Visible"
+                              AllowDrop="True" 
+                              IsReadOnly="True"
+                              HorizontalAlignment="Stretch"
+                              AutoGenerateColumns="False"
+                              IsTextSearchEnabled="True"
+                              IsTextSearchCaseSensitive="False">
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Id" Binding="{Binding StaffId}" Width="*" />
+                            <DataGridTextColumn Header="Staff" Binding="{Binding Name}" Width="2*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
 
             </GroupBox>
         </Grid>
@@ -103,28 +116,10 @@
             </Grid.ColumnDefinitions>
 
             <!-- Linen Commands -->
-            <StackPanel Grid.Row="0"
-                        Grid.Column="0"
-                        Orientation="Horizontal">
-                <Button Content="new"
-                        Command="{Binding NewLinenCommand}"
-                        Width="70"
-                        Margin = "5"
-                        Padding="10,2"
-                />
-
-                <Button Content="save"
-                        Command="{Binding SaveCommand}"
-                        Width="70"
-                        Margin = "5"
-                        Padding="10,2"
-                />
-                <Button Content="delete"
-                        Command="{Binding DeleteLinenCommand}"
-                        Width="70"
-                        Margin = "5"
-                        Padding="10,2"
-                />
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                <Button Margin = "5" Padding="10,5"  Content="New" Command="{Binding NewLinenCommand}"/>
+                <Button Margin = "5" Padding="10,5"  Content="Edit" Command="{Binding EditLinenCommand}"/>
+                <Button Margin = "5" Padding="10,5"  Content="Delete" Command="{Binding DeleteLinenCommand}"/>
             </StackPanel>
 
             <!-- Linens -->
@@ -132,7 +127,7 @@
 
                 <DataGrid Height="Auto"
                           ItemsSource="{Binding SortedLinens}"
-                          SelectedItem="{Binding SelectedLinen}"
+                          SelectedItem="{Binding SelectedClientLinen}"
                           SelectionMode="Single"
                           VerticalScrollBarVisibility="Visible"
                           AllowDrop="True" 

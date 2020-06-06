@@ -46,10 +46,6 @@
         <windows1:RfidReaderWindow/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type windows:StaffChangeWindowModel}">
-        <windows1:StaffChangeWindow/>
-    </DataTemplate>
-
     <DataTemplate DataType="{x:Type windows:MasterLinenWindowModel}">
         <windows1:MasterLinenWindow/>
     </DataTemplate>    
@@ -60,6 +56,10 @@
 
     <DataTemplate DataType="{x:Type windows:MasterDepartmentWindowModel}">
         <windows1:MasterDepartmentWindow/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type windows:MasterStaffWindowModel}">
+        <windows1:MasterStaffWindow/>
     </DataTemplate>
 
 </ResourceDictionary>

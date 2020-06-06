@@ -21,17 +21,18 @@
 
     <Grid Background="White">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="1.5*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
 
 
 <!-- Client List -->
 
-        <GroupBox Grid.Column="0" Grid.Row="0" Margin="5" Header="Clients" Padding="5">
+        <GroupBox Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Margin="5" Header="Clients" Padding="5">
             <Grid Name="StaffWindow">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -136,6 +137,42 @@
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Id" Binding="{Binding Id}" />
                         <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </GroupBox>
+
+<!--Staff List -->
+
+        <GroupBox Grid.Column="1" Grid.Row="1" Margin="5" Header="Client Staff" Padding="5">
+            <Grid >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+        
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
+                    <Button Margin = "5" Padding="20,5"  Content="New" Command="{Binding AddStaffCommand}"/>
+                    <Button Margin = "5" Padding="20,5"  Content="Edit" Command="{Binding EditStaffCommand}"/>
+                    <Button Margin = "5" Padding="20,5"  Content="Delete" Command="{Binding DeleteStaffCommand}"/>
+                </StackPanel>
+        
+                <DataGrid Grid.Row="1" Height="Auto"
+                          ItemsSource="{Binding SortedStaffs}"
+                          SelectedItem="{Binding SelectedStaff}"
+                          SelectionMode="Single"
+                          VerticalScrollBarVisibility="Visible"
+                          AllowDrop="True" 
+                          IsReadOnly="True"
+                          HorizontalAlignment="Stretch"
+                          AutoGenerateColumns="False"
+                          IsTextSearchEnabled="True"
+                          IsTextSearchCaseSensitive="False">
+        
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Staff Id" Binding="{Binding StaffId}" Width="*" />
+                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="3*" />
+                        <DataGridTextColumn Header="Phone number" Binding="{Binding PhoneNumber}" Width="2*"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </Grid>

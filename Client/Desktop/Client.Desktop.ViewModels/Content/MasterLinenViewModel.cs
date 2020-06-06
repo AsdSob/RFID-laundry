@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Threading.Tasks;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
@@ -35,6 +34,7 @@ namespace Client.Desktop.ViewModels.Content
         public RelayCommand EditCommand { get; }
         public RelayCommand NewCommand { get; }
         public RelayCommand DeleteMasterLinenCommand { get; }
+        public RelayCommand InitializeCommand { get; }
 
         public MasterLinenViewModel(ILaundryService dataService, IDialogService dialogService, IResolver resolver)
         {
@@ -45,12 +45,12 @@ namespace Client.Desktop.ViewModels.Content
             EditCommand = new RelayCommand(Edit,(()=> SelectedMasterLinen != null));
             NewCommand = new RelayCommand(AddMasterLinen);
             DeleteMasterLinenCommand = new RelayCommand(DeleteMasterLinen, (() => SelectedMasterLinen != null));
+            InitializeCommand = new RelayCommand(Initialize);
 
             MasterLinens = new ObservableCollection<MasterLinenEntity>();
-            Task.Factory.StartNew(() => GetData());
         }
 
-        private async Task GetData()
+        private async void Initialize()
         {
             _dialogService.ShowBusy();
 
@@ -116,7 +116,7 @@ namespace Client.Desktop.ViewModels.Content
             {
                 MasterLinens.Clear();
 
-                await GetData();
+                Initialize();
             }
         }
     }

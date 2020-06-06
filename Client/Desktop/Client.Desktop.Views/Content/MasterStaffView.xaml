@@ -56,9 +56,9 @@
             <!--Staff List-->
 
             <StackPanel  Grid.Row="2" Orientation="Horizontal" Margin="10,0">
-                <Button Margin = "5" Padding="10,2"  Content="New" Command="{Binding AddStaffCommand}"/>
-                <Button Margin = "5" Padding="10,2"  Content="Delete" Command="{Binding DeleteStaffCommand}"/>
-                <Button Margin = "5" Padding="10,2"  Content="Save" Command="{Binding SaveCommand}"/>
+                <Button Margin = "5" Padding="10" Content="New" Command="{Binding AddStaffCommand}"/>
+                <Button Margin = "5" Padding="10" Content="Edit" Command="{Binding EditStaffCommand}"/>
+                <Button Margin = "5" Padding="10" Content="Delete" Command="{Binding DeleteStaffCommand}"/>
             </StackPanel>
 
             <GroupBox Grid.Row="4" 
@@ -78,14 +78,15 @@
                           IsTextSearchCaseSensitive="False">
 
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Id" Binding="{Binding StaffId}" />
-                        <DataGridTextColumn Header="Name" Binding="{Binding StaffName}" Width="*" />
+                        <DataGridTextColumn Header="Staff Id" Binding="{Binding StaffId}" Width="*" />
+                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="3*" />
+                        <DataGridTextColumn Header="Phone" Binding="{Binding PhoneNumber}" Width="2*" />
                     </DataGrid.Columns>
                 </DataGrid>
             </GroupBox>
 
             <!-- Staff Details-->
-            <Grid Row="3">
+            <!--<Grid Row="3">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -110,7 +111,7 @@
                 <GroupBox Grid.Column="1" Grid.Row="1" Header="Email" Margin="5">
                     <TextBox Text="{Binding SelectedStaff.Email}" TextWrapping="Wrap" />
                 </GroupBox>
-            </Grid>
+            </Grid>-->
         </Grid>
 
         <!-- Client Linen -->
@@ -129,7 +130,7 @@
             <GroupBox Grid.Row="1" Header="Client Linen">
                 <DataGrid Height="Auto"
                       ItemsSource="{Binding SortedLinens}"
-                      SelectedItem="{Binding SelectedLinen}"
+                      SelectedItem="{Binding SelectedClientLinen}"
                       SelectionMode="Single"
                       VerticalScrollBarVisibility="Visible"
                       AllowDrop="True" 
@@ -147,7 +148,7 @@
                                             IsReadOnly="False"
                                             DisplayMemberPath="Name"
                                             SelectedValuePath="Id"
-                                            MinWidth="150"
+                                            Width="*"
                                             SelectedValueBinding="{Binding MasterLinenId}">
                             <DataGridComboBoxColumn.ElementStyle>
                                 <Style TargetType="{x:Type ComboBox}">
@@ -162,9 +163,9 @@
                         </DataGridComboBoxColumn>
 
                         <DataGridComboBoxColumn Header="Staff"
-                                            DisplayMemberPath="StaffName"
+                                            DisplayMemberPath="Name"
                                             SelectedValuePath="Id"
-                                            MinWidth="150"
+                                            Width="*"
                                             SelectedValueBinding="{Binding StaffId}">
                             <DataGridComboBoxColumn.ElementStyle>
                                 <Style TargetType="{x:Type ComboBox}">
@@ -182,6 +183,7 @@
                         <DataGridComboBoxColumn Header="Department"
                                             DisplayMemberPath="Name"
                                             IsReadOnly="True"
+                                            Width="0.5*"
                                             SelectedValuePath="Id"
                                             SelectedValueBinding="{Binding DepartmentId}">
                             <DataGridComboBoxColumn.ElementStyle>
@@ -196,9 +198,9 @@
                             </DataGridComboBoxColumn.EditingElementStyle>
                         </DataGridComboBoxColumn>
 
-                        <DataGridTextColumn Header="Packing Value" Binding="{Binding PackingValue}"/>
+                        <DataGridTextColumn Header="PV" Binding="{Binding PackingValue}"/>
 
-                        <DataGridTextColumn Header="Tag" Binding="{Binding Tag}" MinWidth="150"/>
+                        <DataGridTextColumn Header="Tag" Binding="{Binding Tag}" Width="*"/>
 
                     </DataGrid.Columns>
                 </DataGrid>
@@ -249,7 +251,7 @@
 
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Antenna" Binding="{Binding Path=Item1}" />
-                                <DataGridTextColumn Header="Tag" Binding="{Binding Path=Item2}" />
+                                <DataGridTextColumn Header="Tag" Width="*" Binding="{Binding Path=Item2}" />
                             </DataGrid.Columns>
 
                         </DataGrid>

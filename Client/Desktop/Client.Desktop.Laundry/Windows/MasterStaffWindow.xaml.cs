@@ -4,12 +4,10 @@ using Client.Desktop.ViewModels.Windows;
 
 namespace Client.Desktop.Laundry.Windows
 {
-
-    [HasViewModel(typeof(StaffChangeWindowModel))]
-
-    public partial class StaffChangeWindow : CustomWindow
+    [HasViewModel(typeof(MasterStaffWindowModel))]
+    public partial class MasterStaffWindow : CustomWindow
     {
-        public StaffChangeWindow()
+        public MasterStaffWindow()
         {
             InitializeComponent();
         }

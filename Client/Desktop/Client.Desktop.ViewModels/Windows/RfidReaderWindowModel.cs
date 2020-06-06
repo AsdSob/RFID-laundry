@@ -204,12 +204,13 @@ namespace Client.Desktop.ViewModels.Windows
             if (_dialogService.ShowQuestionDialog($"Do you want to close window ? "))
             {
                 CloseAction?.Invoke(true);
-                
             }
         }
 
         private void StartStopReader()
         {
+            ConnectReader();
+
             if (StartStopButton == "Start")
             {
                 if(ConnectionStatus != "Connected") return;

@@ -45,7 +45,7 @@ namespace Client.Desktop.ViewModels
 
             BinSoilCollectionCommand = new RelayCommand(() => Select(typeof(BinSoilCollectionViewModel)), BinSoilCollectionCommandCanExecute);
 
-            _selectedItem = typeof(MasterClientViewModel);
+            _selectedItem = typeof(MasterStaffViewModel);
         }
 
         private bool AuthManageCommandCanExecute()

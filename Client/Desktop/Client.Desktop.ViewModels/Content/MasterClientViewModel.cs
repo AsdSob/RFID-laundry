@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
@@ -28,7 +26,19 @@ namespace Client.Desktop.ViewModels.Content
         private List<UnitViewModel> _cities;
         private DepartmentEntity _selectedDepartment;
         private List<UnitViewModel> _departmentTypes;
+        private ObservableCollection<ClientStaffEntity> _staffs;
+        private ClientStaffEntity _selectedStaff;
 
+        public ClientStaffEntity SelectedStaff
+        {
+            get => _selectedStaff;
+            set => Set(ref _selectedStaff, value);
+        }
+        public ObservableCollection<ClientStaffEntity> Staffs
+        {
+            get => _staffs;
+            set => Set(ref _staffs, value);
+        }
         public List<UnitViewModel> DepartmentTypes
         {
             get => _departmentTypes;
@@ -61,16 +71,24 @@ namespace Client.Desktop.ViewModels.Content
         }
 
         public ObservableCollection<DepartmentEntity> SortedDepartments => SortDepartments();
+        public ObservableCollection<ClientStaffEntity> SortedStaffs => SortStaffs();
 
         #endregion
 
         public RelayCommand AddClientCommand { get; }
         public RelayCommand EditClientCommand { get; }
         public RelayCommand DeleteClientCommand { get; }
-        public RelayCommand EditDepartmentCommand { get; }
 
         public RelayCommand AddDepartmentCommand { get; }
+        public RelayCommand EditDepartmentCommand { get; }
         public RelayCommand DeleteDepartmentCommand { get; }
+
+        public RelayCommand AddStaffCommand { get; }
+        public RelayCommand EditStaffCommand { get; }
+        public RelayCommand DeleteStaffCommand { get; }
+
+        public RelayCommand InitializeCommand { get; }
+
 
 
         public MasterClientViewModel(ILaundryService dataService, IDialogService dialogService, IResolver resolver)
@@ -87,10 +105,14 @@ namespace Client.Desktop.ViewModels.Content
             EditDepartmentCommand = new RelayCommand(EditDepartment, () => SelectedDepartment != null);
             DeleteDepartmentCommand = new RelayCommand(DeleteDepartment, (() => SelectedDepartment != null));
 
+            AddStaffCommand = new RelayCommand(AddNewStaff, () => SelectedDepartment != null);
+            EditStaffCommand = new RelayCommand(EditStaff, () => SelectedStaff != null);
+            DeleteStaffCommand = new RelayCommand(DeleteStaff, (() => SelectedStaff != null));
+            InitializeCommand = new RelayCommand(Initialize);
+
             Cities = EnumExtensions.GetValues<CitiesEnum>();
             DepartmentTypes = EnumExtensions.GetValues<DepartmentTypeEnum>();
 
-            GetData();
             PropertyChanged += OnPropertyChanged;
         }
 
@@ -109,14 +131,22 @@ namespace Client.Desktop.ViewModels.Content
             {
                 DeleteDepartmentCommand.RaiseCanExecuteChanged();
                 EditDepartmentCommand.RaiseCanExecuteChanged();
+                AddStaffCommand.RaiseCanExecuteChanged();
+            }
+
+            if (e.PropertyName == nameof(SelectedStaff))
+            {
+                EditStaffCommand.RaiseCanExecuteChanged();
+                DeleteStaffCommand.RaiseCanExecuteChanged();
             }
 
         }
 
-        private async void GetData()
+        private async void Initialize()
         {
             await GetClients();
             await GetDepartments();
+            await GetStaffs();
         }
 
         private async Task GetClients()
@@ -131,9 +161,20 @@ namespace Client.Desktop.ViewModels.Content
             Departments = departments.ToObservableCollection();
         }
 
+        private async Task GetStaffs()
+        {
+            var staff = await _laundryService.GetAllAsync<ClientStaffEntity>();
+            Staffs = staff.ToObservableCollection();
+        }
+
         private ObservableCollection<DepartmentEntity> SortDepartments()
         {
             return Departments?.Where(x => x.ClientId == SelectedClient?.Id).ToObservableCollection();
+        }
+
+        private ObservableCollection<ClientStaffEntity> SortStaffs()
+        {
+            return Staffs?.Where(x => x.DepartmentId == SelectedDepartment?.Id).ToObservableCollection();
         }
 
         private void EditClient()
@@ -213,6 +254,47 @@ namespace Client.Desktop.ViewModels.Content
             _laundryService.DeleteAsync(department);
 
             Departments.Remove(department);
+        }
+
+
+        private void EditStaff()
+        {
+            StaffWindow(SelectedStaff);
+        }
+
+        private void AddNewStaff()
+        {
+            StaffWindow(null);
+        }
+
+        private async void StaffWindow(ClientStaffEntity staff)
+        {
+            var staffWindow = _resolverService.Resolve<MasterStaffWindowModel>();
+
+            staffWindow.SetSelectedStaff(staff, SelectedDepartment);
+
+            _dialogService.ShowDialog(staffWindow);
+
+            if (staffWindow.HasChanges)
+            {
+                Staffs.Clear();
+                await GetStaffs();
+                RaisePropertyChanged((() => SortedStaffs));
+            }
+        }
+
+        private void DeleteStaff()
+        {
+            if (SelectedStaff == null) return;
+            if (!_dialogService.ShowQuestionDialog($"Do you want to DELETE {SelectedStaff.Name} ?"))
+                return;
+
+            var staff = SelectedStaff;
+            SelectedStaff = null;
+
+            _laundryService.DeleteAsync(staff);
+
+            Staffs.Remove(staff);
         }
 
     }
