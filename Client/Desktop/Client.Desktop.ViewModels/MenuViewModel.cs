@@ -45,7 +45,7 @@ namespace Client.Desktop.ViewModels
 
             BinSoilCollectionCommand = new RelayCommand(() => Select(typeof(BinSoilCollectionViewModel)), BinSoilCollectionCommandCanExecute);
 
-            _selectedItem = typeof(MasterStaffViewModel);
+            _selectedItem = typeof(TagRegistrationViewModel);
         }
 
         private bool AuthManageCommandCanExecute()
@@ -87,7 +87,6 @@ namespace Client.Desktop.ViewModels
 
         private void Select(Type type)
         {
-            // TODO: use enum?
             SelectedItem = type;
         }
     }

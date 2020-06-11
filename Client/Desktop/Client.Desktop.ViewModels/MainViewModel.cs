@@ -54,6 +54,7 @@ namespace Client.Desktop.ViewModels
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _authenticationService = authenticationService ?? throw new ArgumentNullException(nameof(authenticationService));
             _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
+
             MenuViewModel = menuViewModel ?? throw new ArgumentNullException(nameof(menuViewModel));
 
             MenuViewModel.PropertyChanged += MenuViewModelOnPropertyChanged;
@@ -70,7 +71,6 @@ namespace Client.Desktop.ViewModels
             }
 
             MenuIsVisible = true;
-
             SetMenuContent(MenuViewModel);
         }
 

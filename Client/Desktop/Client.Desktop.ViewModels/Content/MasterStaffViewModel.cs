@@ -345,7 +345,7 @@ namespace Client.Desktop.ViewModels.Content
 
         private void GetReaderTags()
         {
-            Tags = RfidReaderWindow.Tags;
+            //Tags = RfidReaderWindow.Tags;
         }
 
         private void AddSelectedTag()

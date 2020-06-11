@@ -26,10 +26,10 @@ namespace Client.Desktop.ViewModels.Windows
         private RfidService _readerService;
         private string _connectionStatus;
         private string _startStopButton;
-        private ObservableCollection<Tuple<int, string>> _tags;
+        private ObservableCollection<RfidTagViewModel> _tags;
         private string _connectDisconnectButton;
 
-        public ObservableCollection<Tuple<int, string>> Tags
+        public ObservableCollection<RfidTagViewModel> Tags
         {
             get => _tags;
             set => Set(() => Tags, ref _tags, value);
@@ -92,12 +92,14 @@ namespace Client.Desktop.ViewModels.Windows
             AddReaderCommand = new RelayCommand(AddReader);
             CloseCommand = new RelayCommand(Close);
             DeleteReaderCommand = new RelayCommand(DeleteReader, () => SelectedRfidReader != null);
-            StartStopReaderCommand = new RelayCommand(StartStopReader, CheckConnection);
+            StartStopReaderCommand = new RelayCommand(StartStopReader);
 
             InitializeCommand = new RelayCommand(Initialize);
             StartStopButton = "Start";
             ConnectDisconnectButton = "Connect";
 
+            Tags = new ObservableCollection<RfidTagViewModel>();
+            Initialize();
         }
 
         private async void Initialize()
@@ -142,6 +144,9 @@ namespace Client.Desktop.ViewModels.Windows
         public void ConnectReader()
         {
             if(SelectedRfidReader == null) return;
+            ConnectionStatus = "Connected";
+            return;
+
 
             ReaderService.StopRead();
 
@@ -209,46 +214,70 @@ namespace Client.Desktop.ViewModels.Windows
 
         private void StartStopReader()
         {
-            ConnectReader();
+            //ConnectReader();
 
             if (StartStopButton == "Start")
             {
-                if(ConnectionStatus != "Connected") return;
+                //if(ConnectionStatus != "Connected") return;
 
-                Tags = new ObservableCollection<Tuple<int, string>>();
+                Tags.Clear();
 
-                ReaderService.Reader.TagsReported += DisplayTag;
-                ReaderService.StartRead();
+                //ReaderService.Reader.TagsReported += DisplayTag;
+                //ReaderService.StartRead();
+
+                AddTestTags();
                 StartStopButton = "Stop";
                 return;
             }
 
             if (StartStopButton == "Stop")
             {
-                ReaderService.StopRead();
-                ReaderService.Reader.TagsReported -= DisplayTag;
+                //ReaderService.StopRead();
+                //ReaderService.Reader.TagsReported -= DisplayTag;
 
                 StartStopButton = "Start";
             }
         }
 
-        private bool CheckConnection()
+        private void AddTestTags()
         {
-            return ReaderService.Reader.IsConnected;
+            Random random = new Random();
+
+            for (int i = 0; i < 10; i++)
+            {
+                Tags.Add(new RfidTagViewModel()
+                {
+                    Antenna = random.Next(1, 4),
+                    Tag = $"TagNumber - {i}"
+                });
+            }
         }
+
+        //public static string RandomString(int length)
+        //{
+        //    Random random = new Random();
+
+        //    const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        //    return new string(Enumerable.Repeat(chars, length)
+        //        .Select(s => s[random.Next(s.Length)]).ToArray());
+        //}
 
         private void DisplayTag(ImpinjReader reader, TagReport report)
         {
             foreach (Tag tag in report)
             {
-                if (Tags.Any(x => Equals(x.Item2, tag.Epc.ToString())))
+                if (Tags.Any(x => Equals(x.Tag, tag.Epc.ToString())))
                 {
                     continue;
                 }
 
                 _dispatcher.RunInMainThread((() =>
                 {
-                    Tags.Add(new Tuple<int, string>(tag.AntennaPortNumber, tag.Epc.ToString()));
+                    Tags.Add(new RfidTagViewModel()
+                    {
+                        Tag = tag.Epc.ToString(),
+                        Antenna = tag.AntennaPortNumber
+                    });
                 }));
             }
         }

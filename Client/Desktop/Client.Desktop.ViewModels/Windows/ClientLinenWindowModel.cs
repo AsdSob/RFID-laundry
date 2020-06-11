@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Xml.Schema;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
@@ -16,16 +15,14 @@ namespace Client.Desktop.ViewModels.Windows
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
         private readonly IMainDispatcher _dispatcher;
-        private List<ClientLinenEntity> _clientLinens;
+        private List<ClientLinenEntityViewModel> _clientLinens;
         private ClientLinenEntityViewModel _selectedLinen;
         private List<MasterLinenEntity> _masterLinens;
-        private ClientEntity _selectedClient;
         private List<ClientEntity> _clients;
         private List<DepartmentEntity> _departments;
-        private DepartmentEntity _selectedDepartment;
         private List<ClientStaffEntity> _staffs;
-        private ClientStaffEntity _selectedStaff;
         private bool _hasChanges;
+
 
         public Action<bool> CloseAction { get; set; }
 
@@ -34,20 +31,10 @@ namespace Client.Desktop.ViewModels.Windows
             get => _hasChanges;
             set => Set(ref _hasChanges, value);
         }
-        public ClientStaffEntity SelectedStaff
-        {
-            get => _selectedStaff;
-            set => Set(ref _selectedStaff, value);
-        }
         public List<ClientStaffEntity> Staffs
         {
             get => _staffs;
             set => Set(ref _staffs, value);
-        }
-        public DepartmentEntity SelectedDepartment
-        {
-            get => _selectedDepartment;
-            set => Set(ref _selectedDepartment, value);
         }
         public List<DepartmentEntity> Departments
         {
@@ -59,11 +46,6 @@ namespace Client.Desktop.ViewModels.Windows
             get => _clients;
             set => Set(ref _clients, value);
         }
-        public ClientEntity SelectedClient
-        {
-            get => _selectedClient;
-            set => Set(ref _selectedClient, value);
-        }
         public List<MasterLinenEntity> MasterLinens
         {
             get => _masterLinens;
@@ -74,17 +56,19 @@ namespace Client.Desktop.ViewModels.Windows
             get => _selectedLinen;
             set => Set(ref _selectedLinen, value);
         }
-        public List<ClientLinenEntity> ClientLinens
+        public List<ClientLinenEntityViewModel> ClientLinens
         {
             get => _clientLinens;
             set => Set(ref _clientLinens, value);
         }
 
-        public List<DepartmentEntity> SortedDepartments => Departments?.Where(x => x.ClientId == SelectedClient?.Id).ToList();
-        public List<ClientStaffEntity> SortedStaffs => Staffs?.Where(x => x.DepartmentId == SelectedDepartment?.Id).ToList();
+        public List<DepartmentEntity> SortedDepartments => SortDepartments();
+        public List<ClientStaffEntity> SortedStaffs => SortStaffs();
 
         public RelayCommand SaveCommand { get; }
         public RelayCommand CloseCommand { get; }
+        public RelayCommand NewCommand { get; }
+        public RelayCommand ClearSelectedStaffCommand { get; }
         public RelayCommand InitializeCommand { get; }
 
 
@@ -96,30 +80,14 @@ namespace Client.Desktop.ViewModels.Windows
 
             SaveCommand = new RelayCommand(Save);
             CloseCommand = new RelayCommand(Close);
-            InitializeCommand = new RelayCommand(Initialize);
+            NewCommand = new RelayCommand(NewLinen);
+            ClearSelectedStaffCommand = new RelayCommand(ClearSelectedStaff);
+            //InitializeCommand = new RelayCommand(Initialize);
 
             PropertyChanged += OnPropertyChanged;
         }
 
-        public void SetSelectedLinen(ClientLinenEntity linen)
-        {
-            SelectedLinen = null;
-
-            if (linen != null)
-            {
-                SelectedLinen = new ClientLinenEntityViewModel(linen);
-                return;
-            }
-
-            SelectedLinen = new ClientLinenEntityViewModel(new ClientLinenEntity()
-            {
-                DepartmentId = SelectedDepartment.Id,
-                ClientId = SelectedClient.Id,
-                StaffId = SelectedStaff?.Id,
-            });
-        }
-
-        private async void Initialize()
+        public async void Initialize()
         {
             _dialogService.ShowBusy();
 
@@ -137,8 +105,12 @@ namespace Client.Desktop.ViewModels.Windows
                 var masterLinens = await _laundryService.GetAllAsync<MasterLinenEntity>();
                 MasterLinens = masterLinens.ToList();
 
-                var linens = await _laundryService.GetAllAsync<ClientLinenEntity>();
+                var linen = await _laundryService.GetAllAsync<ClientLinenEntity>();
+                var linens = linen.Select(x => new ClientLinenEntityViewModel(x));
                 ClientLinens = linens.ToList();
+
+                RaisePropertyChanged(() => SortedDepartments);
+                RaisePropertyChanged(() => SortedStaffs);
 
                 HasChanges = false;
             }
@@ -152,19 +124,98 @@ namespace Client.Desktop.ViewModels.Windows
             }
         }
 
-        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void ItemOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(SelectedClient))
+            if (!(sender is ClientLinenEntityViewModel item)) return;
+
+            if (e.PropertyName == nameof(SelectedLinen.ClientId))
             {
-                RaisePropertyChanged(() =>  SortedDepartments);
+                RaisePropertyChanged(() => SortedDepartments);
+                RaisePropertyChanged(() => SortedStaffs);
             }
 
-            if (e.PropertyName == nameof(SelectedDepartment))
+            if (e.PropertyName == nameof(SelectedLinen.DepartmentId))
             {
                 RaisePropertyChanged(() => SortedStaffs);
             }
+
+            if (e.PropertyName == nameof(SelectedLinen.MasterLinenId))
+            {
+                SelectedLinen.PackingValue = MasterLinens.FirstOrDefault(x => x.Id == SelectedLinen.MasterLinenId).PackingValue;
+            }
         }
 
+        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            //if (e.PropertyName == nameof(SelectedDepartment))
+            //{
+            //    RaisePropertyChanged(() => SortedStaffs);
+            //}
+        }
+
+        private List<DepartmentEntity> SortDepartments()
+        {
+            var departments = new List<DepartmentEntity>();
+
+            if (SelectedLinen.ClientId == 0)
+            {
+                return departments;
+            }
+
+            departments = Departments?.Where(x => x.ClientId == SelectedLinen.ClientId).ToList();
+
+            if (departments != null && departments.All(x => x.Id != SelectedLinen.DepartmentId))
+            {
+                SelectedLinen.DepartmentId = 0;
+            }
+            return departments;
+        }
+
+        private List<ClientStaffEntity> SortStaffs()
+        {
+            var staffs = new List<ClientStaffEntity>();
+
+            if (SelectedLinen.DepartmentId == 0)
+            {
+                return staffs;
+            }
+            
+            staffs = Staffs?.Where(x => x.DepartmentId == SelectedLinen.DepartmentId).ToList();
+
+            if (staffs != null && staffs.All(x => x.Id != SelectedLinen.StaffId))
+            {
+                SelectedLinen.StaffId = null;
+            }
+            return staffs;
+        }
+
+        public void SetSelectedLinen(ClientLinenEntityViewModel linen)
+        {
+            SelectedLinen = linen;
+
+            SelectedLinen.PropertyChanged += ItemOnPropertyChanged;
+        }
+
+        private void NewLinen()
+        {
+            var linen = new ClientLinenEntityViewModel()
+            {
+                DepartmentId = SelectedLinen.DepartmentId,
+                ClientId = SelectedLinen.ClientId,
+                StaffId = SelectedLinen.StaffId,
+                Tag = SelectedLinen.Tag,
+                MasterLinenId = 0,
+            };
+
+            SelectedLinen = linen;
+
+            SelectedLinen.PropertyChanged += ItemOnPropertyChanged;
+        }
+
+        private void ClearSelectedStaff()
+        {
+            SelectedLinen.StaffId = null;
+        }
 
         private void Save()
         {
@@ -191,7 +242,7 @@ namespace Client.Desktop.ViewModels.Windows
 
         private void Close()
         {
-            if (!HasChanges)
+            if (SelectedLinen.HasChanges())
             {
                 if (_dialogService.ShowQuestionDialog($"Do you want to close window ? \n \"All changes will be canceled\""))
                 {

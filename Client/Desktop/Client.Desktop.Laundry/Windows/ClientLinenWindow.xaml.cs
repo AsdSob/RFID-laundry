@@ -3,12 +3,10 @@ using Client.Desktop.ViewModels.Windows;
 
 namespace Client.Desktop.Laundry.Windows
 {
-    [HasViewModel(typeof(MasterClientWindowModel))]
-
-    public partial class MasterClientWindow : CustomWindow
-
+    [HasViewModel(typeof(ClientLinenWindowModel))]
+    public partial class ClientLinenWindow : CustomWindow
     {
-        public MasterClientWindow()
+        public ClientLinenWindow()
         {
             InitializeComponent();
         }

@@ -46,6 +46,7 @@ namespace Client.Desktop.Laundry.ViewModels
             builder.RegisterType<MasterClientWindowModel>().SingleInstance();
             builder.RegisterType<MasterDepartmentWindowModel>().SingleInstance();
             builder.RegisterType<MasterStaffWindowModel>().SingleInstance();
+            builder.RegisterType<ClientLinenWindowModel>().SingleInstance();
 
             builder.RegisterType<AuthManageViewModel>();
             builder.RegisterType<TagRegistrationViewModel>().SingleInstance();

@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Shapes;
+using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
@@ -24,12 +27,18 @@ namespace Client.Desktop.ViewModels.Content
         private DepartmentEntity _selectedDepartment;
         private ObservableCollection<ClientStaffEntity> _staffs;
         private ClientStaffEntity _selectedStaff;
-        private ObservableCollection<ClientLinenEntity> _linens;
-        private ClientLinenEntity _selectedClientLinen;
+        private ObservableCollection<ClientLinenEntityViewModel> _linens;
+        private ClientLinenEntityViewModel _selectedClientLinen;
         private List<MasterLinenEntity> _masterLinens;
-        private Tuple<int, string> _selectedTag;
+        private RfidTagViewModel _selectedTag;
+        private string _addShowButton;
 
-        public Tuple<int, string> SelectedTag
+        public string AddShowButton
+        {
+            get => _addShowButton;
+            set => Set(ref _addShowButton, value);
+        }
+        public RfidTagViewModel SelectedTag
         {
             get => _selectedTag;
             set => Set(() => SelectedTag, ref _selectedTag, value);
@@ -39,12 +48,12 @@ namespace Client.Desktop.ViewModels.Content
             get => _masterLinens;
             set => Set(() => MasterLinens, ref _masterLinens, value);
         }
-        public ClientLinenEntity SelectedClientLinen
+        public ClientLinenEntityViewModel SelectedClientLinen
         {
             get => _selectedClientLinen;
             set => Set(() => SelectedClientLinen, ref _selectedClientLinen, value);
         }
-        public ObservableCollection<ClientLinenEntity> Linens
+        public ObservableCollection<ClientLinenEntityViewModel> Linens
         {
             get => _linens;
             set => Set(() => Linens, ref _linens, value);
@@ -87,10 +96,9 @@ namespace Client.Desktop.ViewModels.Content
             Departments?.Where(x => x?.ClientId == SelectedClient?.Id).ToObservableCollection();
 
         public ObservableCollection<ClientStaffEntity> SortedStaff => SortStaff();
-            
-        public ObservableCollection<ClientLinenEntity> SortedLinens =>
-            Linens?.Where(x => x?.StaffId == SelectedStaff?.Id).ToObservableCollection();
 
+        public ObservableCollection<ClientLinenEntityViewModel> SortedLinens => SortLinens();
+           
 
         public RelayCommand NewStaffCommand { get; }
         public RelayCommand EditStaffCommand { get; }
@@ -101,9 +109,10 @@ namespace Client.Desktop.ViewModels.Content
         public RelayCommand DeleteLinenCommand { get; }
 
         public RelayCommand InitializeCommand { get; }
-        public RelayCommand SearchTagCommand { get; }
-        public RelayCommand UseTagCommand { get; }
-        public RelayCommand ClearSelectedDepartmentCommand { get; }
+        public RelayCommand ClearSelectedStaffCommand { get; }
+
+        public RelayCommand AddShowLinenByTagCommand { get; }
+        public RelayCommand DeleteTagCommand { get; }
 
 
         public TagRegistrationViewModel(ILaundryService dataService, IDialogService dialogService, IResolver resolver, IMainDispatcher dispatcher)
@@ -113,23 +122,61 @@ namespace Client.Desktop.ViewModels.Content
             _resolverService = resolver ?? throw new ArgumentNullException(nameof(resolver));
             _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
 
-            NewStaffCommand = new RelayCommand(AddNewStaff,(() => SelectedDepartment !=null));
-            EditStaffCommand = new RelayCommand(EditStaff,(() => SelectedStaff !=null));
+            NewStaffCommand = new RelayCommand(()=> StaffWindow(null),(() => SelectedDepartment !=null));
+            EditStaffCommand = new RelayCommand(()=>StaffWindow(SelectedStaff), (() => SelectedStaff !=null));
             DeleteStaffCommand = new RelayCommand(DeleteStaff,(() => SelectedStaff !=null));
 
-            NewLinenCommand = new RelayCommand(()=> LinenWindow(null),() => SelectedStaff !=null);
-            EditLinenCommand = new RelayCommand(() => LinenWindow(SelectedClientLinen),() => SelectedStaff !=null);
+            NewLinenCommand = new RelayCommand(() => LinenWindow(null)/*, () => SelectedDepartment !=null*/);
+            EditLinenCommand = new RelayCommand(() => LinenWindow(SelectedClientLinen),() => SelectedClientLinen !=null);
             DeleteLinenCommand = new RelayCommand(DeleteLinen,(() => SelectedClientLinen !=null));
 
-            SearchTagCommand = new RelayCommand(SearchTag);
-            ClearSelectedDepartmentCommand = new RelayCommand(ClearSelectedDepartment);
-
-            UseTagCommand = new RelayCommand(UseTag, (() => SelectedTag != null));
+            ClearSelectedStaffCommand = new RelayCommand(ClearSelectedStaff);
+            AddShowLinenByTagCommand = new RelayCommand(AddShowLinenByTag, () => SelectedTag != null);
+            DeleteTagCommand = new RelayCommand(DeleteTag, () => SelectedTag != null || SelectedClientLinen != null);
 
             InitializeCommand = new RelayCommand(Initialize);
             RfidReaderWindow = _resolverService.Resolve<RfidReaderWindowModel>();
 
+            AddShowButton = "Add";
+
+            RfidReaderWindow.Tags.CollectionChanged += TagsCollectionChanged;
+
             PropertyChanged += OnPropertyChanged;
+        }
+
+        //private void UnSubscribeItem(ClientLinenEntityViewModel item)
+        //{
+        //    item.PropertyChanged -= ItemOnPropertyChanged;
+        //}
+
+        //private void SubscribeItem(ClientLinenEntityViewModel item)
+        //{
+        //    item.PropertyChanged += ItemOnPropertyChanged;
+        //}
+
+        //private void ItemOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        //{
+        //    if (!(sender is ClientLinenEntityViewModel item)) return;
+
+        //    if (item.HasChanges() && item.IsValid)
+        //    {
+        //        item.AcceptChanges();
+        //        _laundryService.AddOrUpdateAsync(item.OriginalObject);
+        //    }
+        //}
+
+        private void TagsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (var tag in RfidReaderWindow.Tags)
+                {
+                    if (Linens.Any(x => x.Tag == tag.Tag))
+                    {
+                        tag.IsRegistered = true;
+                    }
+                }
+            }
         }
 
         private async void Initialize()
@@ -143,95 +190,91 @@ namespace Client.Desktop.ViewModels.Content
             var masterLinen = await _laundryService.GetAllAsync<MasterLinenEntity>();
             MasterLinens = masterLinen.ToList();
 
+            GetStaffs();
+            GetClientLinens();
+        }
+
+        private async void GetStaffs()
+        {
             var staff = await _laundryService.GetAllAsync<ClientStaffEntity>();
             Staffs = staff.ToObservableCollection();
 
-            var linen = await _laundryService.GetAllAsync<ClientLinenEntity>();
-            Linens = linen.ToObservableCollection();
+            RaisePropertyChanged(() => SortedStaff);
+        }
 
+        private async void GetClientLinens()
+        {
+            var linen = await _laundryService.GetAllAsync<ClientLinenEntity>();
+            var linens = linen.Select(x => new ClientLinenEntityViewModel(x));
+            Linens = linens.ToObservableCollection();
+
+            RaisePropertyChanged(()=> SortedLinens);
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(SelectedClient))
-            {
-                RaisePropertyChanged(() => SortedDepartments);
-            }
+            //if (e.PropertyName == nameof(SelectedClient))
+            //{
+            //    RaisePropertyChanged(() => SortedDepartments);
+            //}else
 
-            if (e.PropertyName == nameof(SelectedDepartment))
-            {
-                NewStaffCommand?.RaiseCanExecuteChanged();
+            //if (e.PropertyName == nameof(SelectedDepartment))
+            //{
+            //    NewStaffCommand?.RaiseCanExecuteChanged();
+            //    NewLinenCommand?.RaiseCanExecuteChanged();
 
-                RaisePropertyChanged(() => SortedStaff);
-            }
+            //    RaisePropertyChanged(() => SortedLinens);
+            //    RaisePropertyChanged(() => SortedStaff);
+            //}else
 
-            if (e.PropertyName == nameof(SelectedStaff))
-            {
-                EditStaffCommand.RaiseCanExecuteChanged();
-                NewLinenCommand?.RaiseCanExecuteChanged();
-                DeleteStaffCommand?.RaiseCanExecuteChanged();
-                
-                RaisePropertyChanged(() => SortedLinens);
-            }
+            //if (e.PropertyName == nameof(SelectedStaff))
+            //{
+            //    EditStaffCommand.RaiseCanExecuteChanged();
+            //    DeleteStaffCommand?.RaiseCanExecuteChanged();
+
+            //    RaisePropertyChanged(() => SortedLinens);
+            //}else
 
             if (e.PropertyName == nameof(SelectedClientLinen))
             {
                 DeleteLinenCommand?.RaiseCanExecuteChanged();
+                EditLinenCommand?.RaiseCanExecuteChanged();
+                DeleteTagCommand?.RaiseCanExecuteChanged();
             }
+            else
 
             if (e.PropertyName == nameof(SelectedTag))
             {
-                UseTagCommand?.RaiseCanExecuteChanged();
-
-                SearchingTag = SelectedTag.Item2;
+                AddShowLinenByTagCommand?.RaiseCanExecuteChanged();
+                DeleteTagCommand?.RaiseCanExecuteChanged();
+                AddShowButtonName();
             }
+        }
+
+        private ObservableCollection<ClientLinenEntityViewModel> SortLinens()
+        {
+            return SelectedStaff == null ?
+                Linens?.Where(x => x.DepartmentId == SelectedDepartment?.Id).ToObservableCollection() :
+                Linens?.Where(x => x?.StaffId == SelectedStaff?.Id).ToObservableCollection();
         }
 
         private ObservableCollection<ClientStaffEntity> SortStaff()
         {
             var staff = new ObservableCollection<ClientStaffEntity>();
 
-            if (SelectedDepartment == null)
+            if (SelectedDepartment == null && SortedDepartments != null)
             {
-                foreach (var department in SortedDepartments.Where(x=> x.ClientId == SelectedClient?.Id))
+                foreach (var department in SortedDepartments.Where(x => x.ClientId == SelectedClient?.Id))
                 {
-                    staff.AddRange(Staffs?.Where(x => x?.DepartmentId == department?.Id).ToObservableCollection());
+                    staff.AddRange(Staffs?.Where(x => x?.DepartmentId == department.Id).ToObservableCollection());
                 }
             }
             else
             {
-                staff =Staffs?.Where(x => x?.DepartmentId == SelectedDepartment?.Id).ToObservableCollection();
+                staff = Staffs?.Where(x => x?.DepartmentId == SelectedDepartment?.Id).ToObservableCollection();
             }
 
             return staff;
-        }
-
-        private void ClearSelectedDepartment()
-        {
-            SelectedDepartment = null;
-        }
-
-        private async void DeleteLinen()
-        {
-            var masterLinen = MasterLinens.FirstOrDefault(x => x.Id == SelectedClientLinen.MasterLinenId);
-
-            if (!_dialogService.ShowQuestionDialog(
-                    $"Do you want to DELETE {masterLinen?.Name} ?")) 
-                return;
-
-            await _laundryService.DeleteAsync(SelectedClientLinen);
-
-            Linens.Remove(SelectedClientLinen);
-        }
-
-        private void EditStaff()
-        {
-            StaffWindow(SelectedStaff);
-        }
-
-        private void AddNewStaff()
-        {
-            StaffWindow(null);
         }
 
         private void StaffWindow(ClientStaffEntity staff)
@@ -244,9 +287,7 @@ namespace Client.Desktop.ViewModels.Content
 
             if (staffWindow.HasChanges)
             {
-                Staffs.Clear();
-                Initialize();
-                RaisePropertyChanged((() => SortedStaff));
+                GetStaffs();
             }
         }
 
@@ -267,76 +308,157 @@ namespace Client.Desktop.ViewModels.Content
                 foreach (var linen in linens)
                 {
                     linen.StaffId = null;
-                    _laundryService.AddOrUpdateAsync(linen);
+                    _laundryService.AddOrUpdateAsync(linen.OriginalObject);
                 }
                 return;
             }
 
             foreach (var linen in linens)
             {
-                _laundryService.DeleteAsync(linen);
+                _laundryService.DeleteAsync(linen.OriginalObject);
                 Linens.Remove(linen);
             }
         }
 
-
-        private void LinenWindow(ClientLinenEntity linen)
+        private void LinenWindow(ClientLinenEntityViewModel linen)
         {
             var linenWindow = _resolverService.Resolve<ClientLinenWindowModel>();
 
+            linenWindow.Clients = Clients.ToList();
+            linenWindow.Departments = Departments.ToList();
+            linenWindow.Staffs = Staffs.ToList();
+            linenWindow.MasterLinens = MasterLinens.ToList();
+            linenWindow.ClientLinens = Linens.ToList();
+
+            if (linen == null)
+            {
+                linen = new ClientLinenEntityViewModel()
+                {
+                    //ClientId = SelectedClient?.Id,
+                    //DepartmentId = SelectedDepartment.Id,
+                    //StaffId = SelectedStaff?.Id,
+                    Tag = SelectedTag?.Tag,
+                };
+            }
+
             linenWindow.SetSelectedLinen(linen);
-            linenWindow.SelectedClient = SelectedClient;
-            linenWindow.SelectedDepartment = SelectedDepartment;
-            linenWindow.SelectedStaff = SelectedStaff;
 
             _dialogService.ShowDialog(linenWindow);
 
             if (linenWindow.HasChanges)
             {
-                Linens.Clear();
-                Initialize();
-                RaisePropertyChanged((() => SortedLinens));
+                GetClientLinens();
+                CheckTags();
             }
         }
 
-        private void SearchTag()
+        private async void DeleteLinen()
         {
-            if(String.IsNullOrWhiteSpace(SearchingTag)) return;
+            var masterLinen = MasterLinens.FirstOrDefault(x => x.Id == SelectedClientLinen.MasterLinenId);
 
-            var linen = Linens.FirstOrDefault(x => x.Tag == SearchingTag);
+            if (!_dialogService.ShowQuestionDialog(
+                $"Do you want to DELETE {masterLinen?.Name} ?"))
+                return;
 
-            SelectedClient = Clients.FirstOrDefault(x => x.Id == linen?.ClientId);
-            SelectedDepartment = SortedDepartments.FirstOrDefault(x => x.Id == linen?.DepartmentId);
-            SelectedStaff = SortedStaff.FirstOrDefault(x => x.Id == linen?.StaffId);
+            await _laundryService.DeleteAsync(SelectedClientLinen.OriginalObject);
+
+            Linens.Remove(SelectedClientLinen);
+            CheckTags();
+            RaisePropertyChanged(()=> SortedLinens);
+        }
+
+        private void AddShowButtonName()
+        {
+            if(SelectedTag == null) return;
+
+            AddShowButton = SelectedTag.IsRegistered ? "Show" : "Add";
+        }
+
+        private void CheckTags()
+        {
+            foreach (var tag in RfidReaderWindow.Tags)
+            {
+                 tag.IsRegistered = Linens.Any(x => Equals(x.Tag, tag.Tag));
+            }
+        }
+
+        private void AddShowLinenByTag()
+        {
+            if (SelectedTag.IsRegistered)
+            {
+                var linen = Linens.FirstOrDefault(x => x.Tag == SelectedTag.Tag);
+                if (linen == null) return;
+
+                SelectedClientLinen = linen;
+
+                LinenWindow(linen);
+
+                //SelectedClient = Clients.FirstOrDefault(x => x.Id == linen.ClientId);
+                //SelectedDepartment = SortedDepartments.FirstOrDefault(x => x.Id == linen.DepartmentId);
+
+                //if (linen.StaffId != null)
+                //{
+                //    SelectedStaff = SortedStaff.FirstOrDefault(x => x.Id == linen.StaffId);
+                //}
+            }
+            else
+            {
+                UseTag();
+                CheckTags();
+            }
+        }
+
+        private void DeleteTag()
+        {
+            if (!_dialogService.ShowQuestionDialog($"Do you want to Delete \"{SelectedClientLinen.Tag}\" ?"))
+            {
+                return;
+            }
+
+            SelectedClientLinen.Tag = null;
+            SelectedClientLinen.AcceptChanges();
+            CheckTags();
+
+            _laundryService.AddOrUpdateAsync(SelectedClientLinen.OriginalObject);
+        }
+
+        private void ClearSelectedStaff()
+        {
+            SelectedStaff = null;
         }
 
         private void UseTag()
         {
             if(SelectedClientLinen ==null || SelectedTag == null) return;
 
-            if (Linens.Any(x => x.Tag == SelectedTag.Item2))
-            {
-                var existLinen = Linens.FirstOrDefault(x => Equals(x.Tag, SelectedTag.Item2));
-                var staff = Staffs.FirstOrDefault(x => x.Id == existLinen.StaffId);
+            SelectedClientLinen.Tag = SelectedTag.Tag;
+            SelectedClientLinen.AcceptChanges();
+            SelectedTag.IsRegistered = true;
 
-                if (!_dialogService.ShowQuestionDialog(
-                    $"Tag {SelectedTag.Item2} already using by {staff?.Name} in <{existLinen.Id}> linen \n Do you want to shift Tag?")
-                ) return;
+            _laundryService.AddOrUpdateAsync(SelectedClientLinen.OriginalObject);
 
-                existLinen.Tag = null;
-                SelectedClientLinen.Tag = SelectedTag.Item2;
-                return;
-            }
+            //if (Linens.Any(x => x.Tag == SelectedTag.Item2))
+            //{
+            //    var existLinen = Linens.FirstOrDefault(x => Equals(x.Tag, SelectedTag.Item2));
+            //    var staff = Staffs.FirstOrDefault(x => x.Id == existLinen.StaffId);
 
-            if (!String.IsNullOrWhiteSpace(SelectedClientLinen.Tag))
-            {
-                if (_dialogService.ShowQuestionDialog($"Selected linen has tag, \n Do you want to replace it?"))
-                {
-                    SelectedClientLinen.Tag = SelectedTag.Item2;
-                    return;
-                }
-            }
+            //    if (!_dialogService.ShowQuestionDialog(
+            //        $"Tag {SelectedTag.Item2} already using by {staff?.Name} in <{existLinen.Id}> linen \n Do you want to shift Tag?")
+            //    ) return;
 
+            //    existLinen.Tag = null;
+            //    SelectedClientLinen.Tag = SelectedTag.Item2;
+            //    return;
+            //}
+
+            //if (!String.IsNullOrWhiteSpace(SelectedClientLinen.Tag))
+            //{
+            //    if (_dialogService.ShowQuestionDialog($"Selected linen has tag, \n Do you want to replace it?"))
+            //    {
+            //        SelectedClientLinen.Tag = SelectedTag.Item2;
+            //        return;
+            //    }
+            //}
         }
     }
 }

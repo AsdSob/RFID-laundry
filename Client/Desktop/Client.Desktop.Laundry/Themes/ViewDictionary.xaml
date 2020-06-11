@@ -13,10 +13,6 @@
         <views:MenuView/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type content:AddViewModel}">
-        <contentView:AddView/>
-    </DataTemplate>
-
     <DataTemplate DataType="{x:Type content:MasterClientViewModel}">
         <contentView:MasterClientView/>
     </DataTemplate>
@@ -41,6 +37,7 @@
         <contentView:BinSoilCollectionView/>
     </DataTemplate>
 
+<!-- Windows -->
 
     <DataTemplate DataType="{x:Type windows:RfidReaderWindowModel}">
         <windows1:RfidReaderWindow/>
@@ -60,6 +57,10 @@
 
     <DataTemplate DataType="{x:Type windows:MasterStaffWindowModel}">
         <windows1:MasterStaffWindow/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type windows:ClientLinenWindowModel}">
+        <windows1:ClientLinenWindow/>
     </DataTemplate>
 
 </ResourceDictionary>

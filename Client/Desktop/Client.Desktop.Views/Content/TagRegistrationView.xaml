@@ -21,8 +21,8 @@
 
     <Grid Margin=" 5,20">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="1"/>
+            <ColumnDefinition Width="3*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -30,31 +30,30 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
            
-
-        <Grid Grid.Column="0" Grid.Row="1" Margin="10,0">
+        <!--<Grid Grid.Column="0" Grid.Row="1" Margin="10,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <!-- Clients -->
+            --><!-- Clients --><!--
             <GroupBox Grid.Row="0" Grid.Column="0" Header="Client" Padding="10">
-
                 <ComboBox ItemsSource="{Binding Clients}" SelectedValue="{Binding SelectedClient}" DisplayMemberPath="Name"/>
-
             </GroupBox>
 
-            <!-- Departments -->
+            --><!-- Departments --><!--
             <GroupBox Grid.Row="1" Grid.Column="0" Header="Departments" Padding="10">
 
                 <DataGrid Height="Auto"
                           ItemsSource="{Binding SortedDepartments}"
                           SelectedItem="{Binding SelectedDepartment}"
                           SelectionMode="Single"
+                          HeadersVisibility="None"
                           VerticalScrollBarVisibility="Visible"
                           AllowDrop="True" 
                           IsReadOnly="True"
@@ -71,17 +70,17 @@
             </GroupBox>
 
 
-            <!-- Staff -->
+            --><!-- Staff --><!--
             <GroupBox Grid.Row="2" Grid.Column="0" Header="Staff" Padding="10">
-                
                 <DockPanel>
 
-                    <!-- Staff Commands -->
-                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                            <Button Margin = "5" Padding="5"  Content="New" Command="{Binding AddStaffCommand}"/>
-                            <Button Margin = "5" Padding="5"  Content="Edit" Command="{Binding EditStaffCommand}"/>
-                            <Button Margin = "5" Padding="5"  Content="Delete" Command="{Binding DeleteStaffCommand}"/>
-                    </StackPanel>
+                    --><!-- Staff Commands --><!--
+                    <DockPanel DockPanel.Dock="Top" LastChildFill="False">
+                            <Button Margin = "5" Padding="5" DockPanel.Dock="Left" Content="New" Command="{Binding NewStaffCommand}"/>
+                            <Button Margin = "5" Padding="5" DockPanel.Dock="Left" Content="Edit" Command="{Binding EditStaffCommand}"/>
+                            <Button Margin = "5" Padding="5" DockPanel.Dock="Left" Content="Delete" Command="{Binding DeleteStaffCommand}"/>
+                            <Button Margin = "5" Padding="5" DockPanel.Dock="Right" Content="All Staff" Command="{Binding ClearSelectedStaffCommand}"/>
+                    </DockPanel>
 
                     <DataGrid Height="Auto"
                               DockPanel.Dock="Bottom"
@@ -91,6 +90,7 @@
                               VerticalScrollBarVisibility="Visible"
                               AllowDrop="True" 
                               IsReadOnly="True"
+                              HeadersVisibility="None"
                               HorizontalAlignment="Stretch"
                               AutoGenerateColumns="False"
                               IsTextSearchEnabled="True"
@@ -104,7 +104,7 @@
                 </DockPanel>
 
             </GroupBox>
-        </Grid>
+        </Grid>-->
 
         <Grid Grid.Row="1" Grid.Column="1" Margin="10,0" Name="LinenWindow">
             <Grid.RowDefinitions>
@@ -126,21 +126,21 @@
             <GroupBox Grid.Row="1" Grid.Column="0" Header="Linen">
 
                 <DataGrid Height="Auto"
-                          ItemsSource="{Binding SortedLinens}"
+                          ItemsSource="{Binding Linens}"
                           SelectedItem="{Binding SelectedClientLinen}"
                           SelectionMode="Single"
-                          VerticalScrollBarVisibility="Visible"
-                          AllowDrop="True" 
-                          IsReadOnly="False"
+                          IsReadOnly="true"
                           HorizontalAlignment="Stretch"
-                          AutoGenerateColumns="False"
                           IsTextSearchEnabled="True"
                           CanUserAddRows="False"
+                          AutoGenerateColumns="False"
                           HorizontalContentAlignment="Stretch"
-                          IsTextSearchCaseSensitive="False">
+                          >
 
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Id" Binding="{Binding Id}"  IsReadOnly="True" />
+
+                        <!--Linen-->
 
                         <DataGridComboBoxColumn Header="Linen"
                                                 DisplayMemberPath="Name"
@@ -155,6 +155,63 @@
                             <DataGridComboBoxColumn.EditingElementStyle>
                                 <Style TargetType="{x:Type ComboBox}">
                                     <Setter Property="ItemsSource" Value="{Binding Path=DataContext.MasterLinens, ElementName=LinenWindow}" />
+                                </Style>
+                            </DataGridComboBoxColumn.EditingElementStyle>
+                        </DataGridComboBoxColumn>
+
+                        <!--Staff-->
+
+                        <DataGridComboBoxColumn Header="Staff"
+                                                DisplayMemberPath="Name"
+                                                SelectedValuePath="Id"
+                                                Width="*"
+                                                SelectedValueBinding="{Binding StaffId}">
+                            <DataGridComboBoxColumn.ElementStyle>
+                                <Style TargetType="{x:Type ComboBox}">
+                                    <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Staffs, ElementName=LinenWindow}" />
+                                </Style>
+                            </DataGridComboBoxColumn.ElementStyle>
+                            <DataGridComboBoxColumn.EditingElementStyle>
+                                <Style TargetType="{x:Type ComboBox}">
+                                    <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Staffs, ElementName=LinenWindow}" />
+                                </Style>
+                            </DataGridComboBoxColumn.EditingElementStyle>
+                        </DataGridComboBoxColumn>
+
+                        <!--Client-->
+
+                        <DataGridComboBoxColumn Header="Client"
+                                                DisplayMemberPath="ShortName"
+                                                SelectedValuePath="Id"
+                                                Width="*"
+                                                SelectedValueBinding="{Binding ClientId}">
+                            <DataGridComboBoxColumn.ElementStyle>
+                                <Style TargetType="{x:Type ComboBox}">
+                                    <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Clients, ElementName=LinenWindow}" />
+                                </Style>
+                            </DataGridComboBoxColumn.ElementStyle>
+                            <DataGridComboBoxColumn.EditingElementStyle>
+                                <Style TargetType="{x:Type ComboBox}">
+                                    <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Clients, ElementName=LinenWindow}" />
+                                </Style>
+                            </DataGridComboBoxColumn.EditingElementStyle>
+                        </DataGridComboBoxColumn>
+
+                        <!--Department-->
+
+                        <DataGridComboBoxColumn Header="Department"
+                                                DisplayMemberPath="Name"
+                                                SelectedValuePath="Id"
+                                                Width="*"
+                                                SelectedValueBinding="{Binding DepartmentId}">
+                            <DataGridComboBoxColumn.ElementStyle>
+                                <Style TargetType="{x:Type ComboBox}">
+                                    <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Departments, ElementName=LinenWindow}" />
+                                </Style>
+                            </DataGridComboBoxColumn.ElementStyle>
+                            <DataGridComboBoxColumn.EditingElementStyle>
+                                <Style TargetType="{x:Type ComboBox}">
+                                    <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Departments, ElementName=LinenWindow}" />
                                 </Style>
                             </DataGridComboBoxColumn.EditingElementStyle>
                         </DataGridComboBoxColumn>
@@ -181,19 +238,10 @@
             </Grid.RowDefinitions>
 
             <!-- Search Tag -->
-            <GroupBox Grid.Row="1" Grid.Column="0" Header="Tag Search">
-                <DockPanel>
-                    <Button Content="search.."
-                            DockPanel.Dock="Right"
-                            Command="{Binding  SearchTagCommand}"
-                            Width="70"
-                            Margin = "5"
-                            Padding="10,2"
-                    />
-
-                    <TextBox DockPanel.Dock="Left" Text="{Binding SearchingTag}" VerticalContentAlignment="Center"/>
-                </DockPanel>
-            </GroupBox>
+            <DockPanel Grid.Row="1" Grid.Column="0" LastChildFill="False">
+                <Button Margin = "5" Padding="10,5"  Content="{Binding AddShowButton}" Command="{Binding AddShowLinenByTagCommand}"/>
+                <Button Margin = "5" Padding="10,5"  Content="Delete" Command="{Binding DeleteTagCommand}"/>
+            </DockPanel>
 
             <!-- RFID\Reader Commands -->
             <DockPanel Grid.Row="0"
@@ -204,21 +252,23 @@
                 <Button DockPanel.Dock="Right"
                         Content="{Binding RfidReaderWindow.StartStopButton}"
                         Command="{Binding RfidReaderWindow.StartStopReaderCommand}"
-                        Width="70"
-                        Margin = "5"
-                        Padding="10,2"
+                        Margin = "20,0"
+                        Padding="20,10"
                 />
 
                 <!-- Connect/Disconnect-->
-                <Button DockPanel.Dock="Right"
+                <!--<Button DockPanel.Dock="Right"
                         Content="{Binding RfidReaderWindow.ConnectDisconnectButton}"
                         Command="{Binding RfidReaderWindow.ConnectReaderCommand}"
                         Width="70"
                         Margin = "5"
                         Padding="10,2"
-                />
+                />-->
 
-                <ComboBox DockPanel.Dock="Left" ItemsSource="{Binding RfidReaderWindow.RfidReaders}" SelectedValue="{Binding RfidReaderWindow.SelectedRfidReader}" DisplayMemberPath="Name"/>
+                <ComboBox DockPanel.Dock="Left" 
+                          ItemsSource="{Binding RfidReaderWindow.RfidReaders}" SelectedValue="{Binding RfidReaderWindow.SelectedRfidReader}" 
+                          VerticalContentAlignment="Center"
+                          DisplayMemberPath="Name"/>
 
             </DockPanel>
 
@@ -229,14 +279,13 @@
                           SelectedItem="{Binding SelectedTag, UpdateSourceTrigger=PropertyChanged}"
                           VerticalScrollBarVisibility="Visible"
                           AllowDrop="True" 
-                          HorizontalAlignment="Stretch"
                           EnableRowVirtualization="True" 
                           IsReadOnly="True" 
-                          IsTextSearchCaseSensitive="False"
                 >
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Antenna" Binding="{Binding Path=Item1}" />
-                        <DataGridTextColumn Header="Tag" Binding="{Binding Path=Item2}" />
+                        <DataGridTextColumn Header="Antenna" Binding="{Binding Path=Antenna}" Width="Auto" />
+                        <DataGridTextColumn Header="reg" Binding="{Binding Path=IsRegistered}" Width="Auto" />
+                        <DataGridTextColumn Header="Tag" Binding="{Binding Path=Tag}" Width="*" />
                     </DataGrid.Columns>
 
                 </DataGrid>

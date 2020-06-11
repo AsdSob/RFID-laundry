@@ -132,11 +132,22 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
         {
             var error = String.Empty;
 
+            if (columnName == nameof(ClientId))
+            {
+                ClientId.ValidateRequired(ref error);
+            }
+            else
+            if (columnName == nameof(DepartmentId))
+            {
+                DepartmentId.ValidateRequired(ref error);
+            }
+            else
             if (columnName == nameof(MasterLinenId))
             {
                 MasterLinenId.ValidateRequired(ref error);
             }
-            else if(columnName == nameof(PackingValue))
+            else
+            if (columnName == nameof(PackingValue))
             {
                 PackingValue.ValidateMinAmount(ref error);
             }
@@ -151,6 +162,8 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             var error = String.Empty;
 
             MasterLinenId.ValidateRequired(ref error);
+            ClientId.ValidateRequired(ref error);
+            DepartmentId.ValidateRequired(ref error);
             PackingValue.ValidateMinAmount(ref error);
 
             Error = error;
