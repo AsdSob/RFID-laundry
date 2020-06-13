@@ -98,16 +98,15 @@ namespace Client.Desktop.ViewModels.Content
 
         public ObservableCollection<ClientLinenEntityViewModel> SortedLinens => SortLinen();
 
-        public RelayCommand SaveCommand { get; }
         public RelayCommand AddStaffCommand { get; }
-        public RelayCommand DeleteStaffCommand { get; }
         public RelayCommand AddLinenCommand { get; }
-        public RelayCommand DeleteLinenCommand { get; }
         public RelayCommand RfidReaderCommand { get; }
-        public RelayCommand GetReaderTagsCommand { get; }
         public RelayCommand EditStaffCommand { get; }
+        public RelayCommand EditLinenCommand { get; }
 
         public RelayCommand AddSelectedTagCommand { get; }
+
+        public RelayCommand InitializeCommand { get; }
         
 
         public MasterStaffViewModel(ILaundryService dataService, IDialogService dialogService, IResolver resolver, IMainDispatcher dispatcher)
@@ -116,27 +115,22 @@ namespace Client.Desktop.ViewModels.Content
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _resolverService = resolver ?? throw new ArgumentNullException(nameof(resolver));
 
-            SaveCommand = new RelayCommand(Save);
             AddStaffCommand = new RelayCommand(AddNewStaff, (() => SelectedDepartment != null));
             EditStaffCommand = new RelayCommand(EditStaff, (() => SelectedStaff != null));
-            DeleteStaffCommand = new RelayCommand(DeleteStaff, (() => SelectedStaff != null));
 
             AddLinenCommand = new RelayCommand(AddLinen, (() => SelectedDepartment != null));
-            DeleteLinenCommand = new RelayCommand(DeleteLinen, (() => SelectedClientLinen != null));
+            EditLinenCommand = new RelayCommand(AddLinen, (() => SelectedClientLinen != null));
 
             RfidReaderCommand = new RelayCommand(RfidReader);
-            GetReaderTagsCommand = new RelayCommand(GetReaderTags);
+            InitializeCommand = new RelayCommand(Initialize);
             AddSelectedTagCommand = new RelayCommand(AddSelectedTag, (() => SelectedTag != null));
-
-            Task.Factory.StartNew( () => GetData());
 
             RfidReaderWindow = _resolverService.Resolve<RfidReaderWindowModel>();
 
             Tags = new ObservableCollection<Tuple<int, string>>();
         }
 
-
-        private async Task GetData()
+        private async void Initialize()
         {
             _dialogService.ShowBusy();
 
@@ -160,7 +154,6 @@ namespace Client.Desktop.ViewModels.Content
                 Linens = linens.ToObservableCollection();
 
                 await GetStaffs();
-
             }
             catch (Exception e)
             {
@@ -201,21 +194,18 @@ namespace Client.Desktop.ViewModels.Content
             if (e.PropertyName == nameof(SelectedStaff))
             {
                 RaisePropertyChanged(() => SortedLinens);
-
-                DeleteStaffCommand.RaiseCanExecuteChanged();
                 EditStaffCommand.RaiseCanExecuteChanged();
             }
 
             if (e.PropertyName == nameof(SelectedClientLinen))
             {
-                DeleteLinenCommand.RaiseCanExecuteChanged();
+                EditLinenCommand.RaiseCanExecuteChanged();
             }
 
             if(e.PropertyName == nameof(SelectedTag))
             {
                 AddSelectedTagCommand.RaiseCanExecuteChanged();
             }            
-          
         }
 
         private ObservableCollection<ClientLinenEntityViewModel> SortLinen()
@@ -241,11 +231,6 @@ namespace Client.Desktop.ViewModels.Content
             _dialogService.ShowInfoDialog("All changes saved");
         }
 
-        private void DeleteEntity<T>(T entity) where T : EntityBase
-        {
-            //TODO: Delete Entity
-        }
-
         private void EditStaff()
         {
             StaffWindow(SelectedStaff);
@@ -262,9 +247,8 @@ namespace Client.Desktop.ViewModels.Content
 
             staffWindow.SetSelectedStaff(staff, SelectedDepartment.OriginalObject);
 
-            _dialogService.ShowDialog(staffWindow);
 
-            if (staffWindow.HasChanges)
+            if (_dialogService.ShowDialog(staffWindow))
             {
                 Staff.Clear();
                 await GetStaffs();
@@ -272,32 +256,10 @@ namespace Client.Desktop.ViewModels.Content
             }
         }
 
-        private void DeleteStaff()
-        {
-            var staff = SelectedStaff;
-
-            if (staff == null) return;
-            if (!_dialogService.ShowQuestionDialog($"Do you want to DELETE {staff.Name}?")) return;
-
-            DeleteEntity(staff);
-            Staff.Remove(staff);
-
-            if (!_dialogService.ShowQuestionDialog($"Do you want to DELETE {staff.Name} linens also?")) return;
-
-            var linens = Linens.Where(x => x.StaffId == staff.Id).ToList();
-
-            foreach (var linen in linens)
-            {
-                DeleteEntity(linen.OriginalObject);
-                Linens.Remove(linen);
-            }
-
-        }
-
         private void AddLinen()
         {
             if (SelectedDepartment == null) return;
-            if (!_dialogService.ShowQuestionDialog("Do you want to add new Linen?")) return;
+            //if (!_dialogService.ShowQuestionDialog("Do you want to add new Linen?")) return;
 
             var newLinen = new ClientLinenEntityViewModel()
             {
@@ -319,33 +281,12 @@ namespace Client.Desktop.ViewModels.Content
             SelectedClientLinen = newLinen;
         }
 
-        private void DeleteLinen()
-        {
-            var linen = SelectedClientLinen;
-
-            if (linen == null) return;
-            if (!_dialogService.ShowQuestionDialog(
-                $"Do you want to DELETE {MasterLinens?.FirstOrDefault(x => x.Id == SelectedClientLinen?.MasterLinenId)?.Name}?")
-            ) return;
-
-            DeleteEntity(linen.OriginalObject);
-            Linens.Remove(linen);
-
-            RaisePropertyChanged(()=> SortedLinens);
-        }
-
-
         private void RfidReader()
         {
             RfidReaderWindow.ReaderService.StopRead();
 
             var showDialog = _dialogService.ShowDialog(RfidReaderWindow);
 
-        }
-
-        private void GetReaderTags()
-        {
-            //Tags = RfidReaderWindow.Tags;
         }
 
         private void AddSelectedTag()
@@ -374,9 +315,7 @@ namespace Client.Desktop.ViewModels.Content
             }
 
             SelectedClientLinen.Tag = SelectedTag.Item2;
-
         }
-
         
     }
 }

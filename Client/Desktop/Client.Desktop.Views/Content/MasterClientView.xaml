@@ -15,7 +15,7 @@
 
     <b:Interaction.Triggers>
         <b:EventTrigger EventName="Loaded">
-            <b:InvokeCommandAction Command="{Binding InitilizeCommand}"/>
+            <b:InvokeCommandAction Command="{Binding InitializeCommand}"/>
         </b:EventTrigger>
     </b:Interaction.Triggers>
 
@@ -42,7 +42,6 @@
                 <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10" >
                     <Button Margin = "5" Padding="20,5"  Content="New" Command="{Binding AddClientCommand}"/>
                     <Button Margin = "5" Padding="20,5"  Content="Edit" Command="{Binding EditClientCommand}"/>
-                    <Button Margin = "5" Padding="20,5"  Content="Delete" Command="{Binding DeleteClientCommand}"/>
                 </StackPanel>
 
                 <DataGrid Grid.Row="1" Height="Auto"
@@ -117,9 +116,8 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
-                    <Button Margin = "5" Padding="20,5"  Content="New" Command="{Binding AddDepartmentCommand}"/>
-                    <Button Margin = "5" Padding="20,5"  Content="Edit" Command="{Binding EditDepartmentCommand}"/>
-                    <Button Margin = "5" Padding="20,5"  Content="Delete" Command="{Binding DeleteDepartmentCommand}"/>
+                    <Button Margin = "5" Padding="10,5" Content="New" Command="{Binding AddDepartmentCommand}"/>
+                    <Button Margin = "5" Padding="10,5" Content="Edit" Command="{Binding EditDepartmentCommand}"/>
                 </StackPanel>
 
                 <DataGrid Grid.Row="1" Height="Auto"
@@ -152,9 +150,8 @@
                 </Grid.RowDefinitions>
         
                 <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
-                    <Button Margin = "5" Padding="20,5"  Content="New" Command="{Binding AddStaffCommand}"/>
-                    <Button Margin = "5" Padding="20,5"  Content="Edit" Command="{Binding EditStaffCommand}"/>
-                    <Button Margin = "5" Padding="20,5"  Content="Delete" Command="{Binding DeleteStaffCommand}"/>
+                    <Button Margin = "5" Padding="10,5" Content="New" Command="{Binding AddStaffCommand}"/>
+                    <Button Margin = "5" Padding="10,5" Content="Edit" Command="{Binding EditStaffCommand}"/>
                 </StackPanel>
         
                 <DataGrid Grid.Row="1" Height="Auto"
@@ -173,6 +170,25 @@
                         <DataGridTextColumn Header="Staff Id" Binding="{Binding StaffId}" Width="*" />
                         <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="3*" />
                         <DataGridTextColumn Header="Phone number" Binding="{Binding PhoneNumber}" Width="2*"/>
+
+                        <DataGridComboBoxColumn Header="Department"
+                                                IsReadOnly="False"
+                                                DisplayMemberPath="Name"
+                                                SelectedValuePath="Id"
+                                                Width="*"
+                                                SelectedValueBinding="{Binding DepartmentId}">
+                            <DataGridComboBoxColumn.ElementStyle>
+                                <Style TargetType="{x:Type ComboBox}">
+                                    <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Departments, ElementName=StaffWindow}" />
+                                </Style>
+                            </DataGridComboBoxColumn.ElementStyle>
+                            <DataGridComboBoxColumn.EditingElementStyle>
+                                <Style TargetType="{x:Type ComboBox}">
+                                    <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Departments, ElementName=StaffWindow}" />
+                                </Style>
+                            </DataGridComboBoxColumn.EditingElementStyle>
+                        </DataGridComboBoxColumn>
+
                     </DataGrid.Columns>
                 </DataGrid>
             </Grid>

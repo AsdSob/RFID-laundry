@@ -50,7 +50,7 @@ namespace Client.Desktop.Laundry.ViewModels
 
             builder.RegisterType<AuthManageViewModel>();
             builder.RegisterType<TagRegistrationViewModel>().SingleInstance();
-            builder.RegisterType<BinSoilCollectionViewModel>().SingleInstance();
+            builder.RegisterType<BinClientViewModel>().SingleInstance();
         }
 
         private void RegisterModules(ContainerBuilder builder)

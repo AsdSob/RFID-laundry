@@ -77,15 +77,12 @@ namespace Client.Desktop.ViewModels.Content
 
         public RelayCommand AddClientCommand { get; }
         public RelayCommand EditClientCommand { get; }
-        public RelayCommand DeleteClientCommand { get; }
 
         public RelayCommand AddDepartmentCommand { get; }
         public RelayCommand EditDepartmentCommand { get; }
-        public RelayCommand DeleteDepartmentCommand { get; }
 
         public RelayCommand AddStaffCommand { get; }
         public RelayCommand EditStaffCommand { get; }
-        public RelayCommand DeleteStaffCommand { get; }
 
         public RelayCommand InitializeCommand { get; }
 
@@ -99,15 +96,12 @@ namespace Client.Desktop.ViewModels.Content
 
             AddClientCommand = new RelayCommand(AddNewClient);
             EditClientCommand = new RelayCommand(EditClient, (() => SelectedClient != null));
-            DeleteClientCommand = new RelayCommand(DeleteClient, () => SelectedClient !=null);
 
             AddDepartmentCommand = new RelayCommand(AddNewDepartment, () => SelectedClient != null);
             EditDepartmentCommand = new RelayCommand(EditDepartment, () => SelectedDepartment != null);
-            DeleteDepartmentCommand = new RelayCommand(DeleteDepartment, (() => SelectedDepartment != null));
 
             AddStaffCommand = new RelayCommand(AddNewStaff, () => SelectedDepartment != null);
             EditStaffCommand = new RelayCommand(EditStaff, () => SelectedStaff != null);
-            DeleteStaffCommand = new RelayCommand(DeleteStaff, (() => SelectedStaff != null));
             InitializeCommand = new RelayCommand(Initialize);
 
             Cities = EnumExtensions.GetValues<CitiesEnum>();
@@ -120,26 +114,23 @@ namespace Client.Desktop.ViewModels.Content
         {
             if (e.PropertyName == nameof(SelectedClient))
             {
-
                 AddDepartmentCommand.RaiseCanExecuteChanged();
-                DeleteClientCommand.RaiseCanExecuteChanged();
                 EditClientCommand.RaiseCanExecuteChanged();
                 RaisePropertyChanged((() => SortedDepartments));
+                RaisePropertyChanged((() => SortedStaffs));
             }
 
             if (e.PropertyName == nameof(SelectedDepartment))
             {
-                DeleteDepartmentCommand.RaiseCanExecuteChanged();
                 EditDepartmentCommand.RaiseCanExecuteChanged();
                 AddStaffCommand.RaiseCanExecuteChanged();
+                RaisePropertyChanged((() => SortedStaffs));
             }
 
             if (e.PropertyName == nameof(SelectedStaff))
             {
                 EditStaffCommand.RaiseCanExecuteChanged();
-                DeleteStaffCommand.RaiseCanExecuteChanged();
             }
-
         }
 
         private async void Initialize()
@@ -174,7 +165,24 @@ namespace Client.Desktop.ViewModels.Content
 
         private ObservableCollection<ClientStaffEntity> SortStaffs()
         {
-            return Staffs?.Where(x => x.DepartmentId == SelectedDepartment?.Id).ToObservableCollection();
+            var staffs = new ObservableCollection<ClientStaffEntity>();
+
+            if (SelectedDepartment == null)
+            {
+                if (SortedDepartments == null)
+                    return staffs;
+
+                foreach (var department in SortedDepartments)
+                {
+                    staffs.AddRange(Staffs?.Where(x => x.DepartmentId == department?.Id));
+                }
+            }
+            else
+            {
+                staffs.AddRange(Staffs?.Where(x => x.DepartmentId == SelectedDepartment?.Id).ToObservableCollection());
+            }
+
+            return staffs;
         }
 
         private void EditClient()
@@ -193,27 +201,11 @@ namespace Client.Desktop.ViewModels.Content
 
             clientWindow.SetSelectedClient(client);
 
-            _dialogService.ShowDialog(clientWindow);
-
-            if (clientWindow.HasChanges)
+            if (_dialogService.ShowDialog(clientWindow))
             {
                 Clients.Clear();
                 await GetClients();
             }
-        }
-
-        private void DeleteClient()
-        {
-            if(SelectedClient == null) return;
-            if(!_dialogService.ShowQuestionDialog($"Do you want to DELETE {SelectedClient.Name} ?"))
-                return;
-
-            var client = SelectedClient;
-            SelectedClient = null;
-
-            _laundryService.DeleteAsync(client);
-
-            Clients.Remove(client);
         }
 
         private void EditDepartment()
@@ -232,30 +224,13 @@ namespace Client.Desktop.ViewModels.Content
 
             departmentWindow.SetSelectedDepartment(department, SelectedClient);
 
-            _dialogService.ShowDialog(departmentWindow);
-
-            if (departmentWindow.HasChanges)
+            if (_dialogService.ShowDialog(departmentWindow))
             {
                 Departments.Clear();
                 await GetDepartments();
                 RaisePropertyChanged((() => SortedDepartments));
             }
         }
-
-        private void DeleteDepartment()
-        {
-            if (SelectedDepartment == null) return;
-            if (!_dialogService.ShowQuestionDialog($"Do you want to DELETE {SelectedDepartment.Name} ?"))
-                return;
-
-            var department = SelectedDepartment;
-            SelectedDepartment = null;
-
-            _laundryService.DeleteAsync(department);
-
-            Departments.Remove(department);
-        }
-
 
         private void EditStaff()
         {
@@ -273,28 +248,12 @@ namespace Client.Desktop.ViewModels.Content
 
             staffWindow.SetSelectedStaff(staff, SelectedDepartment);
 
-            _dialogService.ShowDialog(staffWindow);
-
-            if (staffWindow.HasChanges)
+            if (_dialogService.ShowDialog(staffWindow))
             {
                 Staffs.Clear();
                 await GetStaffs();
                 RaisePropertyChanged((() => SortedStaffs));
             }
-        }
-
-        private void DeleteStaff()
-        {
-            if (SelectedStaff == null) return;
-            if (!_dialogService.ShowQuestionDialog($"Do you want to DELETE {SelectedStaff.Name} ?"))
-                return;
-
-            var staff = SelectedStaff;
-            SelectedStaff = null;
-
-            _laundryService.DeleteAsync(staff);
-
-            Staffs.Remove(staff);
         }
 
     }

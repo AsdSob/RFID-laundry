@@ -33,7 +33,6 @@ namespace Client.Desktop.ViewModels.Content
 
         public RelayCommand EditCommand { get; }
         public RelayCommand NewCommand { get; }
-        public RelayCommand DeleteMasterLinenCommand { get; }
         public RelayCommand InitializeCommand { get; }
 
         public MasterLinenViewModel(ILaundryService dataService, IDialogService dialogService, IResolver resolver)
@@ -44,7 +43,6 @@ namespace Client.Desktop.ViewModels.Content
 
             EditCommand = new RelayCommand(Edit,(()=> SelectedMasterLinen != null));
             NewCommand = new RelayCommand(AddMasterLinen);
-            DeleteMasterLinenCommand = new RelayCommand(DeleteMasterLinen, (() => SelectedMasterLinen != null));
             InitializeCommand = new RelayCommand(Initialize);
 
             MasterLinens = new ObservableCollection<MasterLinenEntity>();
@@ -77,23 +75,8 @@ namespace Client.Desktop.ViewModels.Content
         {
             if (e.PropertyName == nameof(SelectedMasterLinen))
             {
-                DeleteMasterLinenCommand.RaiseCanExecuteChanged();
                 EditCommand.RaiseCanExecuteChanged();
             }
-        }
-
-        private void DeleteMasterLinen()
-        {
-            var masterLinen = SelectedMasterLinen;
-            if(masterLinen == null) return;
-
-            if (!_dialogService.ShowQuestionDialog($"Do you want to DELETE {masterLinen.Name} ?"))
-                return;
-            
-            _laundryService.DeleteAsync(masterLinen);
-
-            MasterLinens.Remove(masterLinen);
-            SelectedMasterLinen = MasterLinens?.FirstOrDefault();
         }
 
         private void Edit()
@@ -106,7 +89,7 @@ namespace Client.Desktop.ViewModels.Content
             MasterLinenWindow(null);
         }
 
-        private async void MasterLinenWindow(MasterLinenEntityViewModel masterLinen)
+        private void MasterLinenWindow(MasterLinenEntityViewModel masterLinen)
         {
             var masterLinenWindow = _resolverService.Resolve<MasterLinenWindowModel>();
 

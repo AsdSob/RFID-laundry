@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Text;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
@@ -17,7 +15,6 @@ namespace Client.Desktop.ViewModels.Windows
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
         private readonly IMainDispatcher _dispatcher;
-        private bool _hasChanges;
         private StaffEntityViewModel _selectedStaff;
         private ObservableCollection<ClientStaffEntity> _staffs;
 
@@ -31,15 +28,11 @@ namespace Client.Desktop.ViewModels.Windows
             get => _selectedStaff;
             set => Set(ref _selectedStaff, value);
         }
-        public bool HasChanges
-        {
-            get => _hasChanges;
-            set => Set(ref _hasChanges, value);
-        }
 
         public Action<bool> CloseAction { get; set; }
         public RelayCommand SaveCommand { get; }
         public RelayCommand CloseCommand { get; }
+        public RelayCommand DeleteCommand { get; }
         public RelayCommand InitializeCommand { get; }
 
         public MasterStaffWindowModel(ILaundryService laundryService, IDialogService dialogService, IMainDispatcher dispatcher)
@@ -50,6 +43,7 @@ namespace Client.Desktop.ViewModels.Windows
 
             SaveCommand = new RelayCommand(Save);
             CloseCommand = new RelayCommand(Close);
+            DeleteCommand = new RelayCommand(Delete);
             InitializeCommand = new RelayCommand(Initialize);
 
         }
@@ -89,7 +83,6 @@ namespace Client.Desktop.ViewModels.Windows
                 _dialogService.HideBusy();
             }
 
-            HasChanges = false;
             PropertyChanged += OnPropertyChanged;
         }
 
@@ -100,51 +93,43 @@ namespace Client.Desktop.ViewModels.Windows
 
         private void Save()
         {
-            if (!SelectedStaff.IsValid)
-            {
-                return;
-            }
-
-            if (!SelectedStaff.HasChanges())
+            if (!SelectedStaff.IsValid || !SelectedStaff.HasChanges())
             {
                 return;
             }
 
             SelectedStaff.AcceptChanges();
-
             _laundryService.AddOrUpdateAsync(SelectedStaff.OriginalObject);
-            HasChanges = true;
 
-            if (_dialogService.ShowQuestionDialog("Saved! \n Do you want to close window ? "))
-            {
-                CloseWindow();
-            }
+            Close();
         }
 
-        private bool CanExecuteParentIdClearCommand()
+        private void Delete()
         {
-            return true;
+            if (!_dialogService.ShowQuestionDialog($"Do you want to DELETE {SelectedStaff.StaffName} ?"))
+                return;
+
+            if (!SelectedStaff.IsNew)
+            {
+                _laundryService.DeleteAsync(SelectedStaff.OriginalObject);
+            }
+
+            Close();
         }
 
         private void Close()
         {
-            if (!HasChanges)
+            if (SelectedStaff.HasChanges())
             {
-                if (_dialogService.ShowQuestionDialog($"Do you want to close window ? \n \"All changes will be canceled\""))
+                if (_dialogService.ShowQuestionDialog($"Do you want to close window ? \n \"Changes is NOT saved\""))
                 {
-                    CloseWindow();
+                    CloseAction?.Invoke(false);
+                    return;
                 }
             }
-            else
-            {
-                CloseWindow();
-            }
 
+            CloseAction?.Invoke(true);
         }
 
-        private void CloseWindow()
-        {
-            CloseAction?.Invoke(HasChanges);
-        }
     }
 }

@@ -79,6 +79,8 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             Update(originalObject);
         }
 
+        public bool IsNew => OriginalObject == null || OriginalObject.IsNew;
+
         public void Update(ClientStaffEntity originalObject)
         {
             OriginalObject = originalObject;

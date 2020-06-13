@@ -21,16 +21,9 @@ namespace Client.Desktop.ViewModels.Windows
         private List<ClientEntity> _clients;
         private List<DepartmentEntity> _departments;
         private List<ClientStaffEntity> _staffs;
-        private bool _hasChanges;
-
 
         public Action<bool> CloseAction { get; set; }
 
-        public bool HasChanges
-        {
-            get => _hasChanges;
-            set => Set(ref _hasChanges, value);
-        }
         public List<ClientStaffEntity> Staffs
         {
             get => _staffs;
@@ -68,6 +61,7 @@ namespace Client.Desktop.ViewModels.Windows
         public RelayCommand SaveCommand { get; }
         public RelayCommand CloseCommand { get; }
         public RelayCommand NewCommand { get; }
+        public RelayCommand DeleteCommand { get; }
         public RelayCommand ClearSelectedStaffCommand { get; }
         public RelayCommand InitializeCommand { get; }
 
@@ -81,10 +75,11 @@ namespace Client.Desktop.ViewModels.Windows
             SaveCommand = new RelayCommand(Save);
             CloseCommand = new RelayCommand(Close);
             NewCommand = new RelayCommand(NewLinen);
+            DeleteCommand = new RelayCommand(Delete);
             ClearSelectedStaffCommand = new RelayCommand(ClearSelectedStaff);
             //InitializeCommand = new RelayCommand(Initialize);
 
-            PropertyChanged += OnPropertyChanged;
+            //PropertyChanged += OnPropertyChanged;
         }
 
         public async void Initialize()
@@ -111,8 +106,6 @@ namespace Client.Desktop.ViewModels.Windows
 
                 RaisePropertyChanged(() => SortedDepartments);
                 RaisePropertyChanged(() => SortedStaffs);
-
-                HasChanges = false;
             }
             catch (Exception e)
             {
@@ -232,32 +225,40 @@ namespace Client.Desktop.ViewModels.Windows
             SelectedLinen.AcceptChanges();
 
             _laundryService.AddOrUpdateAsync(SelectedLinen.OriginalObject);
-            HasChanges = true;
 
             if (_dialogService.ShowQuestionDialog("Saved! \n Do you want to close window ? "))
             {
-                CloseWindow();
+                Close();
             }
+        }
+
+        private void Delete()
+        {
+            var masterLinen = MasterLinens.FirstOrDefault(x => x.Id == SelectedLinen.MasterLinenId);
+
+            if (!_dialogService.ShowQuestionDialog($"Do you want to DELETE {masterLinen?.Name} ?"))
+                return;
+
+            if (!SelectedLinen.IsNew)
+            {
+                _laundryService.DeleteAsync(SelectedLinen.OriginalObject);
+            }
+
+            Close();
         }
 
         private void Close()
         {
             if (SelectedLinen.HasChanges())
             {
-                if (_dialogService.ShowQuestionDialog($"Do you want to close window ? \n \"All changes will be canceled\""))
+                if (_dialogService.ShowQuestionDialog($"Do you want to close window ? \n \"Changes is NOT saved\""))
                 {
-                    CloseWindow();
+                    CloseAction?.Invoke(false);
+                    return;
                 }
             }
-            else
-            {
-                CloseWindow();
-            }
-        }
 
-        private void CloseWindow()
-        {
-            CloseAction?.Invoke(HasChanges);
+            CloseAction?.Invoke(true);
         }
     }
 }

@@ -39,6 +39,7 @@
 
         <DockPanel  Grid.Row="0" Grid.Column="0" LastChildFill="False" Margin="10">
             <Button Margin = "5" Padding="10" DockPanel.Dock="Left"  Content="Save" Command="{Binding SaveCommand}"/>
+            <Button Margin = "5" Padding="10" DockPanel.Dock="Left"  Content="Delete" Command="{Binding DeleteCommand}"/>
             <Button Margin = "5" Padding="10" DockPanel.Dock="Right" Content="Close" Command="{Binding CloseCommand}"/>
         </DockPanel>
 

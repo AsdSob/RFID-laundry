@@ -76,6 +76,8 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             set => Set(() => OriginalObject, ref _originalObject, value);
         }
 
+        public bool IsNew => OriginalObject == null || OriginalObject.IsNew;
+
         public ClientLinenEntityViewModel()
         {
             OriginalObject = new ClientLinenEntity();

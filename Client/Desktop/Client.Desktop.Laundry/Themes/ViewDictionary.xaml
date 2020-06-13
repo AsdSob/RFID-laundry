@@ -33,7 +33,7 @@
         <contentView:TagRegistrationView/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type content:BinSoilCollectionViewModel}">
+    <DataTemplate DataType="{x:Type content:BinClientViewModel}">
         <contentView:BinSoilCollectionView/>
     </DataTemplate>
 

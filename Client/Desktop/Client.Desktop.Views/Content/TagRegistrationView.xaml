@@ -111,15 +111,15 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
+            <Grid.ColumnDefinitions>                                                        
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <!-- Linen Commands -->
             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                <Button Margin = "5" Padding="10,5"  Content="New" Command="{Binding NewLinenCommand}"/>
-                <Button Margin = "5" Padding="10,5"  Content="Edit" Command="{Binding EditLinenCommand}"/>
-                <Button Margin = "5" Padding="10,5"  Content="Delete" Command="{Binding DeleteLinenCommand}"/>
+                <Button Margin = "5" Padding="10,5" Content="New" Command="{Binding NewLinenCommand}"/>
+                <Button Margin = "5" Padding="10,5" Content="Edit" Command="{Binding EditLinenCommand}"/>
+                <Button Margin = "5" Padding="10,5" Content="Delete" Command="{Binding DeleteLinenCommand}"/>
             </StackPanel>
 
             <!-- Linens -->
@@ -289,26 +289,6 @@
                     </DataGrid.Columns>
 
                 </DataGrid>
-            </GroupBox>
-
-            <GroupBox Grid.Row="3" Grid.Column="0">
-                
-                <!-- Find Tag -->
-                <!--<Button Content="Find Selected Tag"
-                            Command="{Binding FindTagCommand}"
-                            Margin = "5"
-                            Padding="10,2"
-                />-->
-
-                <!-- Select tag-->
-                <Button Content="Select"
-                        DockPanel.Dock="Right"
-                        Command="{Binding UseTagCommand}"
-                        Margin = "5"
-                        Padding="10,2"
-                        Height="50"
-                        FontSize="30"
-                />
             </GroupBox>
 
         </Grid>

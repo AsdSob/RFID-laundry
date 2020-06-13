@@ -15,7 +15,7 @@
 
     <b:Interaction.Triggers>
         <b:EventTrigger EventName="Loaded">
-            <b:InvokeCommandAction Command="{Binding InitilizeCommand}"/>
+            <b:InvokeCommandAction Command="{Binding InitializeCommand}"/>
         </b:EventTrigger>
     </b:Interaction.Triggers>
 
@@ -56,9 +56,8 @@
             <!--Staff List-->
 
             <StackPanel  Grid.Row="2" Orientation="Horizontal" Margin="10,0">
-                <Button Margin = "5" Padding="10" Content="New" Command="{Binding AddStaffCommand}"/>
-                <Button Margin = "5" Padding="10" Content="Edit" Command="{Binding EditStaffCommand}"/>
-                <Button Margin = "5" Padding="10" Content="Delete" Command="{Binding DeleteStaffCommand}"/>
+                <Button Margin = "5" Padding="10,5" Content="New" Command="{Binding AddStaffCommand}"/>
+                <Button Margin = "5" Padding="10,5" Content="Edit" Command="{Binding EditStaffCommand}"/>
             </StackPanel>
 
             <GroupBox Grid.Row="4" 
@@ -123,8 +122,7 @@
 
             <DockPanel  Grid.Row="0" LastChildFill="False" Margin="10,0">
                 <Button Margin = "5" Padding="10,2"  Content="New" Command="{Binding AddLinenCommand}"/>
-                <Button Margin = "5" Padding="10,2"  Content="Delete" Command="{Binding DeleteLinenCommand}"/>
-                <Button Margin = "5" Padding="10,2"  Content="Save" Command="{Binding SaveCommand}"/>
+                <Button Margin = "5" Padding="10,2"  Content="Edit" Command="{Binding EditLinenCommand}"/>
             </DockPanel>
 
             <GroupBox Grid.Row="1" Header="Client Linen">
@@ -250,8 +248,8 @@
                         >
 
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Antenna" Binding="{Binding Path=Item1}" />
-                                <DataGridTextColumn Header="Tag" Width="*" Binding="{Binding Path=Item2}" />
+                                <DataGridTextColumn Header="Antenna" Binding="{Binding Path=Antenna}" />
+                                <DataGridTextColumn Header="Tag" Width="*" Binding="{Binding Path=Tag}" />
                             </DataGrid.Columns>
 
                         </DataGrid>

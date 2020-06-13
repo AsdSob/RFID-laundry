@@ -15,7 +15,7 @@
 
     <b:Interaction.Triggers>
         <b:EventTrigger EventName="Loaded">
-            <b:InvokeCommandAction Command="{Binding InitilizeCommand}"/>
+            <b:InvokeCommandAction Command="{Binding InitializeCommand}"/>
         </b:EventTrigger>
     </b:Interaction.Triggers>
 
@@ -34,7 +34,6 @@
         <StackPanel  Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="30,10">
             <Button Margin = "5" Padding="20,5"  Content="New" Command="{Binding NewCommand}"/>
             <Button Margin = "5" Padding="20,5"  Content="Edit" Command="{Binding EditCommand}"/>
-            <Button Margin = "5" Padding="20,5"  Content="Delete" Command="{Binding DeleteMasterLinenCommand}"/>
         </StackPanel>
 
         <DataGrid Height="Auto"

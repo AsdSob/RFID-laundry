@@ -20,13 +20,7 @@ namespace Client.Desktop.ViewModels.Windows
         private ObservableCollection<ClientEntity> _clients;
         private ClientEntityViewModel _selectedClient;
         private List<UnitViewModel> _cities;
-        private bool _hasChanges;
 
-        public bool HasChanges
-        {
-            get => _hasChanges;
-            set => Set(ref _hasChanges, value);
-        }
         public List<UnitViewModel> Cities
         {
             get => _cities;
@@ -52,6 +46,7 @@ namespace Client.Desktop.ViewModels.Windows
 
         public RelayCommand SaveCommand { get; }
         public RelayCommand CloseCommand { get; }
+        public RelayCommand DeleteCommand { get; }
         public RelayCommand ClearParentIdCommand { get; }
         public RelayCommand InitializeCommand { get; }
 
@@ -65,8 +60,9 @@ namespace Client.Desktop.ViewModels.Windows
             _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
 
             SaveCommand = new RelayCommand(Save);
-            CloseCommand = new RelayCommand(Close);
+            CloseCommand = new RelayCommand(CloseWindow);
             ClearParentIdCommand = new RelayCommand(ClearParentId);
+            DeleteCommand = new RelayCommand(Delete);
             InitializeCommand = new RelayCommand(Initialize);
 
             Cities = EnumExtensions.GetValues<CitiesEnum>();
@@ -108,7 +104,6 @@ namespace Client.Desktop.ViewModels.Windows
                 _dialogService.HideBusy();
             }
 
-            HasChanges = false;
             PropertyChanged += OnPropertyChanged;
             RaisePropertyChanged((() => SortedParentClients));
         }
@@ -120,12 +115,7 @@ namespace Client.Desktop.ViewModels.Windows
 
         private void Save()
         {
-            if (!SelectedClient.IsValid)
-            {
-                return;
-            }
-
-            if (!SelectedClient.HasChanges())
+            if (!SelectedClient.IsValid || !SelectedClient.HasChanges())
             {
                 return;
             }
@@ -133,12 +123,24 @@ namespace Client.Desktop.ViewModels.Windows
             SelectedClient.AcceptChanges();
 
             _laundryService.AddOrUpdateAsync(SelectedClient.OriginalObject);
-            HasChanges = true;
 
             if (_dialogService.ShowQuestionDialog("Saved! \n Do you want to close window ? "))
             {
                 CloseWindow();
             }
+        }
+
+        private void Delete()
+        {
+            if (!_dialogService.ShowQuestionDialog($"Do you want to DELETE {SelectedClient.Name} ?"))
+                return;
+
+            if (!SelectedClient.IsNew)
+            {
+                _laundryService.DeleteAsync(SelectedClient.OriginalObject);
+            }
+
+            CloseWindow();
         }
 
         private void ClearParentId()
@@ -151,25 +153,18 @@ namespace Client.Desktop.ViewModels.Windows
             return true;
         }
 
-        private void Close()
-        {
-            if (!HasChanges)
-            {
-                if (_dialogService.ShowQuestionDialog($"Do you want to close window ? \n \"All changes will be canceled\""))
-                {
-                    CloseWindow();
-                }
-            }
-            else
-            {
-                CloseWindow();
-            }
-
-        }
-
         private void CloseWindow()
         {
-            CloseAction?.Invoke(HasChanges);
+            if (SelectedClient.HasChanges())
+            {
+                if (_dialogService.ShowQuestionDialog($"Do you want to close window ? \n \"Changes is NOT saved\""))
+                {
+                    CloseAction?.Invoke(false);
+                    return;
+                }
+            }
+
+            CloseAction?.Invoke(true);
         }
 
     }

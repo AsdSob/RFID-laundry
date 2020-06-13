@@ -34,6 +34,7 @@ namespace Client.Desktop.ViewModels.Windows
 
         public RelayCommand SaveCommand { get; }
         public RelayCommand CloseCommand { get; }
+        public RelayCommand DeleteCommand { get; }
         public RelayCommand InitializeCommand { get; }
 
 
@@ -45,6 +46,7 @@ namespace Client.Desktop.ViewModels.Windows
 
             SaveCommand = new RelayCommand(Save);
             CloseCommand = new RelayCommand(Close);
+            DeleteCommand = new RelayCommand(Delete);
             InitializeCommand = new RelayCommand(Initialize);
 
         }
@@ -105,19 +107,35 @@ namespace Client.Desktop.ViewModels.Windows
             SelectedMasterLinen.AcceptChanges();
 
             _laundryService.AddOrUpdateAsync(SelectedMasterLinen.OriginalObject);
+            
+            Close();
+        }
 
-            if (_dialogService.ShowQuestionDialog("Saved! \n Do you want to close window ? "))
+        private void Delete()
+        {
+            if (!_dialogService.ShowQuestionDialog($"Do you want to DELETE {SelectedMasterLinen.Name} ?"))
+                return;
+
+            if (!SelectedMasterLinen.IsNew)
             {
-                CloseAction?.Invoke(true);
+                _laundryService.DeleteAsync(SelectedMasterLinen.OriginalObject);
             }
+
+            Close();
         }
 
         private void Close()
         {
-            if (_dialogService.ShowQuestionDialog($"Do you want to close window ? \n \"All changes will be canceled\""))
+            if (SelectedMasterLinen.HasChanges())
             {
-                CloseAction?.Invoke(false);
+                if (_dialogService.ShowQuestionDialog($"Do you want to close window ? \n \"Changes is NOT saved\""))
+                {
+                    CloseAction?.Invoke(false);
+                    return;
+                }
             }
+
+            CloseAction?.Invoke(true);
         }
     }
 }

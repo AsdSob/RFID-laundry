@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
-using System.Windows.Shapes;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
@@ -144,27 +143,6 @@ namespace Client.Desktop.ViewModels.Content
             PropertyChanged += OnPropertyChanged;
         }
 
-        //private void UnSubscribeItem(ClientLinenEntityViewModel item)
-        //{
-        //    item.PropertyChanged -= ItemOnPropertyChanged;
-        //}
-
-        //private void SubscribeItem(ClientLinenEntityViewModel item)
-        //{
-        //    item.PropertyChanged += ItemOnPropertyChanged;
-        //}
-
-        //private void ItemOnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        //{
-        //    if (!(sender is ClientLinenEntityViewModel item)) return;
-
-        //    if (item.HasChanges() && item.IsValid)
-        //    {
-        //        item.AcceptChanges();
-        //        _laundryService.AddOrUpdateAsync(item.OriginalObject);
-        //    }
-        //}
-
         private void TagsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
@@ -213,28 +191,6 @@ namespace Client.Desktop.ViewModels.Content
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            //if (e.PropertyName == nameof(SelectedClient))
-            //{
-            //    RaisePropertyChanged(() => SortedDepartments);
-            //}else
-
-            //if (e.PropertyName == nameof(SelectedDepartment))
-            //{
-            //    NewStaffCommand?.RaiseCanExecuteChanged();
-            //    NewLinenCommand?.RaiseCanExecuteChanged();
-
-            //    RaisePropertyChanged(() => SortedLinens);
-            //    RaisePropertyChanged(() => SortedStaff);
-            //}else
-
-            //if (e.PropertyName == nameof(SelectedStaff))
-            //{
-            //    EditStaffCommand.RaiseCanExecuteChanged();
-            //    DeleteStaffCommand?.RaiseCanExecuteChanged();
-
-            //    RaisePropertyChanged(() => SortedLinens);
-            //}else
-
             if (e.PropertyName == nameof(SelectedClientLinen))
             {
                 DeleteLinenCommand?.RaiseCanExecuteChanged();
@@ -283,9 +239,9 @@ namespace Client.Desktop.ViewModels.Content
 
             staffWindow.SetSelectedStaff(staff, SelectedDepartment);
 
-            _dialogService.ShowDialog(staffWindow);
+           
 
-            if (staffWindow.HasChanges)
+            if (_dialogService.ShowDialog(staffWindow))
             {
                 GetStaffs();
             }
@@ -343,9 +299,7 @@ namespace Client.Desktop.ViewModels.Content
 
             linenWindow.SetSelectedLinen(linen);
 
-            _dialogService.ShowDialog(linenWindow);
-
-            if (linenWindow.HasChanges)
+            if (_dialogService.ShowDialog(linenWindow))
             {
                 GetClientLinens();
                 CheckTags();
@@ -393,13 +347,6 @@ namespace Client.Desktop.ViewModels.Content
 
                 LinenWindow(linen);
 
-                //SelectedClient = Clients.FirstOrDefault(x => x.Id == linen.ClientId);
-                //SelectedDepartment = SortedDepartments.FirstOrDefault(x => x.Id == linen.DepartmentId);
-
-                //if (linen.StaffId != null)
-                //{
-                //    SelectedStaff = SortedStaff.FirstOrDefault(x => x.Id == linen.StaffId);
-                //}
             }
             else
             {
@@ -436,29 +383,6 @@ namespace Client.Desktop.ViewModels.Content
             SelectedTag.IsRegistered = true;
 
             _laundryService.AddOrUpdateAsync(SelectedClientLinen.OriginalObject);
-
-            //if (Linens.Any(x => x.Tag == SelectedTag.Item2))
-            //{
-            //    var existLinen = Linens.FirstOrDefault(x => Equals(x.Tag, SelectedTag.Item2));
-            //    var staff = Staffs.FirstOrDefault(x => x.Id == existLinen.StaffId);
-
-            //    if (!_dialogService.ShowQuestionDialog(
-            //        $"Tag {SelectedTag.Item2} already using by {staff?.Name} in <{existLinen.Id}> linen \n Do you want to shift Tag?")
-            //    ) return;
-
-            //    existLinen.Tag = null;
-            //    SelectedClientLinen.Tag = SelectedTag.Item2;
-            //    return;
-            //}
-
-            //if (!String.IsNullOrWhiteSpace(SelectedClientLinen.Tag))
-            //{
-            //    if (_dialogService.ShowQuestionDialog($"Selected linen has tag, \n Do you want to replace it?"))
-            //    {
-            //        SelectedClientLinen.Tag = SelectedTag.Item2;
-            //        return;
-            //    }
-            //}
         }
     }
 }

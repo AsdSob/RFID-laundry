@@ -43,7 +43,7 @@ namespace Client.Desktop.ViewModels
 
             TagRegistrationCommand = new RelayCommand(() => Select(typeof(TagRegistrationViewModel)), TagRegistrationCommandCanExecute);
 
-            BinSoilCollectionCommand = new RelayCommand(() => Select(typeof(BinSoilCollectionViewModel)), BinSoilCollectionCommandCanExecute);
+            BinSoilCollectionCommand = new RelayCommand(() => Select(typeof(BinClientViewModel)), BinSoilCollectionCommandCanExecute);
 
             _selectedItem = typeof(TagRegistrationViewModel);
         }

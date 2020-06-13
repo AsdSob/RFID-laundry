@@ -17,7 +17,6 @@ namespace Client.Desktop.ViewModels.Windows
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
         private readonly IMainDispatcher _dispatcher;
-        private bool _hasChanges;
         private List<DepartmentEntity> _departments;
         private List<UnitViewModel> _departmentTypes;
         private DepartmentEntityViewModel _selectedDepartment;
@@ -38,11 +37,6 @@ namespace Client.Desktop.ViewModels.Windows
             get => _departmentTypes;
             set => Set(ref _departmentTypes, value);
         }
-        public bool HasChanges
-        {
-            get => _hasChanges;
-            set => Set(ref _hasChanges, value);
-        }
 
         public List<DepartmentEntity> Departments
         {
@@ -53,6 +47,7 @@ namespace Client.Desktop.ViewModels.Windows
         public Action<bool> CloseAction { get; set; }
         public RelayCommand SaveCommand { get; }
         public RelayCommand CloseCommand { get; }
+        public RelayCommand DeleteCommand { get; }
         public RelayCommand InitializeCommand { get; }
 
         public MasterDepartmentWindowModel(ILaundryService laundryService, IDialogService dialogService, IMainDispatcher dispatcher)
@@ -63,6 +58,7 @@ namespace Client.Desktop.ViewModels.Windows
 
             SaveCommand = new RelayCommand(Save);
             CloseCommand = new RelayCommand(Close);
+            DeleteCommand = new RelayCommand(Delete);
             InitializeCommand = new RelayCommand(Initialize);
 
             DepartmentTypes = EnumExtensions.GetValues<DepartmentTypeEnum>();
@@ -106,7 +102,6 @@ namespace Client.Desktop.ViewModels.Windows
                 _dialogService.HideBusy();
             }
 
-            HasChanges = false;
             PropertyChanged += OnPropertyChanged;
         }
 
@@ -120,46 +115,45 @@ namespace Client.Desktop.ViewModels.Windows
 
         private void Save()
         {
-            if (!SelectedDepartment.IsValid)
-            {
-                return;
-            }
-
-            if (!SelectedDepartment.HasChanges())
+            if (!SelectedDepartment.IsValid || !SelectedDepartment.HasChanges())
             {
                 return;
             }
 
             SelectedDepartment.AcceptChanges();
             _laundryService.AddOrUpdateAsync(SelectedDepartment.OriginalObject);
-            HasChanges = true;
 
-            if (_dialogService.ShowQuestionDialog("Saved! \n Do you want to close window ? "))
+            Close();
+        }
+
+        private void Delete()
+        {
+            if (!_dialogService.ShowQuestionDialog($"Do you want to DELETE {SelectedDepartment.Name} ?"))
+                return;
+
+            if (!SelectedDepartment.IsNew)
             {
-                CloseWindow();
+                _laundryService.DeleteAsync(SelectedDepartment.OriginalObject);
             }
+
+            Close();
         }
 
         private void Close()
         {
-            if (!HasChanges)
+            if (SelectedDepartment.HasChanges())
             {
-                if (_dialogService.ShowQuestionDialog($"Do you want to close window ? \n \"All changes will be canceled\""))
+                if (_dialogService.ShowQuestionDialog($"Do you want to close window ? \n \"Changes is NOT saved\""))
                 {
-                    CloseWindow();
+                    CloseAction?.Invoke(false);
+                    return;
                 }
             }
-            else
-            {
-                CloseWindow();
-            }
+
+            CloseAction?.Invoke(true);
 
         }
 
-        private void CloseWindow()
-        {
-            CloseAction?.Invoke(HasChanges);
-        }
 
     }
 

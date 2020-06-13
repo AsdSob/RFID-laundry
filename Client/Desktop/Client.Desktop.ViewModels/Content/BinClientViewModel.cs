@@ -8,7 +8,7 @@ using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Content
 {
-    public class BinSoilCollectionViewModel : ViewModelBase
+    public class BinClientViewModel : ViewModelBase
     {
         private readonly IDialogService _dialogService;
         private readonly ILaundryService _laundryService;
@@ -52,7 +52,7 @@ namespace Client.Desktop.ViewModels.Content
         public RelayCommand InitializeCommand { get; }
 
 
-        public BinSoilCollectionViewModel(ILaundryService dataService, IDialogService dialogService, IResolver resolver, IMainDispatcher dispatcher)
+        public BinClientViewModel(ILaundryService dataService, IDialogService dialogService, IResolver resolver, IMainDispatcher dispatcher)
         {
             _laundryService = dataService ?? throw new ArgumentNullException(nameof(dataService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
