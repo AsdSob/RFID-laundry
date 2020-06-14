@@ -5,6 +5,9 @@ using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Content;
 using Client.Desktop.ViewModels.Content.Administration;
+using Client.Desktop.ViewModels.Content.Bin;
+using Client.Desktop.ViewModels.Content.File;
+using Client.Desktop.ViewModels.Content.Master;
 
 namespace Client.Desktop.ViewModels
 {

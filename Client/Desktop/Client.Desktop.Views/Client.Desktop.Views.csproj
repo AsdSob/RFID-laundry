@@ -15,4 +15,8 @@
     <ProjectReference Include="..\Client.Desktop.ViewModels\Client.Desktop.ViewModels.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="NewFolder\" />
+  </ItemGroup>
+
 </Project>

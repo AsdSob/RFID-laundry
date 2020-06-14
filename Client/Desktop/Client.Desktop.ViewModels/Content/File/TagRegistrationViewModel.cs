@@ -11,7 +11,7 @@ using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Windows;
 using Storage.Laundry.Models;
 
-namespace Client.Desktop.ViewModels.Content
+namespace Client.Desktop.ViewModels.Content.File
 {
     public class TagRegistrationViewModel :ViewModelBase
     {

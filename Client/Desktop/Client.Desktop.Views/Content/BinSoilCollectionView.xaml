@@ -5,9 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:content="clr-namespace:Client.Desktop.ViewModels.Content;assembly=Client.Desktop.ViewModels"
+             xmlns:bin="clr-namespace:Client.Desktop.ViewModels.Content.Bin;assembly=Client.Desktop.ViewModels"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance content:BinClientViewModel}">
+             d:DataContext="{d:DesignInstance bin:BinClientViewModel}">
 
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverterKey"></BooleanToVisibilityConverter>
@@ -31,7 +32,7 @@
         </Grid.RowDefinitions>    
 
         <Grid Grid.Column="0" Grid.Row="1">
-
+            
         </Grid>
     </Grid>
 </UserControl>

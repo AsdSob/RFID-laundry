@@ -1,8 +1,7 @@
-﻿using System.Windows.Controls;
-using Client.Desktop.ViewModels.Common.Attributes;
+﻿using Client.Desktop.ViewModels.Common.Attributes;
 using Client.Desktop.ViewModels.Windows;
 
-namespace Client.Desktop.Laundry.Windows
+namespace Client.Desktop.Views.Windows
 {
     [HasViewModel(typeof(MasterDepartmentWindowModel))]
 
