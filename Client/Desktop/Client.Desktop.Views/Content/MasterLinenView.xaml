@@ -23,8 +23,6 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -32,36 +30,45 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <StackPanel  Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="30,10">
-            <Button Margin = "5" Padding="20,5"  Content="New" Command="{Binding NewCommand}"/>
-            <Button Margin = "5" Padding="20,5"  Content="Edit" Command="{Binding EditCommand}"/>
+        <StackPanel  Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
+            <Button Content="New" Command="{Binding NewCommand}"/>
+            <Button Content="Edit" Command="{Binding EditCommand}"/>
         </StackPanel>
 
-        <DataGrid Height="Auto"
-                  Width="Auto"
-                  Grid.Row="1"
-                  Grid.Column="0"
-                  Margin="30,0"
-                  ItemsSource="{Binding MasterLinens}"
-                  SelectedItem="{Binding SelectedMasterLinen}"
-                  SelectionMode="Single"
-                  AllowDrop="True" 
-                  IsReadOnly="True"
-                  HorizontalAlignment="Stretch"
-                  IsTextSearchEnabled="True"
-                  AutoGenerateColumns="False"
-                  IsTextSearchCaseSensitive="False"
-                  CanUserAddRows="False">
 
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
+        <GroupBox Grid.Row="1" Grid.Column="0" Margin="5" Header="Master Linen">
 
-                <DataGridTextColumn Header="Name" Binding="{Binding Name, ValidatesOnDataErrors=True , UpdateSourceTrigger=PropertyChanged}" Width="Auto" />
+            <DataGrid Height="Auto"
+                      Width="Auto"
+                      ItemsSource="{Binding MasterLinens}"
+                      SelectedItem="{Binding SelectedMasterLinen}"
+                      SelectionMode="Single"
+                      AllowDrop="True" 
+                      IsReadOnly="True"
+                      HorizontalAlignment="Stretch"
+                      IsTextSearchEnabled="True"
+                      AutoGenerateColumns="False"
+                      IsTextSearchCaseSensitive="False"
+            >
 
-                <DataGridTextColumn Header="Packing Value" Binding="{Binding PackingValue , ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" />
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
 
-            </DataGrid.Columns>
-        </DataGrid>
+                    <DataGridTextColumn Header="Name" Binding="{Binding Name, ValidatesOnDataErrors=True , UpdateSourceTrigger=PropertyChanged}" Width="Auto" />
+
+                    <DataGridTextColumn Header="Packing Value" 
+                                        Binding="{Binding PackingValue , ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+        
         
     </Grid>
 </UserControl>

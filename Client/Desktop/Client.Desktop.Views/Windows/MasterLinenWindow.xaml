@@ -6,11 +6,12 @@
                     xmlns:local="clr-namespace:Client.Desktop.Views.Windows"
                     xmlns:windows="clr-namespace:Client.Desktop.ViewModels.Windows;assembly=Client.Desktop.ViewModels"
                     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-                    xmlns:behaviors="clr-namespace:Client.Desktop.Views.Behaviors;assembly=Client.Desktop.Views"
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    xmlns:customControl="clr-namespace:Client.Desktop.Views.CustomControl"
                     mc:Ignorable="d"
                     Title="Master Linen"
-                    Height="250"
-                    Width="400"
+                    Height="330"
+                    Width="500"
                     WindowStartupLocation="CenterOwner"
                     WindowStyle="ToolWindow"
                     d:DataContext="{d:DesignInstance windows:MasterLinenWindowModel}" BorderBrush="Black" Background="White" BorderThickness="2">
@@ -21,7 +22,7 @@
 
     <b:Interaction.Triggers>
         <b:EventTrigger EventName="Loaded">
-            <b:InvokeCommandAction Command="{Binding InitilizeCommand}"/>
+            <b:InvokeCommandAction Command="{Binding InitializeCommand}"/>
         </b:EventTrigger>
     </b:Interaction.Triggers>
 
@@ -33,40 +34,39 @@
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
 
-        <DockPanel  Grid.Row="0" Grid.Column="0" LastChildFill="False" Margin="10">
-            <Button Margin = "5" Padding="10,2" DockPanel.Dock="Left"  Content="Save" Command="{Binding SaveCommand}"/>
-            <Button Margin = "5" Padding="10,2" DockPanel.Dock="Left" Content="Delete" Command="{Binding DeleteCommand}"/>
-            <Button Margin = "5" Padding="10,2" DockPanel.Dock="Right" Content="Close" Command="{Binding CloseCommand}"/>
+        <DockPanel  Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" LastChildFill="False" Margin="10">
+            <Button DockPanel.Dock="Left" Content="Save" Command="{Binding SaveCommand}"/>
+            <Button DockPanel.Dock="Left" Content="Delete" Command="{Binding DeleteCommand}"/>
+            <Button DockPanel.Dock="Right" Content="Close" Command="{Binding CloseCommand}"/>
         </DockPanel>
 
-        <DockPanel  Grid.Row="1" Grid.Column="0" LastChildFill="True" Margin="10,0">
 
-            <GroupBox Header="Packing value" 
-                      Padding="5" 
-                      MinWidth="100"
-                      Margin="0,10,10,10" 
-                      DockPanel.Dock="Right">
+        <TextBox Text="{Binding SelectedMasterLinen.Name, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" 
+                 Grid.Row="1"
+                 Grid.Column="0"
+                 Grid.ColumnSpan="2"
+                 materialDesign:HintAssist.Hint="Linen"
+                 MaxLength="40"
+        />
 
-                <TextBox Text="{Binding SelectedMasterLinen.PackingValue, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged }" />
-            </GroupBox>
+        <customControl:MaskedTextBox Text="{Binding SelectedMasterLinen.PackingValue, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay }" 
+                                      Grid.Row="2"
+                                      Grid.Column="0"
+                                      materialDesign:HintAssist.Hint="P.V."
+                                      Mask="Decimal"
+                                      MaxLength="2"
+        />
 
-            <GroupBox Header="Linen name" 
-                      Padding="5" 
-                      MinWidth="200"
-                      Margin="10" 
-                      DockPanel.Dock="Left">
-
-                <TextBox Text="{Binding SelectedMasterLinen.Name, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"/>
-            </GroupBox>
-
-        </DockPanel>
-        
-        <Label Grid.Row="2"
-               Content="{Binding SelectedMasterLinen.Error, UpdateSourceTrigger=PropertyChanged }"
-               Foreground="Red"
-               MinHeight="30"/>
+        <!--<TextBox Text="{Binding SelectedMasterLinen.PackingValue, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged }" 
+                 Grid.Row="2"
+                 Grid.Column="0"
+                 materialDesign:HintAssist.Hint="P.V."
+                 FontSize="24"
+                 Height="60"
+        />-->
 
     </Grid>
 </local:CustomWindow>

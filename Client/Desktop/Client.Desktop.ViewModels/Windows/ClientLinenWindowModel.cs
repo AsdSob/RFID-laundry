@@ -62,7 +62,6 @@ namespace Client.Desktop.ViewModels.Windows
         public RelayCommand CloseCommand { get; }
         public RelayCommand NewCommand { get; }
         public RelayCommand DeleteCommand { get; }
-        public RelayCommand ClearSelectedStaffCommand { get; }
         public RelayCommand InitializeCommand { get; }
 
 
@@ -76,7 +75,6 @@ namespace Client.Desktop.ViewModels.Windows
             CloseCommand = new RelayCommand(Close);
             NewCommand = new RelayCommand(NewLinen);
             DeleteCommand = new RelayCommand(Delete);
-            ClearSelectedStaffCommand = new RelayCommand(ClearSelectedStaff);
             //InitializeCommand = new RelayCommand(Initialize);
 
             //PropertyChanged += OnPropertyChanged;
@@ -203,11 +201,6 @@ namespace Client.Desktop.ViewModels.Windows
             SelectedLinen = linen;
 
             SelectedLinen.PropertyChanged += ItemOnPropertyChanged;
-        }
-
-        private void ClearSelectedStaff()
-        {
-            SelectedLinen.StaffId = null;
         }
 
         private void Save()

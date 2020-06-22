@@ -47,7 +47,6 @@ namespace Client.Desktop.ViewModels.Windows
         public RelayCommand SaveCommand { get; }
         public RelayCommand CloseCommand { get; }
         public RelayCommand DeleteCommand { get; }
-        public RelayCommand ClearParentIdCommand { get; }
         public RelayCommand InitializeCommand { get; }
 
         public Action<bool> CloseAction { get; set; }
@@ -61,7 +60,6 @@ namespace Client.Desktop.ViewModels.Windows
 
             SaveCommand = new RelayCommand(Save);
             CloseCommand = new RelayCommand(CloseWindow);
-            ClearParentIdCommand = new RelayCommand(ClearParentId);
             DeleteCommand = new RelayCommand(Delete);
             InitializeCommand = new RelayCommand(Initialize);
 
@@ -141,11 +139,6 @@ namespace Client.Desktop.ViewModels.Windows
             }
 
             CloseWindow();
-        }
-
-        private void ClearParentId()
-        {
-            SelectedClient.ParentId = null;
         }
 
         private bool CanExecuteParentIdClearCommand()

@@ -34,4 +34,10 @@ namespace Client.Desktop.ViewModels.Common.Extensions
         [Description("Fujairah")] Fujairah = 6,
         [Description("Umm Al Quwain")] UAQ = 7,
     }
+
+    public enum TextBoxMask
+    {
+        Decimal,
+        Double,
+    }
 }

@@ -6,10 +6,11 @@
                     xmlns:local="clr-namespace:Client.Desktop.Views.Windows"
                     xmlns:windows="clr-namespace:Client.Desktop.ViewModels.Windows;assembly=Client.Desktop.ViewModels"
                     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                     mc:Ignorable="d"
-                    Title="Master Linen"
-                    Height="250"
-                    Width="400"
+                    Title="Department"
+                    Height="350"
+                    Width="450"
                     WindowStartupLocation="CenterOwner"
                     WindowStyle="ToolWindow"
                     d:DataContext="{d:DesignInstance windows:MasterDepartmentWindowModel}" BorderBrush="Black" Background="White" BorderThickness="2">
@@ -27,37 +28,36 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <DockPanel  Grid.Row="0" Grid.Column="0"  Grid.ColumnSpan="2" LastChildFill="False" Margin="10">
-            <Button Margin = "5" Padding="10" DockPanel.Dock="Left"  Content="Save" Command="{Binding SaveCommand}"/>
-            <Button Margin = "5" Padding="10" DockPanel.Dock="Left"  Content="Delete" Command="{Binding DeleteCommand}"/>
-            <Button Margin = "5" Padding="10" DockPanel.Dock="Right" Content="Close" Command="{Binding CloseCommand}"/>
+        <DockPanel  Grid.Row="0" Grid.Column="0" LastChildFill="False" Margin="10">
+            <Button DockPanel.Dock="Left"  Content="Save" Command="{Binding SaveCommand}"/>
+            <Button DockPanel.Dock="Left"  Content="Delete" Command="{Binding DeleteCommand}"/>
+            <Button DockPanel.Dock="Right" Content="Close" Command="{Binding CloseCommand}"/>
         </DockPanel>
 
-        <GroupBox Grid.Row="1" Grid.Column="0" Header="Name" Margin="5">
-            <TextBox Text="{Binding SelectedDepartment.Name, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" Width="Auto"/>
-        </GroupBox>
+        <TextBox Grid.Row="1" 
+                 Grid.Column="0" 
+                 Text="{Binding SelectedDepartment.Name, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" Width="Auto"
+                 materialDesign:HintAssist.Hint="Name"
+                 />
 
-        <GroupBox Grid.Row="1" Grid.Column="1" Header="Type" Margin="5">
-            <ComboBox ItemsSource="{Binding DepartmentTypes}"
-                      SelectedValue="{Binding SelectedDepartment.DepartmentTypeId}"
-                      DisplayMemberPath="Name"
-                      SelectedValuePath="Id"
-                      IsEditable="False">
-            </ComboBox>
-        </GroupBox>
 
-        <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
-               Content="{Binding SelectedDepartment.Error, UpdateSourceTrigger=PropertyChanged }"
-               Foreground="Red"
-               MinHeight="30"/>
+        <ComboBox Grid.Row="2"
+                  Grid.Column="0"
+                  ItemsSource="{Binding DepartmentTypes}"
+                  SelectedValue="{Binding SelectedDepartment.DepartmentTypeId}"
+                  DisplayMemberPath="Name"
+                  SelectedValuePath="Id"
+                  materialDesign:HintAssist.Hint="Department Type"
+                  IsEditable="False"
+                  >
+        </ComboBox>
 
     </Grid>
 </local:CustomWindow>

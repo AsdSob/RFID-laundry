@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace Client.Desktop.ViewModels.Common.Extensions
 {
@@ -82,6 +83,18 @@ namespace Client.Desktop.ViewModels.Common.Extensions
             if (val <= 0)
             {
                 validationError += "\n* Must be more then 0";
+
+                return false;
+            }
+
+            return true;
+        }
+
+        public static bool ValidateMaxAmount(this int val, ref string validationError)
+        {
+            if (val > 10)
+            {
+                validationError += "\n* Must be less then 10";
 
                 return false;
             }

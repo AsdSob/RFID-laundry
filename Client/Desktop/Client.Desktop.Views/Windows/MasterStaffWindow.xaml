@@ -6,9 +6,10 @@
                     xmlns:local="clr-namespace:Client.Desktop.Views.Windows"
                     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
                     xmlns:windows="clr-namespace:Client.Desktop.ViewModels.Windows;assembly=Client.Desktop.ViewModels"
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                     mc:Ignorable="d"
                     Title="Master Linen"
-                    Height="350"
+                    Height="450"
                     Width="500"
                     WindowStartupLocation="CenterOwner"
                     WindowStyle="ToolWindow"
@@ -28,62 +29,69 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="1.2*"/>
+            <RowDefinition Height="1.5*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
 
-        <DockPanel  Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" LastChildFill="False" Margin="10">
-            <Button Margin = "5" Padding="10" DockPanel.Dock="Left"  Content="Save" Command="{Binding SaveCommand}"/>
-            <Button Margin = "5" Padding="10" DockPanel.Dock="Left"  Content="Delete" Command="{Binding DeleteCommand}"/>
-            <Button Margin = "5" Padding="10" DockPanel.Dock="Right" Content="Close" Command="{Binding CloseCommand}"/>
+        <DockPanel  Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" LastChildFill="False" >
+            <Button DockPanel.Dock="Left"  Content="Save" Command="{Binding SaveCommand}"/>
+            <Button DockPanel.Dock="Left"  Content="Delete" Command="{Binding DeleteCommand}"/>
+            <Button DockPanel.Dock="Right" Content="Close" Command="{Binding CloseCommand}"/>
         </DockPanel>
 
-        <!-- StaffId -->
-        <GroupBox Header="StaffId" 
-                  Padding="5" 
-                  Margin="10"
-                  Grid.Row="1"
-                  Grid.Column="0">
-            <TextBox Text="{Binding SelectedStaff.StaffId, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" TextWrapping="Wrap" />
-        </GroupBox>
-
         <!-- StaffName -->
-        <GroupBox Header="Name" 
-                  Padding="5" 
-                  Margin="10"
-                  Grid.Row="1"
-                  Grid.Column="1">
-            <TextBox Text="{Binding SelectedStaff.StaffName, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" TextWrapping="Wrap" />
-        </GroupBox>
 
-        <!-- Phone -->
-        <GroupBox Header="Phone number" 
-                  Padding="5" 
-                  Margin="10"
-                  Grid.Row="2"
-                  Grid.Column="0">
-            <TextBox Text="{Binding SelectedStaff.PhoneNumber, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" TextWrapping="Wrap" />
-        </GroupBox>
+        <TextBox Grid.Row="1" 
+                 Grid.Column="0"
+                 Grid.ColumnSpan="2"
+                 Style="{StaticResource OutLinedTextBox}"
+                 Text="{Binding SelectedStaff.StaffName, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
+                 HorizontalScrollBarVisibility="Auto" 
+                 VerticalScrollBarVisibility="Auto"
+                 TextWrapping="Wrap"
+                 MaxLength="99"
+                 materialDesign:HintAssist.Hint="Staff Name"
+                 Margin="10,30,10,0"
+        />
 
-        <!-- Email -->
-        <GroupBox Header="Email" 
-                  Padding="5" 
-                  Margin="10"
-                  Grid.Row="2"
-                  Grid.Column="1">
-            <TextBox Text="{Binding SelectedStaff.Email, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" TextWrapping="Wrap" />
-        </GroupBox>
+        <!-- StaffId -->
 
-        <Label Grid.Row="3"
-               Grid.Column="0"
-               Grid.ColumnSpan="2"
-               Content="{Binding SelectedStaff.Error, UpdateSourceTrigger=PropertyChanged }"
-               Foreground="Red"
-               MinHeight="30"/>
+       <TextBox Grid.Row="2"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Text="{Binding SelectedStaff.StaffId, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                MaxLength="14"
+                MaxWidth="200"
+                MinWidth="200"
+                HorizontalAlignment="Left"
+                materialDesign:HintAssist.Hint="Staff Id"
+                FontSize="20"
+       />
 
+
+   <!-- Phone -->
+
+       <TextBox Grid.Row="3"
+                Grid.Column="0"
+                FontSize="15"
+                MaxLength="14"
+                materialDesign:HintAssist.Hint="Phone Number"
+                Text="{Binding SelectedStaff.PhoneNumber, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" TextWrapping="Wrap"
+                />
+
+   <!-- Email -->
+
+       <TextBox Grid.Row="3"
+                Grid.Column="1"
+                FontSize="15"
+                materialDesign:HintAssist.Hint="Email Address"
+                Text="{Binding SelectedStaff.Email, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" TextWrapping="Wrap"
+                />
+        
     </Grid>
+
 </local:CustomWindow>

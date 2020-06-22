@@ -75,7 +75,7 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             if (OriginalObject == null) return;
 
             OriginalObject.Name = Name;
-            OriginalObject.PackingValue = PackingValue;
+            OriginalObject.PackingValue = Convert.ToInt32(PackingValue);
         }
 
         public bool HasChanges() => OriginalObject == null ||
@@ -101,6 +101,7 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             {
                 PackingValue.ValidateRequired(ref error);
                 PackingValue.ValidateMinAmount(ref error);
+                PackingValue.ValidateMaxAmount(ref error);
             }
 
             FullValidate(columnName);
@@ -117,6 +118,7 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
 
             PackingValue.ValidateRequired(ref error);
             PackingValue.ValidateMinAmount(ref error);
+            PackingValue.ValidateMaxAmount(ref error);
 
             Error = error;
         }
@@ -137,10 +139,6 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
                 }
             }
 
-            //if (e.PropertyName == nameof(PackingValue))
-            //{
-            //    PackingValue = Convert.ToInt32(Regex.Replace(PackingValue.ToString(), "[^0-9]", ""));
-            //}
         }
     }
 }

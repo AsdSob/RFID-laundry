@@ -40,9 +40,9 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10" >
-                    <Button Margin = "5" Padding="20,5"  Content="New" Command="{Binding AddClientCommand}"/>
-                    <Button Margin = "5" Padding="20,5"  Content="Edit" Command="{Binding EditClientCommand}"/>
+                <StackPanel Grid.Row="0" Orientation="Horizontal" >
+                    <Button Content="New" Command="{Binding AddClientCommand}"/>
+                    <Button Content="Edit" Command="{Binding EditClientCommand}"/>
                 </StackPanel>
 
                 <DataGrid Grid.Row="1" Height="Auto"
@@ -82,8 +82,6 @@
                             </DataGridComboBoxColumn.EditingElementStyle>
                         </DataGridComboBoxColumn>
 
-                        <DataGridTextColumn Header="Address" Binding="{Binding Address}" Width="*" />
-
                         <DataGridComboBoxColumn Header="Parent"
                                                 IsReadOnly="False"
                                                 DisplayMemberPath="ShortName"
@@ -101,6 +99,9 @@
                                 </Style>
                             </DataGridComboBoxColumn.EditingElementStyle>
                         </DataGridComboBoxColumn>
+
+                        <DataGridTextColumn Header="Address" Binding="{Binding Address}" Width="*" FontSize="10"/>
+
                     </DataGrid.Columns>
                 </DataGrid>
 
@@ -116,9 +117,9 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
-                    <Button Margin = "5" Padding="10,5" Content="New" Command="{Binding AddDepartmentCommand}"/>
-                    <Button Margin = "5" Padding="10,5" Content="Edit" Command="{Binding EditDepartmentCommand}"/>
+                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                    <Button Content="New" Command="{Binding AddDepartmentCommand}"/>
+                    <Button Content="Edit" Command="{Binding EditDepartmentCommand}"/>
                 </StackPanel>
 
                 <DataGrid Grid.Row="1" Height="Auto"
@@ -150,9 +151,9 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
         
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
-                    <Button Margin = "5" Padding="10,5" Content="New" Command="{Binding AddStaffCommand}"/>
-                    <Button Margin = "5" Padding="10,5" Content="Edit" Command="{Binding EditStaffCommand}"/>
+                <StackPanel Grid.Row="0" Orientation="Horizontal" >
+                    <Button Content="New" Command="{Binding AddStaffCommand}"/>
+                    <Button Content="Edit" Command="{Binding EditStaffCommand}"/>
                 </StackPanel>
         
                 <DataGrid Grid.Row="1" Height="Auto"
