@@ -61,7 +61,7 @@ namespace Client.Desktop.ViewModels.Windows
             SaveCommand = new RelayCommand(Save);
             CloseCommand = new RelayCommand(CloseWindow);
             DeleteCommand = new RelayCommand(Delete);
-            InitializeCommand = new RelayCommand(Initialize);
+            //InitializeCommand = new RelayCommand(Initialize);
 
             Cities = EnumExtensions.GetValues<CitiesEnum>();
         }

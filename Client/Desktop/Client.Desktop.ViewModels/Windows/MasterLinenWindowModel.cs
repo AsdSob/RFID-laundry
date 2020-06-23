@@ -47,7 +47,7 @@ namespace Client.Desktop.ViewModels.Windows
             SaveCommand = new RelayCommand(Save);
             CloseCommand = new RelayCommand(Close);
             DeleteCommand = new RelayCommand(Delete);
-            InitializeCommand = new RelayCommand(Initialize);
+            //InitializeCommand = new RelayCommand(Initialize);
 
         }
 

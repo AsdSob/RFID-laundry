@@ -104,7 +104,7 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
                 PackingValue.ValidateMaxAmount(ref error);
             }
 
-            FullValidate(columnName);
+            //FullValidate(columnName);
 
             return error;
         }

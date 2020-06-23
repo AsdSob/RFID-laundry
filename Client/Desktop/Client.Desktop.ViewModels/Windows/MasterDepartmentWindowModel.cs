@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -17,7 +18,7 @@ namespace Client.Desktop.ViewModels.Windows
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
         private readonly IMainDispatcher _dispatcher;
-        private List<DepartmentEntity> _departments;
+        private ObservableCollection<DepartmentEntity> _departments;
         private List<UnitViewModel> _departmentTypes;
         private DepartmentEntityViewModel _selectedDepartment;
         private ClientEntity _selectedClient;
@@ -38,7 +39,7 @@ namespace Client.Desktop.ViewModels.Windows
             set => Set(ref _departmentTypes, value);
         }
 
-        public List<DepartmentEntity> Departments
+        public ObservableCollection<DepartmentEntity> Departments
         {
             get => _departments;
             set => Set(ref _departments, value);
@@ -59,7 +60,7 @@ namespace Client.Desktop.ViewModels.Windows
             SaveCommand = new RelayCommand(Save);
             CloseCommand = new RelayCommand(Close);
             DeleteCommand = new RelayCommand(Delete);
-            InitializeCommand = new RelayCommand(Initialize);
+            //InitializeCommand = new RelayCommand(Initialize);
 
             DepartmentTypes = EnumExtensions.GetValues<DepartmentTypeEnum>();
         }
@@ -90,7 +91,7 @@ namespace Client.Desktop.ViewModels.Windows
             {
                 var department = await _laundryService.GetAllAsync<DepartmentEntity>();
                 var departments = department.Where(x => x.ClientId == SelectedClient.Id);
-                Departments = departments.ToList();
+                Departments = departments.ToObservableCollection();
 
             }
             catch (Exception e)

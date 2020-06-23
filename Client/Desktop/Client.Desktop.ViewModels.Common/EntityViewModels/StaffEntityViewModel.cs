@@ -143,7 +143,7 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
                 Email.ValidateEmail(ref error);
             }
 
-            FullValidate(columnName);
+            //FullValidate(columnName);
 
             return error;
         }

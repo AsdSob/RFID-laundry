@@ -148,7 +148,7 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
                 ShortName.ValidateByNameMaxLength(ref error);
             }
 
-            FullValidate(columnName);
+            //FullValidate(columnName);
 
             return error;
         }

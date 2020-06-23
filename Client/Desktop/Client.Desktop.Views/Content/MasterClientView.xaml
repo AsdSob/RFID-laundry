@@ -20,7 +20,7 @@
         </b:EventTrigger>
     </b:Interaction.Triggers>
 
-    <Grid Background="White">
+    <Grid Background="White" Name="StaffWindow">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1.5*"/>
             <ColumnDefinition Width="*"/>
@@ -34,7 +34,7 @@
 <!-- Client List -->
 
         <GroupBox Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Margin="5" Header="Clients" Padding="5">
-            <Grid Name="StaffWindow">
+            <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
@@ -50,22 +50,21 @@
                       SelectedItem="{Binding SelectedClient}"
                       SelectionMode="Single"
                       VerticalScrollBarVisibility="Visible"
-                      AllowDrop="True" 
-                      IsReadOnly="True"
-                      HorizontalAlignment="Stretch"
                       AutoGenerateColumns="False"
-                      IsTextSearchEnabled="True"
-                      IsTextSearchCaseSensitive="False"
+                      IsReadOnly="True"
                       >
 
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Id" Binding="{Binding Id}" />
-                        <DataGridCheckBoxColumn Header="Active" Binding="{Binding Active}" />
+
+
+                        <DataGridCheckBoxColumn Header="Active" Binding="{Binding Active}"/>
+
+
                         <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*" />
                         <DataGridTextColumn Header="Short Name" Binding="{Binding ShortName}" Width="*" />
 
                         <DataGridComboBoxColumn Header="City"
-                                                IsReadOnly="False"
                                                 DisplayMemberPath="Name"
                                                 SelectedValuePath="Id"
                                                 Width="0.5*"
@@ -83,7 +82,6 @@
                         </DataGridComboBoxColumn>
 
                         <DataGridComboBoxColumn Header="Parent"
-                                                IsReadOnly="False"
                                                 DisplayMemberPath="ShortName"
                                                 SelectedValuePath="Id"
                                                 MinWidth="150"
@@ -100,7 +98,7 @@
                             </DataGridComboBoxColumn.EditingElementStyle>
                         </DataGridComboBoxColumn>
 
-                        <DataGridTextColumn Header="Address" Binding="{Binding Address}" Width="*" FontSize="10"/>
+                        <!--<DataGridTextColumn Header="Address" Binding="{Binding Address}" Width="*" FontSize="10"/>-->
 
                     </DataGrid.Columns>
                 </DataGrid>
@@ -151,10 +149,11 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
         
-                <StackPanel Grid.Row="0" Orientation="Horizontal" >
-                    <Button Content="New" Command="{Binding AddStaffCommand}"/>
-                    <Button Content="Edit" Command="{Binding EditStaffCommand}"/>
-                </StackPanel>
+                <DockPanel Grid.Row="0" LastChildFill="False" >
+                    <Button Content="New" DockPanel.Dock="Left" Command="{Binding AddStaffCommand}"/>
+                    <Button Content="Edit" DockPanel.Dock="Left" Command="{Binding EditStaffCommand}"/>
+                    <CheckBox DockPanel.Dock="Right" IsChecked="{Binding ShowAllStaff, UpdateSourceTrigger=PropertyChanged}" Content="Show All" Margin="30,0"/>
+                </DockPanel>
         
                 <DataGrid Grid.Row="1" Height="Auto"
                           ItemsSource="{Binding SortedStaffs}"

@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:content="clr-namespace:Client.Desktop.ViewModels.Content;assembly=Client.Desktop.ViewModels"
              xmlns:file="clr-namespace:Client.Desktop.ViewModels.Content.File;assembly=Client.Desktop.ViewModels"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
@@ -31,82 +30,6 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
            
-        <!--<Grid Grid.Column="0" Grid.Row="1" Margin="10,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-
-            --><!-- Clients --><!--
-            <GroupBox Grid.Row="0" Grid.Column="0" Header="Client" Padding="10">
-                <ComboBox ItemsSource="{Binding Clients}" SelectedValue="{Binding SelectedClient}" DisplayMemberPath="Name"/>
-            </GroupBox>
-
-            --><!-- Departments --><!--
-            <GroupBox Grid.Row="1" Grid.Column="0" Header="Departments" Padding="10">
-
-                <DataGrid Height="Auto"
-                          ItemsSource="{Binding SortedDepartments}"
-                          SelectedItem="{Binding SelectedDepartment}"
-                          SelectionMode="Single"
-                          HeadersVisibility="None"
-                          VerticalScrollBarVisibility="Visible"
-                          AllowDrop="True" 
-                          IsReadOnly="True"
-                          HorizontalAlignment="Stretch"
-                          AutoGenerateColumns="False"
-                          IsTextSearchEnabled="True"
-                          IsTextSearchCaseSensitive="False">
-
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" />
-                    </DataGrid.Columns>
-                </DataGrid>
-
-            </GroupBox>
-
-
-            --><!-- Staff --><!--
-            <GroupBox Grid.Row="2" Grid.Column="0" Header="Staff" Padding="10">
-                <DockPanel>
-
-                    --><!-- Staff Commands --><!--
-                    <DockPanel DockPanel.Dock="Top" LastChildFill="False">
-                            <Button Margin = "5" Padding="5" DockPanel.Dock="Left" Content="New" Command="{Binding NewStaffCommand}"/>
-                            <Button Margin = "5" Padding="5" DockPanel.Dock="Left" Content="Edit" Command="{Binding EditStaffCommand}"/>
-                            <Button Margin = "5" Padding="5" DockPanel.Dock="Left" Content="Delete" Command="{Binding DeleteStaffCommand}"/>
-                            <Button Margin = "5" Padding="5" DockPanel.Dock="Right" Content="All Staff" Command="{Binding ClearSelectedStaffCommand}"/>
-                    </DockPanel>
-
-                    <DataGrid Height="Auto"
-                              DockPanel.Dock="Bottom"
-                              ItemsSource="{Binding SortedStaff}"
-                              SelectedItem="{Binding SelectedStaff}"
-                              SelectionMode="Single"
-                              VerticalScrollBarVisibility="Visible"
-                              AllowDrop="True" 
-                              IsReadOnly="True"
-                              HeadersVisibility="None"
-                              HorizontalAlignment="Stretch"
-                              AutoGenerateColumns="False"
-                              IsTextSearchEnabled="True"
-                              IsTextSearchCaseSensitive="False">
-
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Id" Binding="{Binding StaffId}" Width="*" />
-                            <DataGridTextColumn Header="Staff" Binding="{Binding Name}" Width="2*"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </DockPanel>
-
-            </GroupBox>
-        </Grid>-->
-
         <Grid Grid.Row="1" Grid.Column="1" Margin="10,0" Name="LinenWindow">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -118,9 +41,9 @@
 
             <!-- Linen Commands -->
             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                <Button Margin = "5" Padding="10,5" Content="New" Command="{Binding NewLinenCommand}"/>
-                <Button Margin = "5" Padding="10,5" Content="Edit" Command="{Binding EditLinenCommand}"/>
-                <Button Margin = "5" Padding="10,5" Content="Delete" Command="{Binding DeleteLinenCommand}"/>
+                <Button Content="New" Command="{Binding NewLinenCommand}"/>
+                <Button Content="Edit" Command="{Binding EditLinenCommand}"/>
+                <Button Content="Delete" Command="{Binding DeleteLinenCommand}"/>
             </StackPanel>
 
             <!-- Linens -->
@@ -239,9 +162,9 @@
             </Grid.RowDefinitions>
 
             <!-- Search Tag -->
-            <DockPanel Grid.Row="1" Grid.Column="0" LastChildFill="False">
-                <Button Margin = "5" Padding="10,5"  Content="{Binding AddShowButton}" Command="{Binding AddShowLinenByTagCommand}"/>
-                <Button Margin = "5" Padding="10,5"  Content="Delete" Command="{Binding DeleteTagCommand}"/>
+            <DockPanel Grid.Row="1" Grid.Column="0" LastChildFill="False" Margin="0,20,0,0">
+                <Button Content="{Binding AddShowButton}" Command="{Binding AddShowLinenByTagCommand}"/>
+                <Button Content="Remove" Command="{Binding DeleteTagCommand}"/>
             </DockPanel>
 
             <!-- RFID\Reader Commands -->
@@ -253,18 +176,8 @@
                 <Button DockPanel.Dock="Right"
                         Content="{Binding RfidReaderWindow.StartStopButton}"
                         Command="{Binding RfidReaderWindow.StartStopReaderCommand}"
-                        Margin = "20,0"
-                        Padding="20,10"
-                />
 
-                <!-- Connect/Disconnect-->
-                <!--<Button DockPanel.Dock="Right"
-                        Content="{Binding RfidReaderWindow.ConnectDisconnectButton}"
-                        Command="{Binding RfidReaderWindow.ConnectReaderCommand}"
-                        Width="70"
-                        Margin = "5"
-                        Padding="10,2"
-                />-->
+                />
 
                 <ComboBox DockPanel.Dock="Left" 
                           ItemsSource="{Binding RfidReaderWindow.RfidReaders}" SelectedValue="{Binding RfidReaderWindow.SelectedRfidReader}" 
@@ -281,8 +194,8 @@
                           VerticalScrollBarVisibility="Visible"
                           AllowDrop="True" 
                           EnableRowVirtualization="True" 
-                          IsReadOnly="True" 
-                >
+                          IsReadOnly="True" >
+
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Antenna" Binding="{Binding Path=Antenna}" Width="Auto" />
                         <DataGridTextColumn Header="reg" Binding="{Binding Path=IsRegistered}" Width="Auto" />

@@ -7,9 +7,10 @@
                     xmlns:windows="clr-namespace:Client.Desktop.ViewModels.Windows;assembly=Client.Desktop.ViewModels"
                     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    xmlns:customControl="clr-namespace:Client.Desktop.Views.CustomControl"
                     mc:Ignorable="d"
                     Title="Client Linen"
-                    Height="Auto"
+                    Height="500"
                     Width="600"
                     WindowStartupLocation="CenterOwner"
                     WindowStyle="ToolWindow"
@@ -29,107 +30,123 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="0.4*" />
+            <RowDefinition Height="0.4*" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <DockPanel  Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" LastChildFill="False" Margin="10">
+        <DockPanel  Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" LastChildFill="False" >
             <Button DockPanel.Dock="Left"  Content="Save" Command="{Binding SaveCommand}"/>
-            <Button DockPanel.Dock="Left"  Content="New" Command="{Binding NewCommand}"/>
+            <!--<Button DockPanel.Dock="Left"  Content="New" Command="{Binding NewCommand}"/>-->
             <Button DockPanel.Dock="Left"  Content="Delete" Command="{Binding DeleteCommand}"/>
             <Button DockPanel.Dock="Right" Content="Close" Command="{Binding CloseCommand}"/>
         </DockPanel>
 
 
-        <Grid Grid.Row="1" Grid.Column="0">
+        <!-- Client -->
+        <ComboBox Grid.Row="1"
+                  Grid.Column="0"
+                  ItemsSource="{Binding Clients}" 
+                  SelectedValue="{Binding SelectedLinen.ClientId, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  materialDesign:HintAssist.Hint="Client"
+                  SelectedValuePath="Id"
+                  DisplayMemberPath="Name"
+                  Margin="10,20,20,0"
+                  FontSize="20"
+                  Height="45"
+        />
+
+        <!-- Department -->
+        <ComboBox Grid.Row="1"
+                  Grid.Column="1"
+                  ItemsSource="{Binding SortedDepartments}"
+                  SelectedValue="{Binding SelectedLinen.DepartmentId, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  SelectedValuePath="Id"
+                  DisplayMemberPath="Name"
+                  materialDesign:HintAssist.Hint="Department"
+                  Margin="0,20,20,0"
+                  FontSize="20"
+                  Height="45"
+        />
+
+        <!-- Staff -->
+        <ComboBox Grid.Row="2"
+                  Grid.Column="0"
+                  Grid.ColumnSpan="2"
+                  ItemsSource="{Binding SortedStaffs}"
+                  SelectedValue="{Binding SelectedLinen.StaffId}"
+                  materialDesign:TextFieldAssist.HasClearButton="True"
+                  materialDesign:HintAssist.Hint="Staff"
+                  SelectedValuePath="Id"
+                  DisplayMemberPath="Name"
+                  IsEditable="False"
+                  Margin="10"
+                  Height="Auto"
+                  >
+        </ComboBox>
+
+
+        <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" >
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-
-
-            <!-- Client -->
-            <ComboBox Grid.Row="0" 
-                      ItemsSource="{Binding Clients}" 
-                      SelectedValue="{Binding SelectedLinen.ClientId, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                      materialDesign:TextFieldAssist.HasClearButton="True"
-                      materialDesign:HintAssist.Hint="Client"
-                      SelectedValuePath="Id"
-                      DisplayMemberPath="Name"
-                      Margin="20"
-            />
-
-            <!-- Department -->
-            <ComboBox Grid.Row="1"
-                      ItemsSource="{Binding SortedDepartments}"
-                      SelectedValue="{Binding SelectedLinen.DepartmentId, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                      SelectedValuePath="Id"
-                      DisplayMemberPath="Name"
-                      materialDesign:TextFieldAssist.HasClearButton="True"
-                      materialDesign:HintAssist.Hint="Department"
-                      Margin="20"
-            />
-
-            <!-- Staff -->
-            <ComboBox Grid.Row="2"
-                      ItemsSource="{Binding SortedStaffs}"
-                      SelectedValue="{Binding SelectedLinen.StaffId}"
-                      SelectedValuePath="Id"
-                      DisplayMemberPath="Name"
-                      IsEditable="False">
-            </ComboBox>
-        </Grid>
-
-        <Grid Grid.Row="1" Grid.Column="1" Margin="10,0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             
-            <!-- Id -->
-            <GroupBox Header="Id" Grid.Row="0" Grid.Column="0">
-                <Label Content="{Binding SelectedLinen.Id, UpdateSourceTrigger=PropertyChanged}"
-                       Margin="5"/>
-            </GroupBox>
+        <!-- Id -->
+            <TextBox Grid.Row="0" 
+                     Grid.Column="0"
+                     Text="{Binding SelectedLinen.Id, UpdateSourceTrigger=PropertyChanged}"
+                     IsReadOnly="True"
+                     IsEnabled="False"
+                     FontSize="20"
+                     Padding="0"
+                     Margin="20,0"
 
-            <!-- Linen Name -->
-            <GroupBox Header="Linen" Grid.Row="0" Grid.Column="1">
-                <ComboBox ItemsSource="{Binding MasterLinens}"
-                          SelectedValue="{Binding SelectedLinen.MasterLinenId, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          DisplayMemberPath="Name"
-                          VerticalContentAlignment="Center"
-                          SelectedValuePath="Id"
-                          IsEditable="False">
-                </ComboBox>
-            </GroupBox>
+            />
+
+        <!-- Linen Name -->
+            <ComboBox Grid.Row="0" 
+                      Grid.Column="1"
+                      ItemsSource="{Binding MasterLinens}"
+                      SelectedValue="{Binding SelectedLinen.MasterLinenId, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      DisplayMemberPath="Name"
+                      VerticalContentAlignment="Center"
+                      SelectedValuePath="Id"
+                      IsEditable="False"
+                      materialDesign:HintAssist.Hint="Linen">
+            </ComboBox>
 
             <!-- Packing Value -->
-            <GroupBox Header="Packing Value" Grid.Row="1" Grid.Column="0">
-                <TextBox Text="{Binding SelectedLinen.PackingValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" Width="Auto" TextWrapping="Wrap" />
-            </GroupBox>
+            <customControl:MaskedTextBox Grid.Row="0" 
+                                         Grid.Column="2"
+                                         Text="{Binding SelectedLinen.PackingValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
+                                         materialDesign:HintAssist.Hint="P.V."
+                                         Mask="Decimal"
+                                         MaxLength="2"
+                                         MinWidth="100"
+                                         HorizontalContentAlignment="Center"
+                                         />
 
-            <!-- Tag -->
-            <GroupBox Header="RFID Tag" Grid.Row="1" Grid.Column="1">
-                <TextBox materialDesign:HintAssist.Hint="Hint 1" Text="{Binding SelectedLinen.Tag, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" Width="Auto" TextWrapping="Wrap" />
-            </GroupBox>
+        <!-- Tag -->
+            <TextBox  Grid.Row="1" 
+                      Grid.Column="0"
+                      Grid.ColumnSpan="2"
+                      materialDesign:HintAssist.Hint="RFID Tag" 
+                      Text="{Binding SelectedLinen.Tag, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
+                      MaxLength="30"
+                      AllowDrop="True"
+                      TextWrapping="Wrap"
+                      />
 
-            <!--<Label Grid.Row="2"
-                   Grid.Column="0"
-                   Grid.ColumnSpan="2"
-                   Content="{Binding SelectedLinen.Error, UpdateSourceTrigger=PropertyChanged }"
-                   Foreground="Red"
-                   MinHeight="30"/>-->
 
         </Grid>
 

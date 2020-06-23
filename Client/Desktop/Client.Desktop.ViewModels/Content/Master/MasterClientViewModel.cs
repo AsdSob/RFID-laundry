@@ -28,7 +28,13 @@ namespace Client.Desktop.ViewModels.Content.Master
         private List<UnitViewModel> _departmentTypes;
         private ObservableCollection<ClientStaffEntity> _staffs;
         private ClientStaffEntity _selectedStaff;
+        private bool _showAllStaff;
 
+        public bool ShowAllStaff
+        {
+            get => _showAllStaff;
+            set => Set(ref _showAllStaff, value);
+        }
         public ClientStaffEntity SelectedStaff
         {
             get => _selectedStaff;
@@ -118,18 +124,23 @@ namespace Client.Desktop.ViewModels.Content.Master
                 EditClientCommand.RaiseCanExecuteChanged();
                 RaisePropertyChanged((() => SortedDepartments));
                 RaisePropertyChanged((() => SortedStaffs));
-            }
+            }else
 
             if (e.PropertyName == nameof(SelectedDepartment))
             {
                 EditDepartmentCommand.RaiseCanExecuteChanged();
                 AddStaffCommand.RaiseCanExecuteChanged();
                 RaisePropertyChanged((() => SortedStaffs));
-            }
+            }else
 
             if (e.PropertyName == nameof(SelectedStaff))
             {
                 EditStaffCommand.RaiseCanExecuteChanged();
+            }else 
+            
+            if (e.PropertyName == nameof(ShowAllStaff))
+            {
+                RaisePropertyChanged(()=> SortedStaffs);
             }
         }
 
@@ -167,7 +178,7 @@ namespace Client.Desktop.ViewModels.Content.Master
         {
             var staffs = new ObservableCollection<ClientStaffEntity>();
 
-            if (SelectedDepartment == null)
+            if (SelectedDepartment == null || ShowAllStaff)
             {
                 if (SortedDepartments == null)
                     return staffs;
@@ -198,6 +209,7 @@ namespace Client.Desktop.ViewModels.Content.Master
         private async void ClientWindow(ClientEntity client)
         {
             var clientWindow = _resolverService.Resolve<MasterClientWindowModel>();
+            clientWindow.Clients = Clients;
 
             clientWindow.SetSelectedClient(client);
 
@@ -222,6 +234,7 @@ namespace Client.Desktop.ViewModels.Content.Master
         {
             var departmentWindow = _resolverService.Resolve<MasterDepartmentWindowModel>();
 
+            departmentWindow.Departments = Departments;
             departmentWindow.SetSelectedDepartment(department, SelectedClient);
 
             if (_dialogService.ShowDialog(departmentWindow))
@@ -246,6 +259,7 @@ namespace Client.Desktop.ViewModels.Content.Master
         {
             var staffWindow = _resolverService.Resolve<MasterStaffWindowModel>();
 
+            staffWindow.Staffs = Staffs;
             staffWindow.SetSelectedStaff(staff, SelectedDepartment);
 
             if (_dialogService.ShowDialog(staffWindow))
@@ -255,6 +269,7 @@ namespace Client.Desktop.ViewModels.Content.Master
                 RaisePropertyChanged((() => SortedStaffs));
             }
         }
+
 
     }
 }

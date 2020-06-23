@@ -154,7 +154,7 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
                 PackingValue.ValidateMinAmount(ref error);
             }
 
-            FullValidate(columnName);
+            //FullValidate(columnName);
 
             return error;
         }
@@ -174,14 +174,7 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            //if (e.PropertyName == nameof(Tag))
-            //{
-            //    if (!String.IsNullOrEmpty(Tag))
-            //    {
-            //        var regex = new Regex(@"\s");
-            //        Tag = regex.Replace(Tag, "");
-            //    }
-            //}
+
         }
     }
 }

@@ -92,6 +92,7 @@ namespace Client.Desktop.ViewModels.Content.Master
         {
             var masterLinenWindow = _resolverService.Resolve<MasterLinenWindowModel>();
 
+            masterLinenWindow.MasterLinens = MasterLinens;
             masterLinenWindow.SetSelectedLinen(masterLinen);
 
             if (_dialogService.ShowDialog(masterLinenWindow))
