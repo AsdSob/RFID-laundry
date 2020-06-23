@@ -6,6 +6,7 @@
              xmlns:administration="clr-namespace:Client.Desktop.ViewModels.Content.Administration;assembly=Client.Desktop.ViewModels"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:behaviors="clr-namespace:Client.Desktop.Views.Behaviors"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance administration:AuthManageViewModel}">
@@ -28,7 +29,8 @@
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="4*"/>
-            <ColumnDefinition Width="6*"/>
+            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Row="0"
@@ -36,19 +38,12 @@
                     Orientation="Horizontal">
             <Button Content="Add"
                     Command="{Binding AddCommand}"
-                    Width="100"
-                    Margin = "5"
-                    Padding="10,2"
                     />
             <Button Content="Delete"
                     Command="{Binding DeleteCommand}"
-                    Width="100"
-                    Margin = "5"
-                    Padding="10,2"
                     />
         </StackPanel>
         
-
         <DataGrid Grid.Row="1"
                   Grid.Column="0"
                   Height="Auto"
@@ -82,70 +77,83 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <Label Grid.Row="0" Content="User name"/>
-            <TextBox Grid.Row="1" Text="{Binding SelectedAccount.UserName, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" MaxLength="64"/>
-            <Label Grid.Row="2" Content="Login"/>
-            <TextBox Grid.Row="3" Text="{Binding SelectedAccount.Login, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" MaxLength="64"/>
-            <Label Grid.Row="4" Content="Password"/>
-            <PasswordBox Grid.Row="5" x:Name="PasswordBox" MaxLength="64">
+
+            <TextBox Grid.Row="0" 
+                     Text="{Binding SelectedAccount.UserName, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" 
+                     materialDesign:HintAssist.Hint="User Name"
+                     Margin="10"
+                     />
+
+
+            <TextBox Grid.Row="1" 
+                     Text="{Binding SelectedAccount.Login, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
+                     materialDesign:HintAssist.Hint="Login"
+                     Margin="10"
+                     />
+
+            <PasswordBox Grid.Row="2" 
+                         x:Name="PasswordBox" 
+                         materialDesign:HintAssist.Hint="Password"
+                         Margin="10"
+                         >
                 <b:Interaction.Behaviors>
                     <behaviors:PasswordBoxBehavior Password="{Binding SelectedAccount.Password, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
                                                    ResetObject="{Binding SelectedAccount}"/>
                 </b:Interaction.Behaviors>
             </PasswordBox>
-            <Label Grid.Row="6" Content="Repeat password"/>
-            <PasswordBox Grid.Row="7" x:Name="RepeatPasswordBox" MaxLength="64">
+
+            <PasswordBox Grid.Row="3" 
+                         x:Name="RepeatPasswordBox" 
+                         materialDesign:HintAssist.Hint="Repeat Password"
+                         Margin="10"
+            >
                 <b:Interaction.Behaviors>
                     <behaviors:PasswordBoxBehavior Password="{Binding SelectedAccount.RepeatPassword, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
                                                    ResetObject="{Binding SelectedAccount}"/>
                 </b:Interaction.Behaviors>
             </PasswordBox>
-            <Label Grid.Row="8" Content="E-mail"/>
-            <TextBox Grid.Row="9" Text="{Binding SelectedAccount.Email, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" MaxLength="256"/>
-            <Label Grid.Row="10" Content="Role"/>
-            <ComboBox Grid.Row="11" ItemsSource="{Binding Roles}" SelectedValue="{Binding SelectedAccount.Role}"/>
 
-            <DockPanel Grid.Row="12" LastChildFill="True">
+            <TextBox Grid.Row="4" 
+                     Text="{Binding SelectedAccount.Email, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
+                     materialDesign:HintAssist.Hint="E-mail"
+                     Margin="10"
+            />           
+            
+
+            <ComboBox Grid.Row="5" 
+                      ItemsSource="{Binding Roles}" 
+                      SelectedValue="{Binding SelectedAccount.Role}"
+                      materialDesign:HintAssist.Hint="Role"
+                      Margin="10"/>
+
+
+            <DockPanel Grid.Row="6" LastChildFill="True" Margin="10">
                 
-                <Label DockPanel.Dock="Top" Content="RFID Reader"/>
-
                 <Button DockPanel.Dock="Right" 
                         Content="Settings" 
-                        Command="{Binding ReaderSettingCommand}"/>
+                        Command="{Binding ReaderSettingCommand}"
+                        />
 
-                <ComboBox DockPanel.Dock="Left" 
-                          ItemsSource="{Binding RfidReaders}" 
-                          SelectedValue="{Binding SelectedAccountDetails.ReaderId}" 
-                          DisplayMemberPath="Name" 
-                          SelectedValuePath="Id" 
-                          IsEditable="False">
-                </ComboBox>
+                <ComboBox  ItemsSource="{Binding RfidReaders}" 
+                           SelectedValue="{Binding SelectedAccountDetails.ReaderId}"
+                           materialDesign:HintAssist.Hint="Reader"
+                           DisplayMemberPath="Name" 
+                           SelectedValuePath="Id" 
+                           DockPanel.Dock="Left" 
+                           Margin="10"
+                           />
 
             </DockPanel>
 
-            <Label Grid.Row="13"
-                   Content="{Binding SelectedAccount.Error}"
-                   Foreground="Red"
-                   MinHeight="30"/>
-
-            <Button Grid.Row="14"
+            <Button Grid.Row="7"
                     Content="Save"
                     Command="{Binding SaveCommand}"
-                    Width="100"
-                    Margin = "5"
-                    Padding="10,2"
                     HorizontalAlignment="Left"
-                    />
+            />
+
         </Grid>
     </Grid>
 </UserControl>

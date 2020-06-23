@@ -26,12 +26,15 @@ namespace Client.Desktop.ViewModels.Windows
             IMainDispatcher mainDispatcher,
             IAuthorizationService authorizationService)
         {
-            _authenticationService = authenticationService ?? throw new ArgumentNullException(nameof(authenticationService));
+            _authenticationService =
+                authenticationService ?? throw new ArgumentNullException(nameof(authenticationService));
             _mainDispatcher = mainDispatcher ?? throw new ArgumentNullException(nameof(mainDispatcher));
-            _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
+            _authorizationService =
+                authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
 
             InitilizeCommand = new RelayCommand(Initialize);
             LoginCommand = new RelayCommand<object>(Login, CanLogin);
+
         }
 
         private async void Initialize()
@@ -40,6 +43,8 @@ namespace Client.Desktop.ViewModels.Windows
             if (user == null) return;
 
             await LoginAsync(() => Task.FromResult(user));
+
+
         }
 
         #region Properties
@@ -138,6 +143,7 @@ namespace Client.Desktop.ViewModels.Windows
 
         private bool CanLogin(object password)
         {
+            //return true;
             return !IsAuthenticated;
         }
 

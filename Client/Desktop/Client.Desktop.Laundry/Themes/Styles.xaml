@@ -79,6 +79,17 @@
     <Style BasedOn="{StaticResource MaterialDesignDataGridCheckBoxColumnStyle}"
            TargetType="{x:Type DataGridCheckBoxColumn}">
 
+    </Style>    
+    
+    <!--Password Box-->
+    <Style BasedOn="{StaticResource MaterialDesignFloatingHintPasswordBox}"
+           TargetType="{x:Type PasswordBox}">
+        <Setter Property="materialDesign:HintAssist.FloatingScale" Value="0.50"/>
+        <Setter Property="Padding" Value="5,0"/>
+        <Setter Property="Margin" Value="10,0"/>
+        <Setter Property="FontSize" Value="24"/>
+        <Setter Property="Height" Value="60"/>
+
     </Style>
 
 

@@ -6,7 +6,7 @@ namespace Client.Desktop.Views.Windows
 {
 
     [HasViewModel(typeof(RfidReaderWindowModel))]
-    public partial class RfidReaderWindow : Window
+    public partial class RfidReaderWindow : CustomWindow
     {
         public RfidReaderWindow()
         {
