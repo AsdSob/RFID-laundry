@@ -4,13 +4,14 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Windows;
 using Storage.Laundry.Models;
 
-namespace Client.Desktop.ViewModels.Content.Master
+namespace Client.Desktop.ViewModels.Content
 {
     public class MasterClientViewModel : ViewModelBase
     {
@@ -20,14 +21,14 @@ namespace Client.Desktop.ViewModels.Content.Master
 
         #region Parameters
 
-        private ObservableCollection<ClientEntity> _clients;
-        private ClientEntity _selectedClient;
-        private ObservableCollection<DepartmentEntity> _departments;
+        private ObservableCollection<ClientEntityViewModel> _clients;
+        private ClientEntityViewModel _selectedClient;
+        private ObservableCollection<DepartmentEntityViewModel> _departments;
         private List<UnitViewModel> _cities;
-        private DepartmentEntity _selectedDepartment;
+        private DepartmentEntityViewModel _selectedDepartment;
         private List<UnitViewModel> _departmentTypes;
-        private ObservableCollection<ClientStaffEntity> _staffs;
-        private ClientStaffEntity _selectedStaff;
+        private ObservableCollection<ClientStaffEntityViewModel> _staffs;
+        private ClientStaffEntityViewModel _selectedStaff;
         private bool _showAllStaff;
 
         public bool ShowAllStaff
@@ -35,12 +36,12 @@ namespace Client.Desktop.ViewModels.Content.Master
             get => _showAllStaff;
             set => Set(ref _showAllStaff, value);
         }
-        public ClientStaffEntity SelectedStaff
+        public ClientStaffEntityViewModel SelectedStaff
         {
             get => _selectedStaff;
             set => Set(ref _selectedStaff, value);
         }
-        public ObservableCollection<ClientStaffEntity> Staffs
+        public ObservableCollection<ClientStaffEntityViewModel> Staffs
         {
             get => _staffs;
             set => Set(ref _staffs, value);
@@ -50,7 +51,7 @@ namespace Client.Desktop.ViewModels.Content.Master
             get => _departmentTypes;
             set => Set(() => DepartmentTypes, ref _departmentTypes, value);
         }
-        public DepartmentEntity SelectedDepartment
+        public DepartmentEntityViewModel SelectedDepartment
         {
             get => _selectedDepartment;
             set => Set(() => SelectedDepartment, ref _selectedDepartment, value);
@@ -60,24 +61,24 @@ namespace Client.Desktop.ViewModels.Content.Master
             get => _cities;
             set => Set(() => Cities, ref _cities, value);
         }
-        public ObservableCollection<DepartmentEntity> Departments
+        public ObservableCollection<DepartmentEntityViewModel> Departments
         {
             get => _departments;
             set => Set(() => Departments, ref _departments, value);
         }
-        public ClientEntity SelectedClient
+        public ClientEntityViewModel SelectedClient
         {
             get => _selectedClient;
             set => Set(() => SelectedClient, ref _selectedClient, value);
         }
-        public ObservableCollection<ClientEntity> Clients
+        public ObservableCollection<ClientEntityViewModel> Clients
         {
             get => _clients;
             set => Set(() => Clients, ref _clients, value);
         }
 
-        public ObservableCollection<DepartmentEntity> SortedDepartments => SortDepartments();
-        public ObservableCollection<ClientStaffEntity> SortedStaffs => SortStaffs();
+        public ObservableCollection<DepartmentEntityViewModel> SortedDepartments => SortDepartments();
+        public ObservableCollection<ClientStaffEntityViewModel> SortedStaffs => SortStaffs();
 
         #endregion
 
@@ -154,29 +155,32 @@ namespace Client.Desktop.ViewModels.Content.Master
         private async Task GetClients()
         {
             var client = await _laundryService.GetAllAsync<ClientEntity>();
-            Clients = client.ToObservableCollection();
+            var clients = client.Select(x => new ClientEntityViewModel(x));
+            Clients = clients.ToObservableCollection();
         }
 
         private async Task GetDepartments()
         {
-            var departments = await _laundryService.GetAllAsync<DepartmentEntity>();
+            var department = await _laundryService.GetAllAsync<DepartmentEntity>();
+            var departments = department.Select(x => new DepartmentEntityViewModel(x));
             Departments = departments.ToObservableCollection();
         }
 
         private async Task GetStaffs()
         {
             var staff = await _laundryService.GetAllAsync<ClientStaffEntity>();
-            Staffs = staff.ToObservableCollection();
+            var staffs = staff.Select(x => new ClientStaffEntityViewModel(x));
+            Staffs = staffs.ToObservableCollection();
         }
 
-        private ObservableCollection<DepartmentEntity> SortDepartments()
+        private ObservableCollection<DepartmentEntityViewModel> SortDepartments()
         {
             return Departments?.Where(x => x.ClientId == SelectedClient?.Id).ToObservableCollection();
         }
 
-        private ObservableCollection<ClientStaffEntity> SortStaffs()
+        private ObservableCollection<ClientStaffEntityViewModel> SortStaffs()
         {
-            var staffs = new ObservableCollection<ClientStaffEntity>();
+            var staffs = new ObservableCollection<ClientStaffEntityViewModel>();
 
             if (SelectedDepartment == null || ShowAllStaff)
             {
@@ -206,7 +210,7 @@ namespace Client.Desktop.ViewModels.Content.Master
            ClientWindow(null);
         }
 
-        private async void ClientWindow(ClientEntity client)
+        private async void ClientWindow(ClientEntityViewModel client)
         {
             var clientWindow = _resolverService.Resolve<MasterClientWindowModel>();
             clientWindow.Clients = Clients;
@@ -230,7 +234,7 @@ namespace Client.Desktop.ViewModels.Content.Master
             DepartmentWindow(null);
         }
 
-        private async void DepartmentWindow(DepartmentEntity department)
+        private async void DepartmentWindow(DepartmentEntityViewModel department)
         {
             var departmentWindow = _resolverService.Resolve<MasterDepartmentWindowModel>();
 
@@ -255,7 +259,7 @@ namespace Client.Desktop.ViewModels.Content.Master
             StaffWindow(null);
         }
 
-        private async void StaffWindow(ClientStaffEntity staff)
+        private async void StaffWindow(ClientStaffEntityViewModel staff)
         {
             var staffWindow = _resolverService.Resolve<MasterStaffWindowModel>();
 

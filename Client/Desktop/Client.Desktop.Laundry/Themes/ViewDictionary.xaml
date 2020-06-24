@@ -7,24 +7,21 @@
                     xmlns:views="clr-namespace:Client.Desktop.Laundry.Views"
                     xmlns:contentView="clr-namespace:Client.Desktop.Views.Content;assembly=Client.Desktop.Views"
                     xmlns:windows1="clr-namespace:Client.Desktop.Views.Windows;assembly=Client.Desktop.Views"
-                    xmlns:views1="clr-namespace:Client.Desktop.Views;assembly=Client.Desktop.Views"
-                    xmlns:bin="clr-namespace:Client.Desktop.ViewModels.Content.Bin;assembly=Client.Desktop.ViewModels"
-                    xmlns:file="clr-namespace:Client.Desktop.ViewModels.Content.File;assembly=Client.Desktop.ViewModels"
-                    xmlns:master="clr-namespace:Client.Desktop.ViewModels.Content.Master;assembly=Client.Desktop.ViewModels">
+                    xmlns:views1="clr-namespace:Client.Desktop.Views;assembly=Client.Desktop.Views">
 
     <DataTemplate DataType="{x:Type viewModels:MenuViewModel}">
         <views:MenuView/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type master:MasterClientViewModel}">
+    <DataTemplate DataType="{x:Type content:MasterClientViewModel}">
         <contentView:MasterClientView/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type master:MasterStaffViewModel}">
+    <DataTemplate DataType="{x:Type content:MasterStaffViewModel}">
         <contentView:MasterStaffView/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type master:MasterLinenViewModel}">
+    <DataTemplate DataType="{x:Type content:MasterLinenViewModel}">
         <contentView:MasterLinenView/>
     </DataTemplate>
 
@@ -32,11 +29,11 @@
         <views1:AuthManageView/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type file:TagRegistrationViewModel}">
+    <DataTemplate DataType="{x:Type content:TagRegistrationViewModel}">
         <contentView:TagRegistrationView/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type bin:BinClientViewModel}">
+    <DataTemplate DataType="{x:Type content:BinClientViewModel}">
         <contentView:BinSoilCollectionView/>
     </DataTemplate>
 

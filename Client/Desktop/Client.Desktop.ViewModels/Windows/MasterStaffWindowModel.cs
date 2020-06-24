@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
@@ -15,18 +16,18 @@ namespace Client.Desktop.ViewModels.Windows
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
         private readonly IMainDispatcher _dispatcher;
-        private StaffEntityViewModel _selectedStaff;
-        private ObservableCollection<ClientStaffEntity> _staffs;
+        private ClientStaffEntityViewModel _selectedClientStaff;
+        private ObservableCollection<ClientStaffEntityViewModel> _staffs;
 
-        public ObservableCollection<ClientStaffEntity> Staffs
+        public ObservableCollection<ClientStaffEntityViewModel> Staffs
         {
             get => _staffs;
             set => Set(ref _staffs, value);
         }
-        public StaffEntityViewModel SelectedStaff
+        public ClientStaffEntityViewModel SelectedClientStaff
         {
-            get => _selectedStaff;
-            set => Set(ref _selectedStaff, value);
+            get => _selectedClientStaff;
+            set => Set(ref _selectedClientStaff, value);
         }
 
         public Action<bool> CloseAction { get; set; }
@@ -48,17 +49,17 @@ namespace Client.Desktop.ViewModels.Windows
 
         }
 
-        public void SetSelectedStaff(ClientStaffEntity staff, DepartmentEntity department)
+        public void SetSelectedStaff(ClientStaffEntityViewModel staff, DepartmentEntityViewModel department)
         {
-            SelectedStaff = null;
+            SelectedClientStaff = null;
 
             if (staff != null)
             {
-                SelectedStaff = new StaffEntityViewModel(staff);
+                SelectedClientStaff = staff;
                 return;
             }
 
-            SelectedStaff = new StaffEntityViewModel(new ClientStaffEntity()
+            SelectedClientStaff = new ClientStaffEntityViewModel(new ClientStaffEntity()
             {
                 DepartmentId = department.Id,
             });
@@ -71,7 +72,8 @@ namespace Client.Desktop.ViewModels.Windows
             try
             {
                 var staff = await _laundryService.GetAllAsync<ClientStaffEntity>();
-                Staffs = staff.ToObservableCollection();
+                var staffs = staff.Select(x => new ClientStaffEntityViewModel(x));
+                Staffs = staffs.ToObservableCollection();
 
             }
             catch (Exception e)
@@ -93,25 +95,25 @@ namespace Client.Desktop.ViewModels.Windows
 
         private void Save()
         {
-            if (!SelectedStaff.IsValid || !SelectedStaff.HasChanges())
+            if (!SelectedClientStaff.IsValid || !SelectedClientStaff.HasChanges())
             {
                 return;
             }
 
-            SelectedStaff.AcceptChanges();
-            _laundryService.AddOrUpdateAsync(SelectedStaff.OriginalObject);
+            SelectedClientStaff.AcceptChanges();
+            _laundryService.AddOrUpdateAsync(SelectedClientStaff.OriginalObject);
 
             Close();
         }
 
         private void Delete()
         {
-            if (!_dialogService.ShowQuestionDialog($"Do you want to DELETE {SelectedStaff.StaffName} ?"))
+            if (!_dialogService.ShowQuestionDialog($"Do you want to DELETE {SelectedClientStaff.Name} ?"))
                 return;
 
-            if (!SelectedStaff.IsNew)
+            if (!SelectedClientStaff.IsNew)
             {
-                _laundryService.DeleteAsync(SelectedStaff.OriginalObject);
+                _laundryService.DeleteAsync(SelectedClientStaff.OriginalObject);
             }
 
             Close();
@@ -119,7 +121,7 @@ namespace Client.Desktop.ViewModels.Windows
 
         private void Close()
         {
-            if (SelectedStaff.HasChanges())
+            if (SelectedClientStaff.HasChanges())
             {
                 if (_dialogService.ShowQuestionDialog($"Do you want to close window ? \n \"Changes is NOT saved\""))
                 {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
@@ -8,7 +9,7 @@ using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Windows;
 using Storage.Laundry.Models;
 
-namespace Client.Desktop.ViewModels.Content.Master
+namespace Client.Desktop.ViewModels.Content
 {
     public class MasterLinenViewModel :ViewModelBase
     {
@@ -16,15 +17,15 @@ namespace Client.Desktop.ViewModels.Content.Master
         private readonly IDialogService _dialogService;
         private readonly IResolver _resolverService;
 
-        private ObservableCollection<MasterLinenEntity> _masterLinens;
-        private MasterLinenEntity _selectedMasterLinen;
+        private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
+        private MasterLinenEntityViewModel _selectedMasterLinen;
 
-        public MasterLinenEntity SelectedMasterLinen
+        public MasterLinenEntityViewModel SelectedMasterLinen
         {
             get => _selectedMasterLinen;
             set => Set(() => SelectedMasterLinen, ref _selectedMasterLinen, value);
         }
-        public ObservableCollection<MasterLinenEntity> MasterLinens
+        public ObservableCollection<MasterLinenEntityViewModel> MasterLinens
         {
             get => _masterLinens;
             set => Set(() => MasterLinens, ref _masterLinens, value);
@@ -44,7 +45,7 @@ namespace Client.Desktop.ViewModels.Content.Master
             NewCommand = new RelayCommand(AddMasterLinen);
             InitializeCommand = new RelayCommand(Initialize);
 
-            MasterLinens = new ObservableCollection<MasterLinenEntity>();
+            MasterLinens = new ObservableCollection<MasterLinenEntityViewModel>();
         }
 
         private async void Initialize()
@@ -54,7 +55,8 @@ namespace Client.Desktop.ViewModels.Content.Master
             try
             {
                 var master = await _laundryService.GetAllAsync<MasterLinenEntity>();
-                MasterLinens = master.ToObservableCollection();
+                var masters = master.Select(x => new MasterLinenEntityViewModel(x));
+                MasterLinens = masters.ToObservableCollection();
 
             }
             catch (Exception e)
@@ -80,7 +82,7 @@ namespace Client.Desktop.ViewModels.Content.Master
 
         private void Edit()
         {
-            MasterLinenWindow(new MasterLinenEntityViewModel(SelectedMasterLinen));
+            MasterLinenWindow(SelectedMasterLinen);
         }
 
         private void AddMasterLinen()

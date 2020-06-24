@@ -1,7 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.ViewModels;
@@ -9,13 +7,13 @@ using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Common.EntityViewModels
 {
-    public class StaffEntityViewModel : ViewModelBase,IDataErrorInfo
+    public class ClientStaffEntityViewModel : ViewModelBase,IDataErrorInfo
     {
         private ClientStaffEntity _originalObject;
         private int _id;
         private string _staffId;
         private int _departmentId;
-        private string _staffName;
+        private string _name;
         private string _phoneNumber;
         private string _email;
         private bool _isValid;
@@ -41,10 +39,10 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             get => _phoneNumber;
             set => Set(() => PhoneNumber, ref _phoneNumber, value);
         }
-        public string StaffName
+        public string Name
         {
-            get => _staffName;
-            set => Set(() => StaffName, ref _staffName, value);
+            get => _name;
+            set => Set(() => Name, ref _name, value);
         }
         public int DepartmentId
         {
@@ -67,14 +65,14 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             set => Set(() => OriginalObject, ref _originalObject, value);
         }
 
-        public StaffEntityViewModel()
+        public ClientStaffEntityViewModel()
         {
             OriginalObject = new ClientStaffEntity();
 
             PropertyChanged += OnPropertyChanged;
         }
 
-        public StaffEntityViewModel(ClientStaffEntity originalObject) :this()
+        public ClientStaffEntityViewModel(ClientStaffEntity originalObject) :this()
         {
             Update(originalObject);
         }
@@ -85,7 +83,7 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
         {
             OriginalObject = originalObject;
             Id = OriginalObject.Id;
-            StaffName = OriginalObject.Name;
+            Name = OriginalObject.Name;
             StaffId = OriginalObject.StaffId;
             DepartmentId = OriginalObject.DepartmentId;
             Email = OriginalObject.Email;
@@ -96,7 +94,7 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
         {
             if (OriginalObject == null) return;
 
-            OriginalObject.Name = StaffName;
+            OriginalObject.Name = Name;
             OriginalObject.StaffId = StaffId;
             OriginalObject.PhoneNumber = PhoneNumber;
             OriginalObject.Email = Email;
@@ -105,14 +103,14 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
 
         public bool HasChanges() => OriginalObject == null ||
                                     OriginalObject.IsNew ||
-                                    !Equals(StaffName, OriginalObject.Name) ||
+                                    !Equals(Name, OriginalObject.Name) ||
                                     !Equals(StaffId, OriginalObject.StaffId) ||
                                     !Equals(PhoneNumber, OriginalObject.PhoneNumber) ||
                                     !Equals(Email, OriginalObject.Email) ||
                                     !Equals(DepartmentId, OriginalObject.DepartmentId);
 
         public string this[string columnName] => Validate(columnName);
-        public Func<StaffEntityViewModel, string, bool> NameUniqueValidationFunc { get; set; }
+        public Func<ClientStaffEntityViewModel, string, bool> NameUniqueValidationFunc { get; set; }
 
         private string Validate(string columnName)
         {
@@ -125,10 +123,10 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             }
             else
 
-            if (columnName == nameof(StaffName))
+            if (columnName == nameof(Name))
             {
-                StaffName.ValidateRequired(ref error);
-                StaffName.ValidateByNameMaxLength(ref error);
+                Name.ValidateRequired(ref error);
+                Name.ValidateByNameMaxLength(ref error);
             }
             else
 
@@ -155,8 +153,8 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             StaffId.ValidateRequired(ref error);
             StaffId.ValidateByNameMaxLength(ref error);
 
-            StaffName.ValidateRequired(ref error);
-            StaffName.ValidateByNameMaxLength(ref error);
+            Name.ValidateRequired(ref error);
+            Name.ValidateByNameMaxLength(ref error);
 
             DepartmentId.ValidateRequired(ref error);
 
@@ -168,12 +166,12 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(StaffName))
+            if (e.PropertyName == nameof(Name))
             {
-                if (!String.IsNullOrEmpty(StaffName))
+                if (!String.IsNullOrEmpty(Name))
                 {
                     var regex = new Regex(@"\s+");
-                    StaffName = regex.Replace(StaffName, " ");
+                    Name = regex.Replace(Name, " ");
                 }
             }
             else

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -11,7 +10,7 @@ using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Windows;
 using Storage.Laundry.Models;
 
-namespace Client.Desktop.ViewModels.Content.File
+namespace Client.Desktop.ViewModels.Content
 {
     public class TagRegistrationViewModel :ViewModelBase
     {
@@ -20,12 +19,12 @@ namespace Client.Desktop.ViewModels.Content.File
         private readonly IResolver _resolverService;
         private readonly IMainDispatcher _dispatcher;
 
-        private ObservableCollection<ClientEntity> _clients;
-        private ObservableCollection<DepartmentEntity> _departments;
-        private ObservableCollection<ClientStaffEntity> _staffs;
+        private ObservableCollection<ClientEntityViewModel> _clients;
+        private ObservableCollection<DepartmentEntityViewModel> _departments;
+        private ObservableCollection<ClientStaffEntityViewModel> _staffs;
         private ObservableCollection<ClientLinenEntityViewModel> _linens;
         private ClientLinenEntityViewModel _selectedClientLinen;
-        private List<MasterLinenEntity> _masterLinens;
+        private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
         private RfidTagViewModel _selectedTag;
         private string _addShowButton;
 
@@ -39,7 +38,7 @@ namespace Client.Desktop.ViewModels.Content.File
             get => _selectedTag;
             set => Set(() => SelectedTag, ref _selectedTag, value);
         }
-        public List<MasterLinenEntity> MasterLinens
+        public ObservableCollection<MasterLinenEntityViewModel> MasterLinens
         {
             get => _masterLinens;
             set => Set(() => MasterLinens, ref _masterLinens, value);
@@ -54,17 +53,17 @@ namespace Client.Desktop.ViewModels.Content.File
             get => _linens;
             set => Set(() => Linens, ref _linens, value);
         }
-        public ObservableCollection<ClientStaffEntity> Staffs
+        public ObservableCollection<ClientStaffEntityViewModel> Staffs
         {
             get => _staffs;
             set => Set(() => Staffs, ref _staffs, value);
         }
-        public ObservableCollection<DepartmentEntity> Departments
+        public ObservableCollection<DepartmentEntityViewModel> Departments
         {
             get => _departments;
             set => Set(() => Departments, ref _departments, value);
         }
-        public ObservableCollection<ClientEntity> Clients
+        public ObservableCollection<ClientEntityViewModel> Clients
         {
             get => _clients;
             set => Set(() => Clients, ref _clients, value);
@@ -126,13 +125,16 @@ namespace Client.Desktop.ViewModels.Content.File
         private async void Initialize()
         {
             var client = await _laundryService.GetAllAsync<ClientEntity>();
-            Clients = client.ToObservableCollection();
+            var clients = client.Select(x => new ClientEntityViewModel(x));
+            Clients = clients.ToObservableCollection();
 
-            var departments = await _laundryService.GetAllAsync<DepartmentEntity>();
+            var department = await _laundryService.GetAllAsync<DepartmentEntity>();
+            var departments = department.Select(x => new DepartmentEntityViewModel(x));
             Departments = departments.ToObservableCollection();
 
             var masterLinen = await _laundryService.GetAllAsync<MasterLinenEntity>();
-            MasterLinens = masterLinen.ToList();
+            var masterLinens = masterLinen.Select(x => new MasterLinenEntityViewModel(x));
+            MasterLinens = masterLinens.ToObservableCollection();
 
             GetStaffs();
             GetClientLinens();
@@ -141,7 +143,8 @@ namespace Client.Desktop.ViewModels.Content.File
         private async void GetStaffs()
         {
             var staff = await _laundryService.GetAllAsync<ClientStaffEntity>();
-            Staffs = staff.ToObservableCollection();
+            var staffs = staff.Select(x => new ClientStaffEntityViewModel(x));
+            Staffs = staffs.ToObservableCollection();
         }
 
         private async void GetClientLinens()
@@ -174,11 +177,11 @@ namespace Client.Desktop.ViewModels.Content.File
         {
             var linenWindow = _resolverService.Resolve<ClientLinenWindowModel>();
 
-            linenWindow.Clients = Clients.ToList();
-            linenWindow.Departments = Departments.ToList();
-            linenWindow.Staffs = Staffs.ToList();
-            linenWindow.MasterLinens = MasterLinens.ToList();
-            linenWindow.ClientLinens = Linens.ToList();
+            linenWindow.Clients = Clients;
+            linenWindow.Departments = Departments;
+            linenWindow.Staffs = Staffs;
+            linenWindow.MasterLinens = MasterLinens;
+            linenWindow.ClientLinens = Linens;
 
             if (linen == null)
             {
@@ -232,11 +235,7 @@ namespace Client.Desktop.ViewModels.Content.File
             {
                 var linen = Linens.FirstOrDefault(x => x.Tag == SelectedTag.Tag);
                 if (linen == null) return;
-
-                SelectedClientLinen = linen;
-
                 LinenWindow(linen);
-
             }
             else
             {
@@ -247,18 +246,23 @@ namespace Client.Desktop.ViewModels.Content.File
 
         private void DeleteTag()
         {
-            if (!_dialogService.ShowQuestionDialog($"Do you want to Delete \"{SelectedClientLinen.Tag}\" ?"))
+            var linen = Linens.FirstOrDefault(x => String.Equals(x.Tag, SelectedTag.Tag));
+            if (linen == null)
             {
                 return;
             }
 
-            SelectedClientLinen.Tag = null;
-            SelectedClientLinen.AcceptChanges();
+            if (!_dialogService.ShowQuestionDialog($"Do you want to Delete \"{SelectedTag.Tag}\" ?"))
+            {
+                return;
+            }
+
+            linen.Tag = null;
+            linen.AcceptChanges();
             CheckTags();
 
-            _laundryService.AddOrUpdateAsync(SelectedClientLinen.OriginalObject);
+            _laundryService.AddOrUpdateAsync(linen.OriginalObject);
         }
-
 
         private void UseTag()
         {

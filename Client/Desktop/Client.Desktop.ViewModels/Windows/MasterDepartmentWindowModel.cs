@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
@@ -18,12 +17,12 @@ namespace Client.Desktop.ViewModels.Windows
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
         private readonly IMainDispatcher _dispatcher;
-        private ObservableCollection<DepartmentEntity> _departments;
+        private ObservableCollection<DepartmentEntityViewModel> _departments;
         private List<UnitViewModel> _departmentTypes;
         private DepartmentEntityViewModel _selectedDepartment;
-        private ClientEntity _selectedClient;
+        private ClientEntityViewModel _selectedClient;
 
-        public ClientEntity SelectedClient
+        public ClientEntityViewModel SelectedClient
         {
             get => _selectedClient;
             set => Set(ref _selectedClient, value);
@@ -39,7 +38,7 @@ namespace Client.Desktop.ViewModels.Windows
             set => Set(ref _departmentTypes, value);
         }
 
-        public ObservableCollection<DepartmentEntity> Departments
+        public ObservableCollection<DepartmentEntityViewModel> Departments
         {
             get => _departments;
             set => Set(ref _departments, value);
@@ -65,14 +64,14 @@ namespace Client.Desktop.ViewModels.Windows
             DepartmentTypes = EnumExtensions.GetValues<DepartmentTypeEnum>();
         }
 
-        public void SetSelectedDepartment(DepartmentEntity department, ClientEntity selectedClient)
+        public void SetSelectedDepartment(DepartmentEntityViewModel department, ClientEntityViewModel selectedClient)
         {
             SelectedDepartment = null;
             SelectedClient = selectedClient;
 
             if (department != null)
             {
-                SelectedDepartment = new DepartmentEntityViewModel(department);
+                SelectedDepartment = department;
                 return;
             }
 
@@ -90,7 +89,7 @@ namespace Client.Desktop.ViewModels.Windows
             try
             {
                 var department = await _laundryService.GetAllAsync<DepartmentEntity>();
-                var departments = department.Where(x => x.ClientId == SelectedClient.Id);
+                var departments = department.Select(x=> new DepartmentEntityViewModel(x));
                 Departments = departments.ToObservableCollection();
 
             }

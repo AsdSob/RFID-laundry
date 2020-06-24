@@ -17,7 +17,7 @@ namespace Client.Desktop.ViewModels.Windows
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
         private readonly IMainDispatcher _dispatcher;
-        private ObservableCollection<ClientEntity> _clients;
+        private ObservableCollection<ClientEntityViewModel> _clients;
         private ClientEntityViewModel _selectedClient;
         private List<UnitViewModel> _cities;
 
@@ -31,15 +31,15 @@ namespace Client.Desktop.ViewModels.Windows
             get => _selectedClient;
             set => Set(ref _selectedClient, value);
         }
-        public ObservableCollection<ClientEntity> Clients
+        public ObservableCollection<ClientEntityViewModel> Clients
         {
             get => _clients;
             set => Set(ref _clients, value);
         }
 
-        public List<ClientEntity> SortedParentClients => SortParentClients();
+        public List<ClientEntityViewModel> SortedParentClients => SortParentClients();
 
-        private List<ClientEntity> SortParentClients()
+        private List<ClientEntityViewModel> SortParentClients()
         {
             return Clients?.Where(x => (x.ParentId == 0 || x.ParentId == null) && x.Id != SelectedClient?.Id).ToList();
         }
@@ -66,13 +66,13 @@ namespace Client.Desktop.ViewModels.Windows
             Cities = EnumExtensions.GetValues<CitiesEnum>();
         }
 
-        public void SetSelectedClient(ClientEntity client)
+        public void SetSelectedClient(ClientEntityViewModel client)
         {
             SelectedClient = null;
 
             if (client != null)
             {
-                SelectedClient = new ClientEntityViewModel(client);
+                SelectedClient = client;
                 return;
             }
 
@@ -89,7 +89,8 @@ namespace Client.Desktop.ViewModels.Windows
 
             try
             {
-                var clients = await _laundryService.GetAllAsync<ClientEntity>();
+                var client = await _laundryService.GetAllAsync<ClientEntity>();
+                var clients = client.Select(x => new ClientEntityViewModel(x));
                 Clients = clients.ToObservableCollection();
 
             }

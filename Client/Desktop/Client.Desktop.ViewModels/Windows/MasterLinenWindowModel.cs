@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
@@ -15,7 +16,7 @@ namespace Client.Desktop.ViewModels.Windows
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
         private readonly IMainDispatcher _dispatcher;
-        private ObservableCollection<MasterLinenEntity> _masterLinens;
+        private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
         private MasterLinenEntityViewModel _selectedMasterLinen;
 
         public Action<bool> CloseAction { get; set; }
@@ -26,7 +27,7 @@ namespace Client.Desktop.ViewModels.Windows
             set => Set(ref _selectedMasterLinen, value);
         }
 
-        public ObservableCollection<MasterLinenEntity> MasterLinens
+        public ObservableCollection<MasterLinenEntityViewModel> MasterLinens
         {
             get => _masterLinens;
             set => Set(ref _masterLinens, value);
@@ -73,7 +74,8 @@ namespace Client.Desktop.ViewModels.Windows
 
             try
             {
-                var linens = await _laundryService.GetAllAsync<MasterLinenEntity>();
+                var linen = await _laundryService.GetAllAsync<MasterLinenEntity>();
+                var linens =linen.Select(x=> new MasterLinenEntityViewModel(x));
                 MasterLinens = linens.ToObservableCollection();
 
             }

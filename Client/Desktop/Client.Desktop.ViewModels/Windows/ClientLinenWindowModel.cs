@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
+using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Common.Windows;
@@ -15,31 +16,31 @@ namespace Client.Desktop.ViewModels.Windows
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
         private readonly IMainDispatcher _dispatcher;
-        private List<ClientLinenEntityViewModel> _clientLinens;
+        private ObservableCollection<ClientLinenEntityViewModel> _clientLinens;
         private ClientLinenEntityViewModel _selectedLinen;
-        private List<MasterLinenEntity> _masterLinens;
-        private List<ClientEntity> _clients;
-        private List<DepartmentEntity> _departments;
-        private List<ClientStaffEntity> _staffs;
+        private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
+        private ObservableCollection<ClientEntityViewModel> _clients;
+        private ObservableCollection<DepartmentEntityViewModel> _departments;
+        private ObservableCollection<ClientStaffEntityViewModel> _staffs;
 
         public Action<bool> CloseAction { get; set; }
 
-        public List<ClientStaffEntity> Staffs
+        public ObservableCollection<ClientStaffEntityViewModel> Staffs
         {
             get => _staffs;
             set => Set(ref _staffs, value);
         }
-        public List<DepartmentEntity> Departments
+        public ObservableCollection<DepartmentEntityViewModel> Departments
         {
             get => _departments;
             set => Set(ref _departments, value);
         }
-        public List<ClientEntity> Clients
+        public ObservableCollection<ClientEntityViewModel> Clients
         {
             get => _clients;
             set => Set(ref _clients, value);
         }
-        public List<MasterLinenEntity> MasterLinens
+        public ObservableCollection<MasterLinenEntityViewModel> MasterLinens
         {
             get => _masterLinens;
             set => Set(ref _masterLinens, value);
@@ -49,14 +50,14 @@ namespace Client.Desktop.ViewModels.Windows
             get => _selectedLinen;
             set => Set(ref _selectedLinen, value);
         }
-        public List<ClientLinenEntityViewModel> ClientLinens
+        public ObservableCollection<ClientLinenEntityViewModel> ClientLinens
         {
             get => _clientLinens;
             set => Set(ref _clientLinens, value);
         }
 
-        public List<DepartmentEntity> SortedDepartments => SortDepartments();
-        public List<ClientStaffEntity> SortedStaffs => SortStaffs();
+        public ObservableCollection<DepartmentEntityViewModel> SortedDepartments => SortDepartments();
+        public ObservableCollection<ClientStaffEntityViewModel> SortedStaffs => SortStaffs();
 
         public RelayCommand SaveCommand { get; }
         public RelayCommand CloseCommand { get; }
@@ -86,21 +87,25 @@ namespace Client.Desktop.ViewModels.Windows
 
             try
             {
-                var clients = await _laundryService.GetAllAsync<ClientEntity>();
-                Clients = clients.ToList();
+                var client = await _laundryService.GetAllAsync<ClientEntity>();
+                var clients = client.Select(x => new ClientEntityViewModel(x));
+                Clients = clients.ToObservableCollection();
 
-                var departments = await _laundryService.GetAllAsync<DepartmentEntity>();
-                Departments = departments.ToList();
+                var department = await _laundryService.GetAllAsync<DepartmentEntity>();
+                var departments = department.Select(x => new DepartmentEntityViewModel(x));
+                Departments = departments.ToObservableCollection();
 
-                var staffs = await _laundryService.GetAllAsync<ClientStaffEntity>();
-                Staffs = staffs.ToList();
+                var masterLinen = await _laundryService.GetAllAsync<MasterLinenEntity>();
+                var masterLinens = masterLinen.Select(x => new MasterLinenEntityViewModel(x));
+                MasterLinens = masterLinens.ToObservableCollection();
 
-                var masterLinens = await _laundryService.GetAllAsync<MasterLinenEntity>();
-                MasterLinens = masterLinens.ToList();
+                var staff = await _laundryService.GetAllAsync<ClientStaffEntity>();
+                var staffs = staff.Select(x => new ClientStaffEntityViewModel(x));
+                Staffs = staffs.ToObservableCollection();
 
                 var linen = await _laundryService.GetAllAsync<ClientLinenEntity>();
                 var linens = linen.Select(x => new ClientLinenEntityViewModel(x));
-                ClientLinens = linens.ToList();
+                ClientLinens = linens.ToObservableCollection();
 
                 RaisePropertyChanged(() => SortedDepartments);
                 RaisePropertyChanged(() => SortedStaffs);
@@ -144,16 +149,16 @@ namespace Client.Desktop.ViewModels.Windows
             //}
         }
 
-        private List<DepartmentEntity> SortDepartments()
+        private ObservableCollection<DepartmentEntityViewModel> SortDepartments()
         {
-            var departments = new List<DepartmentEntity>();
+            var departments = new ObservableCollection<DepartmentEntityViewModel>();
 
             if (SelectedLinen.ClientId == 0)
             {
                 return departments;
             }
 
-            departments = Departments?.Where(x => x.ClientId == SelectedLinen.ClientId).ToList();
+            departments = Departments?.Where(x => x.ClientId == SelectedLinen.ClientId).ToObservableCollection();
 
             if (departments != null && departments.All(x => x.Id != SelectedLinen.DepartmentId))
             {
@@ -162,16 +167,16 @@ namespace Client.Desktop.ViewModels.Windows
             return departments;
         }
 
-        private List<ClientStaffEntity> SortStaffs()
+        private ObservableCollection<ClientStaffEntityViewModel> SortStaffs()
         {
-            var staffs = new List<ClientStaffEntity>();
+            var staffs = new ObservableCollection<ClientStaffEntityViewModel>();
 
             if (SelectedLinen.DepartmentId == 0)
             {
                 return staffs;
             }
             
-            staffs = Staffs?.Where(x => x.DepartmentId == SelectedLinen.DepartmentId).ToList();
+            staffs = Staffs?.Where(x => x.DepartmentId == SelectedLinen.DepartmentId).ToObservableCollection();
 
             if (staffs != null && staffs.All(x => x.Id != SelectedLinen.StaffId))
             {
