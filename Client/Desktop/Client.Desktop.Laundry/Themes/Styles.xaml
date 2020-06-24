@@ -72,15 +72,12 @@
         <Setter Property="Height" Value="60"/>
         <Setter Property="Padding" Value="10,0" />
         <Setter Property="materialDesign:HintAssist.FloatingScale" Value="0.50"/>
+        <Setter Property="materialDesign:ColorZoneAssist.Mode" Value="Light"/>
+        <Setter Property="materialDesign:ComboBoxAssist.ShowSelectedItem" Value="true"/>
+        <Setter Property="materialDesign:ComboBoxAssist.ClassicMode" Value="true"/>
 
     </Style>
 
-    <!--DataGridCheckBoxColumn-->
-    <Style BasedOn="{StaticResource MaterialDesignDataGridCheckBoxColumnStyle}"
-           TargetType="{x:Type DataGridCheckBoxColumn}">
-
-    </Style>    
-    
     <!--Password Box-->
     <Style BasedOn="{StaticResource MaterialDesignFloatingHintPasswordBox}"
            TargetType="{x:Type PasswordBox}">
@@ -91,7 +88,6 @@
         <Setter Property="Height" Value="60"/>
 
     </Style>
-
 
 
 </ResourceDictionary>

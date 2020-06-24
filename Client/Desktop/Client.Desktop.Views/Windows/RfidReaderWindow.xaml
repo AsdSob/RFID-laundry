@@ -8,7 +8,7 @@
                        xmlns:windows1="clr-namespace:Client.Desktop.Views.Windows"
                        mc:Ignorable="d"
                        Title="RFID Reader"
-                       Height="600"
+                       Height="700"
                        Width="900"
                        WindowStartupLocation="CenterOwner"
                        WindowStyle="ToolWindow"
@@ -93,8 +93,8 @@
                 </DataGrid>
             </GroupBox>
 
-            <Label Grid.Row="3" Margin="0.5" Content="Tx(Transmit Power) 0.0 | 30.0" HorizontalContentAlignment="Left"/>
-            <Label Grid.Row="3" Content="Rx(Receive Power) 0 | -80" HorizontalContentAlignment="Right"/>
+            <Label Grid.Row="3" Margin="10,0" Content="Tx(Transmit Power) 0.0 | 30.0" HorizontalContentAlignment="Left"/>
+            <Label Grid.Row="3" Margin="10,0" Content="Rx(Receive Power) 0 | -80" HorizontalContentAlignment="Right"/>
 
         </Grid>
 

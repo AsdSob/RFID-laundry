@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:content="clr-namespace:Client.Desktop.ViewModels.Content;assembly=Client.Desktop.ViewModels"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:master="clr-namespace:Client.Desktop.ViewModels.Content.Master;assembly=Client.Desktop.ViewModels"
              mc:Ignorable="d" 
@@ -57,8 +56,8 @@
             <!--Staff List-->
 
             <StackPanel  Grid.Row="2" Orientation="Horizontal" Margin="10,0">
-                <Button Margin = "5" Padding="10,5" Content="New" Command="{Binding AddStaffCommand}"/>
-                <Button Margin = "5" Padding="10,5" Content="Edit" Command="{Binding EditStaffCommand}"/>
+                <Button Content="New" Command="{Binding AddStaffCommand}"/>
+                <Button Content="Edit" Command="{Binding EditStaffCommand}"/>
             </StackPanel>
 
             <GroupBox Grid.Row="4" 
