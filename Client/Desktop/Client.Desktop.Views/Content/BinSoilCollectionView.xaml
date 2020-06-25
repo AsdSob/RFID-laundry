@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:content="clr-namespace:Client.Desktop.ViewModels.Content;assembly=Client.Desktop.ViewModels"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
@@ -27,11 +28,105 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>    
 
-        <Grid Grid.Column="0" Grid.Row="1">
-            
-        </Grid>
+
+
+         <GroupBox Grid.Row="1"
+                   Grid.Column="0"
+                   Header="Staff"
+                   HorizontalContentAlignment="Center"
+                   >
+
+             <DataGrid ItemsSource="{Binding StaffsLoaded}"
+                       SelectionMode="Single"
+                       SelectionUnit="FullRow"
+                       IsReadOnly="False"
+                       HorizontalAlignment="Stretch"
+                       IsTextSearchEnabled="True"
+                       CanUserAddRows="False"
+                       AutoGenerateColumns="False"
+                       HorizontalContentAlignment="Stretch"
+             >
+
+                 <DataGrid.Columns>
+                     <DataGridTextColumn Header="Id" Binding="{Binding StaffId}" Width="*" />
+                     <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="4*" />
+
+                     <materialDesign:DataGridComboBoxColumn
+                         Header="Department"
+                         SelectedValueBinding="{Binding DepartmentId}"
+                         DisplayMemberPath="Name"
+                         SelectedValuePath="Id"
+                         Width="2*"
+                         ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.Departments}"
+                     />
+
+                 </DataGrid.Columns>
+             </DataGrid>
+         </GroupBox>
+
+            <!--<materialDesign:Card Grid.Row="1" Background="{DynamicResource MaterialDesignBackground}">
+                <StackPanel>
+                    <Expander HorizontalAlignment="Stretch"
+                              Header="Expander Example 2a"
+                              IsExpanded="True">
+                        <StackPanel Orientation="Vertical"
+                                    TextBlock.Foreground="{DynamicResource MaterialDesignBody}"
+                                    Margin="24,8,24,16">
+
+                            <TextBlock Text="Your Content" 
+                            />
+                            <TextBlock Opacity=".68"
+                                       Text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut lm."
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Expander>
+                    <Border Background="{DynamicResource MaterialDesignDivider}"
+                            Height="1"
+                            HorizontalAlignment="Stretch"
+                            SnapsToDevicePixels="True" 
+                    />
+                </StackPanel>
+            </materialDesign:Card>-->
+
+
+        <GroupBox Grid.Row="2"
+                  Grid.Column="1"
+                  Header="Linen"
+                  Margin="16"
+                  >
+
+
+            <DataGrid ItemsSource="{Binding StaffsLoaded}"
+                      SelectionMode="Single"
+                      SelectionUnit="FullRow"
+                      IsReadOnly="True"
+                      HorizontalAlignment="Stretch"
+                      IsTextSearchEnabled="True"
+                      CanUserAddRows="False"
+                      AutoGenerateColumns="False"
+                      HorizontalContentAlignment="Stretch"
+            >
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Id" Binding="{Binding StaffId}" Width="*" />
+                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="4*" />
+
+                    <materialDesign:DataGridComboBoxColumn
+                        Header="Department"
+                        SelectedValueBinding="{Binding DepartmentId}"
+                        DisplayMemberPath="Name"
+                        SelectedValuePath="Id"
+                        Width="2*"
+                        ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.Departments}"
+                    />
+
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+
     </Grid>
 </UserControl>

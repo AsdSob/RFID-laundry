@@ -36,7 +36,7 @@ namespace Client.Desktop.Laundry.ViewModels
             builder.RegisterType<LoginWindowViewModel>();
             builder.RegisterType<MenuViewModel>().SingleInstance();
 
-            builder.RegisterType<DataViewModel>().SingleInstance();
+            //builder.RegisterType<DataViewModel>().SingleInstance();
             builder.RegisterType<MasterClientViewModel>().SingleInstance();
             builder.RegisterType<MasterStaffViewModel>().SingleInstance();
             builder.RegisterType<MasterLinenViewModel>().SingleInstance();

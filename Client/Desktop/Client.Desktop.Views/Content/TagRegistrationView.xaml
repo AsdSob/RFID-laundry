@@ -60,6 +60,7 @@
                           CanUserAddRows="False"
                           AutoGenerateColumns="False"
                           HorizontalContentAlignment="Stretch"
+                          
                           >
 
                     <DataGrid.Columns>

@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.ComponentModel;
+using Client.Desktop.ViewModels.Common.ViewModels;
 using Storage.Laundry.Models.Abstract;
 
 namespace Client.Desktop.ViewModels.Common.EntityViewModels.Abstract
 {
-    public class IEntityViewModel
+    public class IEntityViewModel : ViewModelBase
     {
+
     }
 }

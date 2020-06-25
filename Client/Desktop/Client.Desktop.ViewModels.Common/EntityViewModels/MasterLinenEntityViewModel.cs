@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
+using Client.Desktop.ViewModels.Common.EntityViewModels.Abstract;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Storage.Laundry.Models;

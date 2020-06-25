@@ -89,5 +89,16 @@
 
     </Style>
 
+    <!--Group Box-->
+    <Style BasedOn="{StaticResource MaterialDesignCardGroupBox}"
+           TargetType="{x:Type GroupBox}">
+
+        <Setter Property="materialDesign:ShadowAssist.ShadowDepth" Value="Depth3"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="Margin" Value="10"/>
+
+    </Style>
+
 
 </ResourceDictionary>
