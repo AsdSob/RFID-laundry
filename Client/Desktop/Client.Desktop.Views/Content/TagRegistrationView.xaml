@@ -172,7 +172,6 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Search Tag -->
             <DockPanel Grid.Row="1" Grid.Column="0" LastChildFill="False" Margin="0,20,0,0">
                 <Button Content="{Binding AddShowButton}" Command="{Binding AddShowLinenByTagCommand}"/>
                 <Button Content="Remove" Command="{Binding DeleteTagCommand}"/>
@@ -185,13 +184,14 @@
 
                 <!-- Start/Stop-->
                 <Button DockPanel.Dock="Right"
-                        Content="{Binding RfidService.StartStopButton}"
-                        Command="{Binding RfidService.StartStopReaderCommand}"
+                        Content="{Binding StartStopString}"
+                        Command="{Binding StartStopCommand}"
 
                 />
 
                 <ComboBox DockPanel.Dock="Left" 
-                          ItemsSource="{Binding RfidService.RfidReaders}" SelectedValue="{Binding RfidService.SelectedRfidReader}" 
+                          ItemsSource="{Binding Readers}" 
+                          SelectedValue="{Binding SelectedReader}" 
                           VerticalContentAlignment="Center"
                           DisplayMemberPath="Name"/>
 
@@ -200,7 +200,7 @@
             <GroupBox Grid.Column="0" Grid.Row="2" Header="Tags">
                 <DataGrid AutoGenerateColumns="False"
                           Height="NaN"
-                          ItemsSource="{Binding RfidService.Tags}"
+                          ItemsSource="{Binding Tags}"
                           SelectedItem="{Binding SelectedTag, UpdateSourceTrigger=PropertyChanged}"
                           VerticalScrollBarVisibility="Visible"
                           AllowDrop="True" 
@@ -209,8 +209,8 @@
 
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Antenna" Binding="{Binding Path=Antenna}" Width="Auto" />
-                        <DataGridTextColumn Header="reg" Binding="{Binding Path=IsRegistered}" Width="Auto" />
                         <DataGridTextColumn Header="Tag" Binding="{Binding Path=Tag}" Width="*" />
+                        <DataGridTextColumn Header="reg" Binding="{Binding Path=IsRegistered}" Width="Auto" />
                     </DataGrid.Columns>
 
                 </DataGrid>

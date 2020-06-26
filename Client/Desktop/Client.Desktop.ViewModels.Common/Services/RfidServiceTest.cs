@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
-using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Impinj.OctaneSdk;
-using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Common.Services
 {
@@ -17,40 +14,16 @@ namespace Client.Desktop.ViewModels.Common.Services
     {
         public TestImpinj Reader = new TestImpinj();
         private Settings settings;
-        private readonly ILaundryService _laundryService;
-        private readonly IDialogService _dialogService;
+
+        public ConcurrentDictionary<string, int> _data = new ConcurrentDictionary<string, int>();
 
         private string _connectionStatus;
-        private string _startStopButton;
-        private ObservableCollection<RfidReaderEntityViewModel> _rfidReaders;
-        private ConcurrentDictionary<string, int> _data;
-        private RfidReaderEntityViewModel _selectedRfidReader;
-        private ObservableCollection<RfidAntennaEntityViewModel> _antennas;
+        private bool _isReading;
 
-        public ConcurrentDictionary<string, int> Data
+        public bool IsReading
         {
-            get => _data;
-            set => Set(ref _data, value);
-        }
-        public ObservableCollection<RfidAntennaEntityViewModel> Antennas
-        {
-            get => _antennas;
-            set => Set(ref _antennas, value);
-        }
-        public RfidReaderEntityViewModel SelectedRfidReader
-        {
-            get => _selectedRfidReader;
-            set => Set(ref _selectedRfidReader, value);
-        }
-        public ObservableCollection<RfidReaderEntityViewModel> RfidReaders
-        {
-            get => _rfidReaders;
-            set => Set(ref _rfidReaders, value);
-        }
-        public string StartStopButton
-        {
-            get => _startStopButton;
-            set => Set(() => StartStopButton, ref _startStopButton, value);
+            get => _isReading;
+            set => Set(ref _isReading, value);
         }
         public string ConnectionStatus
         {
@@ -58,129 +31,28 @@ namespace Client.Desktop.ViewModels.Common.Services
             set => Set(() => ConnectionStatus, ref _connectionStatus, value);
         }
 
-        public RelayCommand StartStopReaderCommand { get; }
-
-
-        public RfidServiceTest(ILaundryService laundryService, IDialogService dialogService)
+        
+        public void Connect(RfidReaderEntityViewModel reader, List<RfidAntennaEntityViewModel> antennas)
         {
-            _laundryService = laundryService ?? throw new ArgumentNullException(nameof(laundryService));
-            _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
-            StartStopReaderCommand = new RelayCommand(StartStopRead);
+            if (reader == null || !antennas.Any()) return;
 
-            StartStopButton = "Start";
-            ConnectionStatus = "Connected";
-            Data = new ConcurrentDictionary<string, int>();
-            Initialize();
-            PropertyChanged += OnPropertyChanged;
-        }
-
-        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(SelectedRfidReader))
-            {
-                StartStopReaderCommand.RaiseCanExecuteChanged();
-            }
-        }
-
-        private async void Initialize()
-        {
-            _dialogService.ShowBusy();
-
-            try
-            {
-                var reader = await _laundryService.GetAllAsync<RfidReaderEntity>();
-                var readers = reader.Select(x => new RfidReaderEntityViewModel(x));
-                RfidReaders = readers.ToObservableCollection();
-
-                var antenna = await _laundryService.GetAllAsync<RfidAntennaEntity>();
-                var antennas = antenna.Select(x => new RfidAntennaEntityViewModel(x));
-                Antennas = antennas.ToObservableCollection();
-            }
-            catch (Exception e)
-            {
-                _dialogService.HideBusy();
-            }
-            finally
-            {
-                _dialogService.HideBusy();
-            }
-        }
-
-        public bool CheckConnection()
-        {
-            var isConnected = false;
-
-            if (ConnectionStatus == "Connected")
-            {
-                ConnectionStatus = "Disconnected";
-                isConnected = false;
-            }
-            else
-            {
-                isConnected = true;
-                ConnectionStatus = "Connected";
-            }
-
-            return isConnected;
-        }
-
-        public void Connect()
-        {
-            if (SelectedRfidReader == null) return;
-            var antennas = Antennas.Where(x => x.RfidReaderId == SelectedRfidReader.Id).ToList();
-            if (!antennas.Any()) return;
-
-            Connection(SelectedRfidReader, antennas);
-        }
-
-        public void Disconnect()
-        {
-            if (Reader == null) return;
-
-            Reader.Stop();
-            CheckConnection();
+            Connection(reader, antennas);
         }
 
         public bool Connection(RfidReaderEntityViewModel newReader, List<RfidAntennaEntityViewModel> antennas)
         {
-            CheckConnection();
+            IsReading = false;
             return true;
         }
-
-      
-        private void DisplayTag(List<Tuple<string, int>> tags)
-        {
-            Data = new ConcurrentDictionary<string, int>();
-
-            foreach (var tag in tags)
-            {
-                AddData(tag.Item1, tag.Item2);
-            }
-        }
-
-        private void AddData(string epc, int antenna)
-        {
-            if (!Data.TryGetValue(epc, out int val))
-            {
-                Data.TryAdd(epc, antenna);
-            }
-            else
-            {
-                Data.TryUpdate(epc, antenna, val);
-            }
-        }
-
         public void StartStopRead()
         {
-            if (StartStopButton == "Start")
+            if (!IsReading)
             {
                 StartRead();
-                StartStopButton = "Stop";
             }
             else
             {
                 StopRead();
-                StartStopButton = "Start";
             }
         }
 
@@ -188,11 +60,55 @@ namespace Client.Desktop.ViewModels.Common.Services
         {
             Reader.UserEvent += DisplayTag;
             Reader.Start();
+
+            IsReading = true;
         }
 
         public void StopRead()
         {
             Reader.UserEvent -= DisplayTag;
+
+            IsReading = false;
+        }
+
+        public string GetStartStopString()
+        {
+            if (IsReading)
+            {
+                return "Stop";
+            }
+            else
+            {
+                return "Start";
+            }
+        }
+
+
+        public delegate void SortedData(ConcurrentDictionary<string, int> data);
+        public event SortedData SortedDataEvent;
+
+        private void DisplayTag(List<Tuple<string, int>> tags)
+        {
+            _data = new ConcurrentDictionary<string, int>();
+
+            foreach (var tag in tags)
+            {
+                AddData(tag.Item1, tag.Item2);
+            }
+
+            SortedDataEvent?.Invoke(_data);
+        }
+
+        private void AddData(string epc, int antenna)
+        {
+            if (!_data.TryGetValue(epc, out int val))
+            {
+                _data.TryAdd(epc, antenna);
+            }
+            else
+            {
+                _data.TryUpdate(epc, antenna, val);
+            }
         }
 
     }
@@ -210,17 +126,12 @@ namespace Client.Desktop.ViewModels.Common.Services
             tages = new List<Tuple<string, int>>();
             Random random = new Random();
 
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 10; i++)
             {
                 tages.Add(new Tuple<string, int>($"TagNumber - {i}", random.Next(1, 4)));
             }
 
-            UserEvent.Invoke(tages); ;
-        }
-
-        public void Stop()
-        {
-            
+            UserEvent?.Invoke(tages); ;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
@@ -27,7 +27,37 @@ namespace Client.Desktop.ViewModels.Content
         private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
         private RfidTagViewModel _selectedTag;
         private string _addShowButton;
+        private ObservableCollection<RfidTagViewModel> _tags;
+        private ObservableCollection<RfidReaderEntityViewModel> _readers;
+        private ObservableCollection<RfidAntennaEntityViewModel> _antennas;
+        private RfidReaderEntityViewModel _selectedReader;
+        private string _startStopString;
 
+        public string StartStopString
+        {
+            get => _startStopString;
+            set => Set(ref _startStopString, value);
+        }
+        public RfidReaderEntityViewModel SelectedReader
+        {
+            get => _selectedReader;
+            set => Set(ref _selectedReader, value);
+        }
+        public ObservableCollection<RfidAntennaEntityViewModel> Antennas
+        {
+            get => _antennas;
+            set => Set(ref _antennas, value);
+        }
+        public ObservableCollection<RfidReaderEntityViewModel> Readers
+        {
+            get => _readers;
+            set => Set(ref _readers, value);
+        }
+        public ObservableCollection<RfidTagViewModel> Tags
+        {
+            get => _tags;
+            set => Set(ref _tags, value);
+        }
         public string AddShowButton
         {
             get => _addShowButton;
@@ -78,6 +108,7 @@ namespace Client.Desktop.ViewModels.Content
 
         public RelayCommand InitializeCommand { get; }
 
+        public RelayCommand StartStopCommand { get; }
         public RelayCommand AddShowLinenByTagCommand { get; }
         public RelayCommand DeleteTagCommand { get; }
 
@@ -94,30 +125,80 @@ namespace Client.Desktop.ViewModels.Content
             EditLinenCommand = new RelayCommand(() => LinenWindow(SelectedClientLinen),() => SelectedClientLinen !=null);
             DeleteLinenCommand = new RelayCommand(DeleteLinen,(() => SelectedClientLinen !=null));
 
+            StartStopCommand = new RelayCommand(StartStopRead, () => SelectedReader != null);
             AddShowLinenByTagCommand = new RelayCommand(AddShowLinenByTag, () => SelectedTag != null);
             DeleteTagCommand = new RelayCommand(DeleteTag, () => SelectedTag != null || SelectedClientLinen != null);
+
 
             InitializeCommand = new RelayCommand(Initialize);
             RfidService = _resolverService.Resolve<RfidServiceTest>();
 
             AddShowButton = "Add";
-
-            RfidService.Tags.CollectionChanged += TagsCollectionChanged;
+            StartStopString = RfidService.GetStartStopString();
 
             PropertyChanged += OnPropertyChanged;
+            RfidService.SortedDataEvent += TagsCollectionChanged;
+
         }
 
-        private void TagsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void TagsCollectionChanged(ConcurrentDictionary<string, int> dataTags)
         {
-            if (e.Action == NotifyCollectionChangedAction.Add)
+            SetTagViewModels(dataTags);
+        }
+
+        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(SelectedClientLinen))
             {
-                foreach (var tag in RfidService.Tags)
+                DeleteLinenCommand?.RaiseCanExecuteChanged();
+                EditLinenCommand?.RaiseCanExecuteChanged();
+                DeleteTagCommand?.RaiseCanExecuteChanged();
+            }
+            else
+
+            if (e.PropertyName == nameof(SelectedTag))
+            {
+                AddShowLinenByTagCommand?.RaiseCanExecuteChanged();
+                DeleteTagCommand?.RaiseCanExecuteChanged();
+                AddShowButtonName();
+            }            
+            
+            if (e.PropertyName == nameof(SelectedReader))
+            {
+                StartStopCommand?.RaiseCanExecuteChanged();
+                SetReader();
+            }
+
+        }
+
+        private void SetTagViewModels(ConcurrentDictionary<string, int> dataTags)
+        {
+            Tags = new ObservableCollection<RfidTagViewModel>();
+
+            foreach (var data in dataTags)
+            {
+                var tag = new RfidTagViewModel()
                 {
-                    if (Linens.Any(x => x.Tag == tag.Tag))
-                    {
-                        tag.IsRegistered = true;
-                    }
-                }
+                    Tag = data.Key,
+                    Antenna = data.Value,
+                };
+
+                SetTagLinenRegistration(tag);
+
+                Tags.Add(tag);
+            }
+        }
+
+        private void SetTagLinenRegistration(RfidTagViewModel tag)
+        {
+            tag.IsRegistered = Linens.Any(x => Equals(x.Tag, tag.Tag));
+        }
+
+        private void CheckAllTagRegistration()
+        {
+            foreach (var tag in Tags)
+            {
+                SetTagLinenRegistration(tag);
             }
         }
 
@@ -137,6 +218,7 @@ namespace Client.Desktop.ViewModels.Content
 
             GetStaffs();
             GetClientLinens();
+            GetRfidReaders();
         }
 
         private async void GetStaffs()
@@ -153,23 +235,87 @@ namespace Client.Desktop.ViewModels.Content
             Linens = linens.ToObservableCollection();
         }
 
-        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private async void GetRfidReaders()
         {
-            if (e.PropertyName == nameof(SelectedClientLinen))
+            var reader = await _laundryService.GetAllAsync<RfidReaderEntity>();
+            var readers = reader.Select(x => new RfidReaderEntityViewModel(x));
+            Readers = readers.ToObservableCollection();
+
+            var antenna = await _laundryService.GetAllAsync<RfidAntennaEntity>();
+            var antennas = antenna.Select(x => new RfidAntennaEntityViewModel(x));
+            Antennas = antennas.ToObservableCollection();
+        }
+
+        private void AddShowButtonName()
+        {
+            if(SelectedTag == null) return;
+
+            AddShowButton = SelectedTag.IsRegistered ? "Show" : "Add";
+        }
+
+        private void SetReader()
+        {
+            var antennas = Antennas.Where(x => x.RfidReaderId == SelectedReader.Id).ToList();
+            RfidService.Connection(SelectedReader, antennas);
+        }
+
+        private void StartStopRead()
+        {
+            if(SelectedReader == null) return;
+
+            RfidService.StartStopRead();
+            StartStopString = RfidService.GetStartStopString();
+        }
+
+        private void AddShowLinenByTag()
+        {
+            if (SelectedTag.IsRegistered)
             {
-                DeleteLinenCommand?.RaiseCanExecuteChanged();
-                EditLinenCommand?.RaiseCanExecuteChanged();
-                DeleteTagCommand?.RaiseCanExecuteChanged();
+                var linen = Linens.FirstOrDefault(x => x.Tag == SelectedTag.Tag);
+                if (linen == null) return;
+                LinenWindow(linen);
             }
             else
-
-            if (e.PropertyName == nameof(SelectedTag))
             {
-                AddShowLinenByTagCommand?.RaiseCanExecuteChanged();
-                DeleteTagCommand?.RaiseCanExecuteChanged();
-                AddShowButtonName();
+                UseTag();
+                CheckAllTagRegistration();
             }
         }
+
+        private void DeleteTag()
+        {
+            var linen = Linens.FirstOrDefault(x => String.Equals(x.Tag, SelectedTag.Tag));
+            if (linen == null)
+            {
+                return;
+            }
+
+            if (!_dialogService.ShowQuestionDialog($"Do you want to Delete \"{SelectedTag.Tag}\" ?"))
+            {
+                return;
+            }
+
+            linen.Tag = null;
+            linen.AcceptChanges();
+            CheckAllTagRegistration();
+
+            _laundryService.AddOrUpdateAsync(linen.OriginalObject);
+            AddShowButtonName();
+        }
+
+        private void UseTag()
+        {
+            if(SelectedClientLinen ==null || SelectedTag == null) return;
+
+            SelectedClientLinen.Tag = SelectedTag.Tag;
+            SelectedClientLinen.AcceptChanges();
+            SelectedTag.IsRegistered = true;
+
+            _laundryService.AddOrUpdateAsync(SelectedClientLinen.OriginalObject);
+            AddShowButtonName();
+        }
+
+
 
 
         private void LinenWindow(ClientLinenEntityViewModel linen)
@@ -195,7 +341,7 @@ namespace Client.Desktop.ViewModels.Content
             if (_dialogService.ShowDialog(linenWindow))
             {
                 GetClientLinens();
-                CheckTags();
+                CheckAllTagRegistration();
             }
         }
 
@@ -210,71 +356,8 @@ namespace Client.Desktop.ViewModels.Content
             await _laundryService.DeleteAsync(SelectedClientLinen.OriginalObject);
 
             Linens.Remove(SelectedClientLinen);
-            CheckTags();
-
+            CheckAllTagRegistration();
         }
 
-        private void AddShowButtonName()
-        {
-            if(SelectedTag == null) return;
-
-            AddShowButton = SelectedTag.IsRegistered ? "Show" : "Add";
-        }
-
-        private void CheckTags()
-        {
-            foreach (var tag in RfidService.Tags)
-            {
-                 tag.IsRegistered = Linens.Any(x => Equals(x.Tag, tag.Tag));
-            }
-        }
-
-        private void AddShowLinenByTag()
-        {
-            if (SelectedTag.IsRegistered)
-            {
-                var linen = Linens.FirstOrDefault(x => x.Tag == SelectedTag.Tag);
-                if (linen == null) return;
-                LinenWindow(linen);
-            }
-            else
-            {
-                UseTag();
-                CheckTags();
-            }
-        }
-
-        private void DeleteTag()
-        {
-            var linen = Linens.FirstOrDefault(x => String.Equals(x.Tag, SelectedTag.Tag));
-            if (linen == null)
-            {
-                return;
-            }
-
-            if (!_dialogService.ShowQuestionDialog($"Do you want to Delete \"{SelectedTag.Tag}\" ?"))
-            {
-                return;
-            }
-
-            linen.Tag = null;
-            linen.AcceptChanges();
-            CheckTags();
-
-            _laundryService.AddOrUpdateAsync(linen.OriginalObject);
-            AddShowButtonName();
-        }
-
-        private void UseTag()
-        {
-            if(SelectedClientLinen ==null || SelectedTag == null) return;
-
-            SelectedClientLinen.Tag = SelectedTag.Tag;
-            SelectedClientLinen.AcceptChanges();
-            SelectedTag.IsRegistered = true;
-
-            _laundryService.AddOrUpdateAsync(SelectedClientLinen.OriginalObject);
-            AddShowButtonName();
-        }
     }
 }
