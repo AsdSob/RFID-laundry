@@ -156,6 +156,7 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
 
             //FullValidate(columnName);
 
+            IsValid = String.IsNullOrWhiteSpace(error);
             return error;
         }
 

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.ViewModels;
@@ -12,9 +13,9 @@ using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Common.Services
 {
-    public class RfidService : ViewModelBase
+    public class RfidServiceTest : ViewModelBase
     {
-        public ImpinjReader Reader = new ImpinjReader();
+        public TestImpinj Reader = new TestImpinj();
         private Settings settings;
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
@@ -60,17 +61,16 @@ namespace Client.Desktop.ViewModels.Common.Services
         public RelayCommand StartStopReaderCommand { get; }
 
 
-        public RfidService(ILaundryService laundryService, IDialogService dialogService)
+        public RfidServiceTest(ILaundryService laundryService, IDialogService dialogService)
         {
             _laundryService = laundryService ?? throw new ArgumentNullException(nameof(laundryService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
-
-            StartStopReaderCommand = new RelayCommand(StartStopRead, CheckConnection);
+            StartStopReaderCommand = new RelayCommand(StartStopRead);
 
             StartStopButton = "Start";
-            _data = new ConcurrentDictionary<string, int>();
+            ConnectionStatus = "Connected";
+            Data = new ConcurrentDictionary<string, int>();
             Initialize();
-
             PropertyChanged += OnPropertyChanged;
         }
 
@@ -106,6 +106,24 @@ namespace Client.Desktop.ViewModels.Common.Services
             }
         }
 
+        public bool CheckConnection()
+        {
+            var isConnected = false;
+
+            if (ConnectionStatus == "Connected")
+            {
+                ConnectionStatus = "Disconnected";
+                isConnected = false;
+            }
+            else
+            {
+                isConnected = true;
+                ConnectionStatus = "Connected";
+            }
+
+            return isConnected;
+        }
+
         public void Connect()
         {
             if (SelectedRfidReader == null) return;
@@ -117,99 +135,39 @@ namespace Client.Desktop.ViewModels.Common.Services
 
         public void Disconnect()
         {
-            if(Reader == null || !Reader.IsConnected) return;
+            if (Reader == null) return;
 
             Reader.Stop();
-            Reader.TagsReported -= DisplayTag;
-            Reader.Disconnect();
-        }
-
-        private bool Connection(RfidReaderEntityViewModel newReader, List<RfidAntennaEntityViewModel> antennas)
-        {
-            try
-            {
-                Disconnect();
-
-                Reader.Connect(SelectedRfidReader.ReaderIp);
-                Reader.Stop();
-            }
-
-            catch (OctaneSdkException ee)
-            {
-                Console.WriteLine("Octane SDK exception: Reader #1" + ee.Message, "error");
-            }
-            catch (Exception ee)
-            {
-                Console.WriteLine("Exception : Reader #1" + ee.Message, "error");
-                Console.WriteLine(ee.StackTrace);
-            }
-
-            if (!Reader.IsConnected) return false;
-            SetSettings(SelectedRfidReader.TagPopulation);
-            SetAntennaSettings(antennas);
-            Reader.ApplySettings(settings);
-
             CheckConnection();
-            return Reader.IsConnected;
         }
 
-        private void SetSettings(ushort tagPopulation)
+        public bool Connection(RfidReaderEntityViewModel newReader, List<RfidAntennaEntityViewModel> antennas)
         {
-            settings = Reader.QueryDefaultSettings();
-
-            settings.Report.IncludeAntennaPortNumber = true;
-            settings.Report.IncludePhaseAngle = true;
-            settings.Report.IncludeChannel = true;
-            settings.Report.IncludeDopplerFrequency = true;
-            settings.Report.IncludeFastId = true;
-            settings.Report.IncludeFirstSeenTime = true;
-            settings.Report.IncludeLastSeenTime = true;
-            settings.Report.IncludePeakRssi = true;
-            settings.Report.IncludeSeenCount = true;
-            settings.Report.IncludePcBits = true;
-            settings.Report.IncludeSeenCount = true;
-
-            //ReaderMode.AutoSetDenseReaderDeepScan | Rx = -70 | Tx = 15/20
-            //ReaderMode.MaxThrouput | Rx = -80 | Tx = 15
-
-            settings.ReaderMode = ReaderMode.AutoSetDenseReaderDeepScan;//.AutoSetDenseReader;
-            settings.SearchMode = SearchMode.DualTarget;//.DualTarget;
-            settings.Session = 1;
-            settings.TagPopulationEstimate = tagPopulation;
-            settings.Report.Mode = ReportMode.Individual;
+            CheckConnection();
+            return true;
         }
 
-        private void SetAntennaSettings(List<RfidAntennaEntityViewModel> antennas)
+      
+        private void DisplayTag(List<Tuple<string, int>> tags)
         {
-            settings.Antennas.DisableAll();
-            foreach (var antenna in antennas)
+            Data = new ConcurrentDictionary<string, int>();
+
+            foreach (var tag in tags)
             {
-                settings.Antennas.GetAntenna((ushort)antenna.AntennaNumb).IsEnabled = true;
-                settings.Antennas.GetAntenna((ushort)antenna.AntennaNumb).TxPowerInDbm = antenna.TxPower;
-                settings.Antennas.GetAntenna((ushort)antenna.AntennaNumb).RxSensitivityInDbm = antenna.RxSensitivity;
+                AddData(tag.Item1, tag.Item2);
             }
         }
-        
-        public bool CheckConnection()
+
+        private void AddData(string epc, int antenna)
         {
-            var isConnected = Reader.IsConnected;
-
-            try
+            if (!Data.TryGetValue(epc, out int val))
             {
-                ConnectionStatus = isConnected ? "Connected" : "Disconnected";
+                Data.TryAdd(epc, antenna);
             }
-
-            catch (OctaneSdkException ee)
+            else
             {
-                Console.WriteLine("Octane SDK exception: Reader #1" + ee.Message, "error");
+                Data.TryUpdate(epc, antenna, val);
             }
-            catch (Exception ee)
-            {
-                Console.WriteLine("Exception : Reader #1" + ee.Message, "error");
-                Console.WriteLine(ee.StackTrace);
-            }
-
-            return isConnected;
         }
 
         public void StartStopRead()
@@ -228,42 +186,41 @@ namespace Client.Desktop.ViewModels.Common.Services
 
         public void StartRead()
         {
-            if (!Reader.IsConnected) return;
-
-            Reader.TagsReported += DisplayTag;
+            Reader.UserEvent += DisplayTag;
             Reader.Start();
         }
 
         public void StopRead()
         {
-            if (!Reader.IsConnected) return;
-
-            Reader.Stop();
-            Reader.TagsReported -= DisplayTag;
-        }
-
-        private void DisplayTag(ImpinjReader reader, TagReport report)
-        {
-            _data = new ConcurrentDictionary<string, int>();
-
-            foreach (Tag tag in report)
-            {
-                AddData(tag.Epc.ToString(), tag.AntennaPortNumber);
-            }
-        }
-
-        private void AddData(string epc, int antenna)
-        {
-            if (!_data.TryGetValue(epc, out int val))
-            {
-                _data.TryAdd(epc, antenna);
-            }
-            else
-            {
-                _data.TryUpdate(epc, antenna, val);
-            }
+            Reader.UserEvent -= DisplayTag;
         }
 
     }
 
+    public class TestImpinj
+    {
+        public delegate void MyDelegate(List<Tuple<string, int>> val);
+
+        public event MyDelegate UserEvent;
+
+        private List<Tuple<string, int>> tages;
+
+        public void Start()
+        {
+            tages = new List<Tuple<string, int>>();
+            Random random = new Random();
+
+            for (int i = 0; i < 5; i++)
+            {
+                tages.Add(new Tuple<string, int>($"TagNumber - {i}", random.Next(1, 4)));
+            }
+
+            UserEvent.Invoke(tages); ;
+        }
+
+        public void Stop()
+        {
+            
+        }
+    }
 }

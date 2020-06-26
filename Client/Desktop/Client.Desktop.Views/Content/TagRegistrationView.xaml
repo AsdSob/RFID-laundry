@@ -185,13 +185,13 @@
 
                 <!-- Start/Stop-->
                 <Button DockPanel.Dock="Right"
-                        Content="{Binding RfidReaderWindow.StartStopButton}"
-                        Command="{Binding RfidReaderWindow.StartStopReaderCommand}"
+                        Content="{Binding RfidService.StartStopButton}"
+                        Command="{Binding RfidService.StartStopReaderCommand}"
 
                 />
 
                 <ComboBox DockPanel.Dock="Left" 
-                          ItemsSource="{Binding RfidReaderWindow.RfidReaders}" SelectedValue="{Binding RfidReaderWindow.SelectedRfidReader}" 
+                          ItemsSource="{Binding RfidService.RfidReaders}" SelectedValue="{Binding RfidService.SelectedRfidReader}" 
                           VerticalContentAlignment="Center"
                           DisplayMemberPath="Name"/>
 
@@ -200,7 +200,7 @@
             <GroupBox Grid.Column="0" Grid.Row="2" Header="Tags">
                 <DataGrid AutoGenerateColumns="False"
                           Height="NaN"
-                          ItemsSource="{Binding RfidReaderWindow.Tags}"
+                          ItemsSource="{Binding RfidService.Tags}"
                           SelectedItem="{Binding SelectedTag, UpdateSourceTrigger=PropertyChanged}"
                           VerticalScrollBarVisibility="Visible"
                           AllowDrop="True" 

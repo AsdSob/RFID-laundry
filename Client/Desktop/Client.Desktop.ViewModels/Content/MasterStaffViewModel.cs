@@ -134,24 +134,24 @@ namespace Client.Desktop.ViewModels.Content
             RfidReaderWindow = _resolverService.Resolve<RfidReaderWindowModel>();
 
             AddShowButton = "Add";
-            RfidReaderWindow.Tags.CollectionChanged += TagsCollectionChanged;
+            //RfidReaderWindow.Tags.CollectionChanged += TagsCollectionChanged;
 
 
         }
 
-        private void TagsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action == NotifyCollectionChangedAction.Add)
-            {
-                foreach (var tag in RfidReaderWindow.Tags)
-                {
-                    if (Linens.Any(x => x.Tag == tag.Tag))
-                    {
-                        tag.IsRegistered = true;
-                    }
-                }
-            }
-        }
+        //private void TagsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        //{
+        //    if (e.Action == NotifyCollectionChangedAction.Add)
+        //    {
+        //        foreach (var tag in RfidReaderWindow.Tags)
+        //        {
+        //            if (Linens.Any(x => x.Tag == tag.Tag))
+        //            {
+        //                tag.IsRegistered = true;
+        //            }
+        //        }
+        //    }
+        //}
 
         private async void Initialize()
         {
@@ -347,7 +347,7 @@ namespace Client.Desktop.ViewModels.Content
 
         private void RfidReader()
         {
-            RfidReaderWindow.ReaderService.StopRead();
+            //RfidReaderWindow.ReaderService.StopRead();
 
             var showDialog = _dialogService.ShowDialog(RfidReaderWindow);
         }
@@ -361,10 +361,10 @@ namespace Client.Desktop.ViewModels.Content
 
         private void CheckTags()
         {
-            foreach (var tag in RfidReaderWindow.Tags)
-            {
-                tag.IsRegistered = Linens.Any(x => Equals(x.Tag, tag.Tag));
-            }
+            //foreach (var tag in RfidReaderWindow.Tags)
+            //{
+            //    tag.IsRegistered = Linens.Any(x => Equals(x.Tag, tag.Tag));
+            //}
         }
 
         private void AddShowLinenByTag()

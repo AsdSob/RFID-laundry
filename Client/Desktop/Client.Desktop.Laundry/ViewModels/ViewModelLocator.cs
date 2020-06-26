@@ -2,6 +2,7 @@
 using Client.Desktop.Laundry.Module;
 using Client.Desktop.Laundry.Services;
 using Client.Desktop.ViewModels;
+using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Content;
 using Client.Desktop.ViewModels.Content.Administration;
@@ -51,6 +52,11 @@ namespace Client.Desktop.Laundry.ViewModels
             builder.RegisterType<AuthManageViewModel>();
             builder.RegisterType<TagRegistrationViewModel>().SingleInstance();
             builder.RegisterType<BinClientViewModel>().SingleInstance();
+
+
+            builder.RegisterType<BinRfidReaderViewModel>().SingleInstance();
+            builder.RegisterType<RfidService>().SingleInstance();
+            builder.RegisterType<RfidServiceTest>().SingleInstance();
         }
 
         private void RegisterModules(ContainerBuilder builder)

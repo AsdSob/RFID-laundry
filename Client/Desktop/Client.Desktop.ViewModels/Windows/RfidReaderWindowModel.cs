@@ -7,7 +7,6 @@ using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Common.Windows;
-using Impinj.OctaneSdk;
 using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Windows
@@ -17,43 +16,14 @@ namespace Client.Desktop.ViewModels.Windows
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
         private readonly IMainDispatcher _dispatcher;
+        private readonly IResolver _resolverService;
 
         public Action<bool> CloseAction { get; set; }
 
         private ObservableCollection<RfidReaderEntityViewModel> _rfidReaders;
         private RfidReaderEntityViewModel _selectedRfidReader;
         private ObservableCollection<RfidAntennaEntityViewModel> _rfidAntennas;
-        private RfidService _readerService;
-        private string _connectionStatus;
-        private string _startStopButton;
-        private ObservableCollection<RfidTagViewModel> _tags;
-        private string _connectDisconnectButton;
 
-        public ObservableCollection<RfidTagViewModel> Tags
-        {
-            get => _tags;
-            set => Set(() => Tags, ref _tags, value);
-        }
-        public string ConnectDisconnectButton
-        {
-            get => _connectDisconnectButton;
-            set => Set(() => ConnectDisconnectButton, ref _connectDisconnectButton, value);
-        }
-        public string StartStopButton
-        {
-            get => _startStopButton;
-            set => Set(() => StartStopButton, ref _startStopButton, value);
-        }
-        public string ConnectionStatus
-        {
-            get => _connectionStatus;
-            set => Set(() => ConnectionStatus, ref _connectionStatus, value);
-        }
-        public RfidService ReaderService
-        {
-            get => _readerService;
-            set => Set(() => ReaderService, ref _readerService, value);
-        }
         public ObservableCollection<RfidAntennaEntityViewModel> RfidAntennas
         {
             get => _rfidAntennas;
@@ -70,35 +40,30 @@ namespace Client.Desktop.ViewModels.Windows
             set => Set(() => RfidReaders, ref _rfidReaders, value);
         }
 
+        public RfidServiceTest RfidService { get; set; }
+
         public ObservableCollection<RfidAntennaEntityViewModel> SortedAntennas => GetReaderAntennas();
 
         public RelayCommand SaveCommand { get; }
-        public RelayCommand ConnectReaderCommand { get; }
         public RelayCommand DeleteReaderCommand { get; }
         public RelayCommand AddReaderCommand { get; }
         public RelayCommand CloseCommand { get; }
-        public RelayCommand StartStopReaderCommand { get; }
         public RelayCommand InitializeCommand { get; }
 
-        public RfidReaderWindowModel(ILaundryService laundryService, IDialogService dialogService, IMainDispatcher dispatcher)
+        public RfidReaderWindowModel(ILaundryService laundryService, IDialogService dialogService, IMainDispatcher dispatcher,IResolver resolver)
         {
             _laundryService = laundryService ?? throw new ArgumentNullException(nameof(laundryService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
-            ReaderService = new RfidService();
+            _resolverService = resolver ?? throw new ArgumentNullException(nameof(resolver));
 
             SaveCommand = new RelayCommand(Save);
-            ConnectReaderCommand = new RelayCommand(ConnectReader, ()=> SelectedRfidReader != null);
             AddReaderCommand = new RelayCommand(AddReader);
             CloseCommand = new RelayCommand(Close);
             DeleteReaderCommand = new RelayCommand(DeleteReader, () => SelectedRfidReader != null);
-            StartStopReaderCommand = new RelayCommand(StartStopReader);
 
             InitializeCommand = new RelayCommand(Initialize);
-            StartStopButton = "Start";
-            ConnectDisconnectButton = "Connect";
-
-            Tags = new ObservableCollection<RfidTagViewModel>();
+            RfidService = _resolverService.Resolve<RfidServiceTest>();
             Initialize();
         }
 
@@ -134,38 +99,7 @@ namespace Client.Desktop.ViewModels.Windows
             {
                 RaisePropertyChanged(()=> SortedAntennas);
                 DeleteReaderCommand.RaiseCanExecuteChanged();
-
-                StartStopReaderCommand.CanExecute(false);
-
-                ConnectReaderCommand.RaiseCanExecuteChanged();
             }
-        }
-
-        public void ConnectReader()
-        {
-            if(SelectedRfidReader == null) return;
-            ConnectionStatus = "Connected";
-            return;
-
-
-            ReaderService.StopRead();
-
-            var isConnected = ReaderService.Connection(SelectedRfidReader, SortedAntennas.ToList());
-
-            if (isConnected)
-            {
-                StartStopReaderCommand.CanExecute(true);
-                ConnectionStatus = "Connected";
-                ConnectDisconnectButton = "Disconnect";
-            }
-            else
-            {
-                StartStopReaderCommand.CanExecute(false);
-                ConnectionStatus = "NOT Connected";
-                ConnectDisconnectButton = "Connect";
-            }
-
-            StartStopReaderCommand?.RaiseCanExecuteChanged();
         }
 
         private ObservableCollection<RfidAntennaEntityViewModel> GetReaderAntennas()
@@ -209,76 +143,6 @@ namespace Client.Desktop.ViewModels.Windows
             if (_dialogService.ShowQuestionDialog($"Do you want to close window ? "))
             {
                 CloseAction?.Invoke(true);
-            }
-        }
-
-        private void StartStopReader()
-        {
-            //ConnectReader();
-
-            if (StartStopButton == "Start")
-            {
-                //if(ConnectionStatus != "Connected") return;
-
-                Tags.Clear();
-
-                //ReaderService.Reader.TagsReported += DisplayTag;
-                //ReaderService.StartRead();
-
-                AddTestTags();
-                StartStopButton = "Stop";
-                return;
-            }
-
-            if (StartStopButton == "Stop")
-            {
-                //ReaderService.StopRead();
-                //ReaderService.Reader.TagsReported -= DisplayTag;
-
-                StartStopButton = "Start";
-            }
-        }
-
-        private void AddTestTags()
-        {
-            Random random = new Random();
-
-            for (int i = 0; i < 10; i++)
-            {
-                Tags.Add(new RfidTagViewModel()
-                {
-                    Antenna = random.Next(1, 4),
-                    Tag = $"TagNumber - {i}"
-                });
-            }
-        }
-
-        //public static string RandomString(int length)
-        //{
-        //    Random random = new Random();
-
-        //    const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        //    return new string(Enumerable.Repeat(chars, length)
-        //        .Select(s => s[random.Next(s.Length)]).ToArray());
-        //}
-
-        private void DisplayTag(ImpinjReader reader, TagReport report)
-        {
-            foreach (Tag tag in report)
-            {
-                if (Tags.Any(x => Equals(x.Tag, tag.Epc.ToString())))
-                {
-                    continue;
-                }
-
-                _dispatcher.RunInMainThread((() =>
-                {
-                    Tags.Add(new RfidTagViewModel()
-                    {
-                        Tag = tag.Epc.ToString(),
-                        Antenna = tag.AntennaPortNumber
-                    });
-                }));
             }
         }
 

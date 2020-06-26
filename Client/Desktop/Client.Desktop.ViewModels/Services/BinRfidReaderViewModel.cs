@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
@@ -57,14 +58,14 @@ namespace Client.Desktop.ViewModels.Services
             _laundryService = laundryService ?? throw new ArgumentNullException(nameof(laundryService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
-            ReaderService = new RfidService();
+            //ReaderService = new RfidService();
 
             Tags = new ObservableCollection<RfidTagViewModel>();
+
             Initialize();
-            Start();
         }
 
-        private async void Initialize()
+        private async Task Initialize()
         {
             _dialogService.ShowBusy();
 
@@ -77,6 +78,7 @@ namespace Client.Desktop.ViewModels.Services
                 var antenna = await _laundryService.GetAllAsync<RfidAntennaEntity>();
                 var antennas = antenna.Select(x => new RfidAntennaEntityViewModel(x));
                 RfidAntennas = antennas.ToObservableCollection();
+
             }
             catch (Exception e)
             {
@@ -88,6 +90,8 @@ namespace Client.Desktop.ViewModels.Services
             }
 
             PropertyChanged += OnPropertyChanged;
+            //Start();
+
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -98,40 +102,39 @@ namespace Client.Desktop.ViewModels.Services
             }
         }
 
-        public void Start()
-        {
-            //Test
-            SelectedRfidReader = RfidReaders.FirstOrDefault();
+        //public void Start()
+        //{
+        //    //TODO: Get Reader and Client from locationBinSettings
+        //    SelectedRfidReader = RfidReaders.FirstOrDefault();
 
-            //TODO: Get Reader and Client from locationBinSettings
 
-            if (SelectedRfidReader == null) return;
-            var antennas = RfidAntennas.Where(x => x.RfidReaderId == SelectedRfidReader.Id).ToList();
+        //    if (SelectedRfidReader == null) return;
+        //    var antennas = RfidAntennas.Where(x => x.RfidReaderId == SelectedRfidReader.Id).ToList();
 
-            ReaderService.Connection(SelectedRfidReader, antennas);
+        //    ReaderService.Connection(SelectedRfidReader, antennas);
 
-            ReaderService.StartRead();
-            ReaderService.Reader.TagsReported += DisplayTag;
-        }
+        //    ReaderService.StartRead();
+        //    ReaderService.Reader.TagsReported += DisplayTag;
+        //}
 
-        private void DisplayTag(ImpinjReader reader, TagReport report)
-        {
-            foreach (Tag tag in report)
-            {
-                if (Tags.Any(x => Equals(x.Tag, tag.Epc.ToString())))
-                {
-                    continue;
-                }
+        //private void DisplayTag(ImpinjReader reader, TagReport report)
+        //{
+        //    foreach (Tag tag in report)
+        //    {
+        //        if (Tags.Any(x => Equals(x.Tag, tag.Epc.ToString())))
+        //        {
+        //            continue;
+        //        }
 
-                _dispatcher.RunInMainThread((() =>
-                {
-                    Tags.Add(new RfidTagViewModel()
-                    {
-                        Tag = tag.Epc.ToString(),
-                        Antenna = tag.AntennaPortNumber
-                    });
-                }));
-            }
-        }
+        //        _dispatcher.RunInMainThread((() =>
+        //        {
+        //            Tags.Add(new RfidTagViewModel()
+        //            {
+        //                Tag = tag.Epc.ToString(),
+        //                Antenna = tag.AntennaPortNumber
+        //            });
+        //        }));
+        //    }
+        //}
     }
 }

@@ -113,13 +113,13 @@
                        VerticalContentAlignment="Center" 
                        Margin = "5" 
                        Padding="20,2" 
-                       Content="{Binding ConnectionStatus}" 
+                       Content="{Binding RfidService.ConnectionStatus}" 
                        FontWeight="ExtraBold" 
                        AllowDrop="True" />
 
                 <Button DockPanel.Dock="Left" 
-                        Content="{Binding StartStopButton}" 
-                        Command="{Binding StartStopReaderCommand}"/>
+                        Content="{Binding RfidService.StartStopButton}" 
+                        Command="{Binding RfidService.StartStopReaderCommand}"/>
 
             </DockPanel>
 
@@ -127,7 +127,7 @@
 
                 <DataGrid AutoGenerateColumns="False"
                           Height="NaN"
-                          ItemsSource="{Binding Tags}"
+                          ItemsSource="{Binding RfidService.Tags}"
                           VerticalScrollBarVisibility="Visible"
                           AllowDrop="True" 
                           HorizontalAlignment="Stretch"

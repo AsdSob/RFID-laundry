@@ -69,8 +69,7 @@ namespace Client.Desktop.ViewModels.Content
             set => Set(() => Clients, ref _clients, value);
         }
 
-        public RfidReaderWindowModel RfidReaderWindow { get; set; }
-        public string SearchingTag { get; set; }
+        public RfidServiceTest RfidService { get; set; }
 
         
         public RelayCommand NewLinenCommand { get; }
@@ -99,11 +98,11 @@ namespace Client.Desktop.ViewModels.Content
             DeleteTagCommand = new RelayCommand(DeleteTag, () => SelectedTag != null || SelectedClientLinen != null);
 
             InitializeCommand = new RelayCommand(Initialize);
-            RfidReaderWindow = _resolverService.Resolve<RfidReaderWindowModel>();
+            RfidService = _resolverService.Resolve<RfidServiceTest>();
 
             AddShowButton = "Add";
 
-            RfidReaderWindow.Tags.CollectionChanged += TagsCollectionChanged;
+            RfidService.Tags.CollectionChanged += TagsCollectionChanged;
 
             PropertyChanged += OnPropertyChanged;
         }
@@ -112,7 +111,7 @@ namespace Client.Desktop.ViewModels.Content
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                foreach (var tag in RfidReaderWindow.Tags)
+                foreach (var tag in RfidService.Tags)
                 {
                     if (Linens.Any(x => x.Tag == tag.Tag))
                     {
@@ -212,6 +211,7 @@ namespace Client.Desktop.ViewModels.Content
 
             Linens.Remove(SelectedClientLinen);
             CheckTags();
+
         }
 
         private void AddShowButtonName()
@@ -223,7 +223,7 @@ namespace Client.Desktop.ViewModels.Content
 
         private void CheckTags()
         {
-            foreach (var tag in RfidReaderWindow.Tags)
+            foreach (var tag in RfidService.Tags)
             {
                  tag.IsRegistered = Linens.Any(x => Equals(x.Tag, tag.Tag));
             }
@@ -262,6 +262,7 @@ namespace Client.Desktop.ViewModels.Content
             CheckTags();
 
             _laundryService.AddOrUpdateAsync(linen.OriginalObject);
+            AddShowButtonName();
         }
 
         private void UseTag()
@@ -273,6 +274,7 @@ namespace Client.Desktop.ViewModels.Content
             SelectedTag.IsRegistered = true;
 
             _laundryService.AddOrUpdateAsync(SelectedClientLinen.OriginalObject);
+            AddShowButtonName();
         }
     }
 }
