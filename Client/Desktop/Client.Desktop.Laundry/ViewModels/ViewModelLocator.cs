@@ -39,7 +39,7 @@ namespace Client.Desktop.Laundry.ViewModels
 
             //builder.RegisterType<DataViewModel>().SingleInstance();
             builder.RegisterType<MasterClientViewModel>().SingleInstance();
-            builder.RegisterType<MasterStaffViewModel>().SingleInstance();
+            //builder.RegisterType<MasterStaffViewModel>().SingleInstance();
             builder.RegisterType<MasterLinenViewModel>().SingleInstance();
 
             builder.RegisterType<RfidReaderWindowModel>().SingleInstance();

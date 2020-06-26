@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -19,11 +20,34 @@ namespace Client.Desktop.ViewModels.Windows
         private readonly IResolver _resolverService;
 
         public Action<bool> CloseAction { get; set; }
-
+        private RfidTagViewModel _selectedTag;
+        private ObservableCollection<RfidTagViewModel> _tags;
+        private string _startStopString;
         private ObservableCollection<RfidReaderEntityViewModel> _rfidReaders;
         private RfidReaderEntityViewModel _selectedRfidReader;
         private ObservableCollection<RfidAntennaEntityViewModel> _rfidAntennas;
+        private string _connectionStatus;
 
+        public string ConnectionStatus
+        {
+            get => _connectionStatus;
+            set => Set(ref _connectionStatus, value);
+        }
+        public string StartStopString
+        {
+            get => _startStopString;
+            set => Set(ref _startStopString, value);
+        }
+        public ObservableCollection<RfidTagViewModel> Tags
+        {
+            get => _tags;
+            set => Set(ref _tags, value);
+        }
+        public RfidTagViewModel SelectedTag
+        {
+            get => _selectedTag;
+            set => Set(() => SelectedTag, ref _selectedTag, value);
+        }
         public ObservableCollection<RfidAntennaEntityViewModel> RfidAntennas
         {
             get => _rfidAntennas;
@@ -49,6 +73,9 @@ namespace Client.Desktop.ViewModels.Windows
         public RelayCommand AddReaderCommand { get; }
         public RelayCommand CloseCommand { get; }
         public RelayCommand InitializeCommand { get; }
+        public RelayCommand StartStopReadCommand { get; }
+
+        public RelayCommand CheckConnectionCommand { get; }
 
         public RfidReaderWindowModel(ILaundryService laundryService, IDialogService dialogService, IMainDispatcher dispatcher,IResolver resolver)
         {
@@ -62,9 +89,16 @@ namespace Client.Desktop.ViewModels.Windows
             CloseCommand = new RelayCommand(Close);
             DeleteReaderCommand = new RelayCommand(DeleteReader, () => SelectedRfidReader != null);
 
+            StartStopReadCommand = new RelayCommand(StartStopRead, () => SelectedRfidReader != null);
+            CheckConnectionCommand = new RelayCommand(CheckConnection, () => SelectedRfidReader != null);
+
             InitializeCommand = new RelayCommand(Initialize);
             RfidService = _resolverService.Resolve<RfidServiceTest>();
-            Initialize();
+            StartStopString = RfidService.GetStartStopString();
+
+            RfidService.SortedDataEvent += TagsCollectionChanged;
+            PropertyChanged += OnPropertyChanged;
+
         }
 
         private async void Initialize()
@@ -90,7 +124,6 @@ namespace Client.Desktop.ViewModels.Windows
                 _dialogService.HideBusy();
             }
 
-            PropertyChanged += OnPropertyChanged;
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -99,7 +132,46 @@ namespace Client.Desktop.ViewModels.Windows
             {
                 RaisePropertyChanged(()=> SortedAntennas);
                 DeleteReaderCommand.RaiseCanExecuteChanged();
+                CheckConnectionCommand.RaiseCanExecuteChanged();
+
+                StartStopReadCommand?.RaiseCanExecuteChanged();
+                SetReader();
             }
+        }
+
+        private void TagsCollectionChanged(ConcurrentDictionary<string, int> dataTags)
+        {
+            SetTagViewModels(dataTags);
+        }
+
+        private void SetTagViewModels(ConcurrentDictionary<string, int> dataTags)
+        {
+            Tags = new ObservableCollection<RfidTagViewModel>();
+
+            foreach (var data in dataTags)
+            {
+                var tag = new RfidTagViewModel()
+                {
+                    Tag = data.Key,
+                    Antenna = data.Value,
+                };
+
+                Tags.Add(tag);
+            }
+        }
+
+        private void SetReader()
+        {
+            var antennas = RfidAntennas.Where(x => x.RfidReaderId == SelectedRfidReader.Id).ToList();
+            RfidService.Connection(SelectedRfidReader, antennas);
+        }
+
+        private void StartStopRead()
+        {
+            if (SelectedRfidReader == null) return;
+
+            RfidService.StartStopRead();
+            StartStopString = RfidService.GetStartStopString();
         }
 
         private ObservableCollection<RfidAntennaEntityViewModel> GetReaderAntennas()
@@ -137,7 +209,13 @@ namespace Client.Desktop.ViewModels.Windows
             }
             return antennas;
         }
-        
+
+        private void CheckConnection()
+        {
+            ConnectionStatus = RfidService.CheckConnection();
+        }
+
+
         private void Close()
         {
             if (_dialogService.ShowQuestionDialog($"Do you want to close window ? "))

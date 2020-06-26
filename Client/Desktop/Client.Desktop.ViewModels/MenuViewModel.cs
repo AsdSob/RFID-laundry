@@ -37,7 +37,7 @@ namespace Client.Desktop.ViewModels
             NewCommand = new RelayCommand(() => Select(typeof(DataViewModel)));
             ExitCommand = new RelayCommand(() => Select(typeof(ExitViewModel)));
             ClientCommand = new RelayCommand(() => Select(typeof(MasterClientViewModel)));
-            StaffCommand = new RelayCommand(() => Select(typeof(MasterStaffViewModel)), StaffCommandCanExecute);
+            //StaffCommand = new RelayCommand(() => Select(typeof(MasterStaffViewModel)), StaffCommandCanExecute);
             MasterLinenCommand = new RelayCommand(() => Select(typeof(MasterLinenViewModel)), MasterLinenCommandCanExecute);
             AuthManageCommand = new RelayCommand(() => Select(typeof(AuthManageViewModel)), AuthManageCommandCanExecute);
 

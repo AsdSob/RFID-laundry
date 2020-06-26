@@ -46,6 +46,7 @@ namespace Client.Desktop.ViewModels.Windows
 
         public RelayCommand SaveCommand { get; }
         public RelayCommand CloseCommand { get; }
+        public RelayCommand NewCommand { get; }
         public RelayCommand DeleteCommand { get; }
         public RelayCommand InitializeCommand { get; }
 
@@ -61,6 +62,7 @@ namespace Client.Desktop.ViewModels.Windows
             SaveCommand = new RelayCommand(Save);
             CloseCommand = new RelayCommand(CloseWindow);
             DeleteCommand = new RelayCommand(Delete);
+            NewCommand = new RelayCommand(NewItem);
             //InitializeCommand = new RelayCommand(Initialize);
 
             Cities = EnumExtensions.GetValues<CitiesEnum>();
@@ -76,11 +78,16 @@ namespace Client.Desktop.ViewModels.Windows
                 return;
             }
 
-            SelectedClient = new ClientEntityViewModel(new ClientEntity()
+            NewItem();
+        }
+
+        public void NewItem()
+        {
+            SelectedClient = new ClientEntityViewModel()
             {
-                Active = true,
-                CityId = (int)CitiesEnum.AbuDhabi,
-            });
+                CityId = 1,
+                Active = true
+            };
         }
 
         private async void Initialize()

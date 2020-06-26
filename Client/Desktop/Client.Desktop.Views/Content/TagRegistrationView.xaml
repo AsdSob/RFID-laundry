@@ -182,13 +182,19 @@
                         Grid.Column="0"
                        >
 
+                <Button DockPanel.Dock="Right"
+                        Content="Setting"
+                        Command="{Binding ReaderSettingsWindowCommand}"
+
+                />
+
                 <!-- Start/Stop-->
                 <Button DockPanel.Dock="Right"
                         Content="{Binding StartStopString}"
                         Command="{Binding StartStopCommand}"
 
-                />
-
+                />                
+                
                 <ComboBox DockPanel.Dock="Left" 
                           ItemsSource="{Binding Readers}" 
                           SelectedValue="{Binding SelectedReader}" 

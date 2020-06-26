@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
@@ -27,8 +27,7 @@ namespace Client.Desktop.ViewModels.Content
         private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
         private ObservableCollection<ClientLinenEntityViewModel> _linens;
         private ClientLinenEntityViewModel _selectedClientLinen;
-        private ObservableCollection<RfidTagViewModel> _tags;
-        private RfidTagViewModel _selectedTag;
+
         private string _addShowButton;
 
         public string AddShowButton
@@ -38,16 +37,6 @@ namespace Client.Desktop.ViewModels.Content
         }
         public RfidReaderWindowModel RfidReaderWindow { get; set; }
 
-        public RfidTagViewModel SelectedTag
-        {
-            get => _selectedTag;
-            set => Set(() => SelectedTag, ref _selectedTag, value);
-        }
-        public ObservableCollection<RfidTagViewModel> Tags
-        {
-            get => _tags;
-            set => Set(() => Tags, ref _tags, value);
-        }
         public ClientLinenEntityViewModel SelectedClientLinen
         {
             get => _selectedClientLinen;
@@ -412,6 +401,110 @@ namespace Client.Desktop.ViewModels.Content
 
             _laundryService.AddOrUpdateAsync(SelectedClientLinen.OriginalObject);
         }
+
+
+        #region RFID Part
+
+        private RfidTagViewModel _selectedTag;
+        private ObservableCollection<RfidTagViewModel> _tags;
+        private ObservableCollection<RfidReaderEntityViewModel> _readers;
+        private ObservableCollection<RfidAntennaEntityViewModel> _antennas;
+        private RfidReaderEntityViewModel _selectedReader;
+        private string _startStopString;
+        public RfidServiceTest RfidService { get; set; }
+
+        public string StartStopString
+        {
+            get => _startStopString;
+            set => Set(ref _startStopString, value);
+        }
+        public RfidReaderEntityViewModel SelectedReader
+        {
+            get => _selectedReader;
+            set => Set(ref _selectedReader, value);
+        }
+        public ObservableCollection<RfidAntennaEntityViewModel> Antennas
+        {
+            get => _antennas;
+            set => Set(ref _antennas, value);
+        }
+        public ObservableCollection<RfidReaderEntityViewModel> Readers
+        {
+            get => _readers;
+            set => Set(ref _readers, value);
+        }
+        public ObservableCollection<RfidTagViewModel> Tags
+        {
+            get => _tags;
+            set => Set(ref _tags, value);
+        }
+        public RfidTagViewModel SelectedTag
+        {
+            get => _selectedTag;
+            set => Set(() => SelectedTag, ref _selectedTag, value);
+        }
+        private async void GetRfidReaders()
+        {
+            var reader = await _laundryService.GetAllAsync<RfidReaderEntity>();
+            var readers = reader.Select(x => new RfidReaderEntityViewModel(x));
+            Readers = readers.ToObservableCollection();
+
+            var antenna = await _laundryService.GetAllAsync<RfidAntennaEntity>();
+            var antennas = antenna.Select(x => new RfidAntennaEntityViewModel(x));
+            Antennas = antennas.ToObservableCollection();
+        }
+
+        private void TagsCollectionChanged(ConcurrentDictionary<string, int> dataTags)
+        {
+            SetTagViewModels(dataTags);
+        }
+
+        private void SetTagViewModels(ConcurrentDictionary<string, int> dataTags)
+        {
+            Tags = new ObservableCollection<RfidTagViewModel>();
+
+            foreach (var data in dataTags)
+            {
+                var tag = new RfidTagViewModel()
+                {
+                    Tag = data.Key,
+                    Antenna = data.Value,
+                };
+
+                SetTagLinenRegistration(tag);
+
+                Tags.Add(tag);
+            }
+        }
+
+        private void SetTagLinenRegistration(RfidTagViewModel tag)
+        {
+            tag.IsRegistered = Linens.Any(x => Equals(x.Tag, tag.Tag));
+        }
+
+        private void CheckAllTagRegistration()
+        {
+            foreach (var tag in Tags)
+            {
+                SetTagLinenRegistration(tag);
+            }
+        }
+
+        private void SetReader()
+        {
+            var antennas = Antennas.Where(x => x.RfidReaderId == SelectedReader.Id).ToList();
+            RfidService.Connection(SelectedReader, antennas);
+        }
+
+        private void StartStopRead()
+        {
+            if (SelectedReader == null) return;
+
+            RfidService.StartStopRead();
+            StartStopString = RfidService.GetStartStopString();
+        }
+        #endregion
+
 
     }
 }

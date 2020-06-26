@@ -149,6 +149,20 @@ namespace Client.Desktop.ViewModels.Common.Services
             }
         }
 
+        public string CheckConnection()
+        {
+            if(Reader == null || !Reader.IsConnected) return "Error";
+
+            if (Reader.IsConnected)
+            {
+                return "Connected";
+            }
+            else
+            {
+                return "Not Connected";
+            }
+        }
+
 
         public delegate void SortedData(ConcurrentDictionary<string, int> data);
         public event SortedData SortedDataEvent;

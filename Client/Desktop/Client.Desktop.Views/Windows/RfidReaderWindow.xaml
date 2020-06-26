@@ -43,7 +43,8 @@
                 <Button DockPanel.Dock="Left"  Content="New" Command="{Binding AddReaderCommand}" />
                 <Button DockPanel.Dock="Left"  Content="Delete" Command="{Binding DeleteReaderCommand}"/>
                 <Button DockPanel.Dock="Left" Content="Save" Command="{Binding SaveCommand}"/>
-                <Button DockPanel.Dock="Right" Content="Connect" Command="{Binding ConnectReaderCommand}"/>
+                <Button DockPanel.Dock="Left" Content="Connect" Command="{Binding CheckConnectionCommand}"/>
+                <Button DockPanel.Dock="Right" Content="Close" Command="{Binding CloseCommand}"/>
             </DockPanel>
 
             <!-- Reader Settings -->
@@ -113,13 +114,13 @@
                        VerticalContentAlignment="Center" 
                        Margin = "5" 
                        Padding="20,2" 
-                       Content="{Binding RfidService.ConnectionStatus}" 
+                       Content="{Binding ConnectionStatus}" 
                        FontWeight="ExtraBold" 
                        AllowDrop="True" />
 
-                <Button DockPanel.Dock="Left" 
-                        Content="{Binding RfidService.StartStopButton}" 
-                        Command="{Binding RfidService.StartStopReaderCommand}"/>
+                <Button DockPanel.Dock="Right" 
+                        Content="{Binding StartStopString}" 
+                        Command="{Binding StartStopReadCommand}"/>
 
             </DockPanel>
 
@@ -127,7 +128,7 @@
 
                 <DataGrid AutoGenerateColumns="False"
                           Height="NaN"
-                          ItemsSource="{Binding RfidService.Tags}"
+                          ItemsSource="{Binding Tags}"
                           VerticalScrollBarVisibility="Visible"
                           AllowDrop="True" 
                           HorizontalAlignment="Stretch"

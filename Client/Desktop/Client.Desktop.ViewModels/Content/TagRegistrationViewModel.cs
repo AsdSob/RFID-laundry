@@ -25,13 +25,14 @@ namespace Client.Desktop.ViewModels.Content
         private ObservableCollection<ClientLinenEntityViewModel> _linens;
         private ClientLinenEntityViewModel _selectedClientLinen;
         private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
-        private RfidTagViewModel _selectedTag;
         private string _addShowButton;
+        private RfidTagViewModel _selectedTag;
         private ObservableCollection<RfidTagViewModel> _tags;
         private ObservableCollection<RfidReaderEntityViewModel> _readers;
         private ObservableCollection<RfidAntennaEntityViewModel> _antennas;
         private RfidReaderEntityViewModel _selectedReader;
         private string _startStopString;
+        public RfidServiceTest RfidService { get; set; }
 
         public string StartStopString
         {
@@ -58,16 +59,18 @@ namespace Client.Desktop.ViewModels.Content
             get => _tags;
             set => Set(ref _tags, value);
         }
-        public string AddShowButton
-        {
-            get => _addShowButton;
-            set => Set(ref _addShowButton, value);
-        }
         public RfidTagViewModel SelectedTag
         {
             get => _selectedTag;
             set => Set(() => SelectedTag, ref _selectedTag, value);
         }
+
+        public string AddShowButton
+        {
+            get => _addShowButton;
+            set => Set(ref _addShowButton, value);
+        }
+
         public ObservableCollection<MasterLinenEntityViewModel> MasterLinens
         {
             get => _masterLinens;
@@ -99,9 +102,6 @@ namespace Client.Desktop.ViewModels.Content
             set => Set(() => Clients, ref _clients, value);
         }
 
-        public RfidServiceTest RfidService { get; set; }
-
-        
         public RelayCommand NewLinenCommand { get; }
         public RelayCommand EditLinenCommand { get; }
         public RelayCommand DeleteLinenCommand { get; }
@@ -111,6 +111,7 @@ namespace Client.Desktop.ViewModels.Content
         public RelayCommand StartStopCommand { get; }
         public RelayCommand AddShowLinenByTagCommand { get; }
         public RelayCommand DeleteTagCommand { get; }
+        public RelayCommand ReaderSettingsWindowCommand { get; }
 
 
         public TagRegistrationViewModel(ILaundryService dataService, IDialogService dialogService, IResolver resolver, IMainDispatcher dispatcher)
@@ -129,6 +130,8 @@ namespace Client.Desktop.ViewModels.Content
             AddShowLinenByTagCommand = new RelayCommand(AddShowLinenByTag, () => SelectedTag != null);
             DeleteTagCommand = new RelayCommand(DeleteTag, () => SelectedTag != null || SelectedClientLinen != null);
 
+            ReaderSettingsWindowCommand = new RelayCommand(ReaderSettingsWindow);
+
 
             InitializeCommand = new RelayCommand(Initialize);
             RfidService = _resolverService.Resolve<RfidServiceTest>();
@@ -139,11 +142,6 @@ namespace Client.Desktop.ViewModels.Content
             PropertyChanged += OnPropertyChanged;
             RfidService.SortedDataEvent += TagsCollectionChanged;
 
-        }
-
-        private void TagsCollectionChanged(ConcurrentDictionary<string, int> dataTags)
-        {
-            SetTagViewModels(dataTags);
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -169,37 +167,6 @@ namespace Client.Desktop.ViewModels.Content
                 SetReader();
             }
 
-        }
-
-        private void SetTagViewModels(ConcurrentDictionary<string, int> dataTags)
-        {
-            Tags = new ObservableCollection<RfidTagViewModel>();
-
-            foreach (var data in dataTags)
-            {
-                var tag = new RfidTagViewModel()
-                {
-                    Tag = data.Key,
-                    Antenna = data.Value,
-                };
-
-                SetTagLinenRegistration(tag);
-
-                Tags.Add(tag);
-            }
-        }
-
-        private void SetTagLinenRegistration(RfidTagViewModel tag)
-        {
-            tag.IsRegistered = Linens.Any(x => Equals(x.Tag, tag.Tag));
-        }
-
-        private void CheckAllTagRegistration()
-        {
-            foreach (var tag in Tags)
-            {
-                SetTagLinenRegistration(tag);
-            }
         }
 
         private async void Initialize()
@@ -234,7 +201,6 @@ namespace Client.Desktop.ViewModels.Content
             var linens = linen.Select(x => new ClientLinenEntityViewModel(x));
             Linens = linens.ToObservableCollection();
         }
-
         private async void GetRfidReaders()
         {
             var reader = await _laundryService.GetAllAsync<RfidReaderEntity>();
@@ -246,11 +212,40 @@ namespace Client.Desktop.ViewModels.Content
             Antennas = antennas.ToObservableCollection();
         }
 
-        private void AddShowButtonName()
+        private void TagsCollectionChanged(ConcurrentDictionary<string, int> dataTags)
         {
-            if(SelectedTag == null) return;
+            SetTagViewModels(dataTags);
+        }
 
-            AddShowButton = SelectedTag.IsRegistered ? "Show" : "Add";
+        private void SetTagViewModels(ConcurrentDictionary<string, int> dataTags)
+        {
+            Tags = new ObservableCollection<RfidTagViewModel>();
+
+            foreach (var data in dataTags)
+            {
+                var tag = new RfidTagViewModel()
+                {
+                    Tag = data.Key,
+                    Antenna = data.Value,
+                };
+
+                SetTagLinenRegistration(tag);
+
+                Tags.Add(tag);
+            }
+        }
+
+        private void SetTagLinenRegistration(RfidTagViewModel tag)
+        {
+            tag.IsRegistered = Linens.Any(x => Equals(x.Tag, tag.Tag));
+        }
+
+        private void CheckAllTagRegistration()
+        {
+            foreach (var tag in Tags)
+            {
+                SetTagLinenRegistration(tag);
+            }
         }
 
         private void SetReader()
@@ -261,10 +256,17 @@ namespace Client.Desktop.ViewModels.Content
 
         private void StartStopRead()
         {
-            if(SelectedReader == null) return;
+            if (SelectedReader == null) return;
 
             RfidService.StartStopRead();
             StartStopString = RfidService.GetStartStopString();
+        }
+
+        private void AddShowButtonName()
+        {
+            if(SelectedTag == null) return;
+
+            AddShowButton = SelectedTag.IsRegistered ? "Show" : "Add";
         }
 
         private void AddShowLinenByTag()
@@ -315,9 +317,6 @@ namespace Client.Desktop.ViewModels.Content
             AddShowButtonName();
         }
 
-
-
-
         private void LinenWindow(ClientLinenEntityViewModel linen)
         {
             var linenWindow = _resolverService.Resolve<ClientLinenWindowModel>();
@@ -357,6 +356,16 @@ namespace Client.Desktop.ViewModels.Content
 
             Linens.Remove(SelectedClientLinen);
             CheckAllTagRegistration();
+        }
+
+        private void ReaderSettingsWindow()
+        {
+            var window = _resolverService.Resolve<RfidReaderWindowModel>();
+
+            if (_dialogService.ShowDialog(window))
+            {
+                GetRfidReaders();
+            }
         }
 
     }
