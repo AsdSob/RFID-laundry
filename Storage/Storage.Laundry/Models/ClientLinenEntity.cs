@@ -8,7 +8,6 @@ namespace Storage.Laundry.Models
         public int DepartmentId { get; set; }
         public int ClientId { get; set; }
         public int MasterLinenId { get; set; }
-        public int? StaffId { get; set; }
         public string RfidTag { get; set; }
         public int StatusId { get; set; }
         public int PackingValue { get; set; }
@@ -17,6 +16,5 @@ namespace Storage.Laundry.Models
         public virtual MasterLinenEntity MasterLinenEntity { get; set; }
         public virtual DepartmentEntity DepartmentEntity { get; set; }
         public virtual ClientEntity ClientEntity { get; set; }
-        public virtual ClientStaffEntity ClientStaffEntity { get; set; }
     }
 }

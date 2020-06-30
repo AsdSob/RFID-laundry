@@ -149,11 +149,6 @@ namespace Client.Desktop.ViewModels.Windows
             CloseWindow();
         }
 
-        private bool CanExecuteParentIdClearCommand()
-        {
-            return true;
-        }
-
         private void CloseWindow()
         {
             if (SelectedClient.HasChanges())

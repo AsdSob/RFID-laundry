@@ -22,8 +22,8 @@ namespace Client.Desktop.ViewModels.Content
         private ClientEntityViewModel _selectedClient;
         private ObservableCollection<DepartmentEntityViewModel> _departments;
         private DepartmentEntityViewModel _selectedDepartment;
-        private ObservableCollection<ClientStaffEntityViewModel> _staff;
-        private ClientStaffEntityViewModel _selectedStaff;
+        private ObservableCollection<StaffDetailsEntityViewModel> _staff;
+        private StaffDetailsEntityViewModel _selectedStaffDetails;
         private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
         private ObservableCollection<ClientLinenEntityViewModel> _linens;
         private ClientLinenEntityViewModel _selectedClientLinen;
@@ -52,12 +52,12 @@ namespace Client.Desktop.ViewModels.Content
             get => _masterLinens;
             set => Set(() => MasterLinens, ref _masterLinens, value);
         }
-        public ClientStaffEntityViewModel SelectedStaff
+        public StaffDetailsEntityViewModel SelectedStaffDetails
         {
-            get => _selectedStaff;
-            set => Set(() => SelectedStaff, ref _selectedStaff, value);
+            get => _selectedStaffDetails;
+            set => Set(() => SelectedStaffDetails, ref _selectedStaffDetails, value);
         }
-        public ObservableCollection<ClientStaffEntityViewModel> Staff
+        public ObservableCollection<StaffDetailsEntityViewModel> Staff
         {
             get => _staff;
             set => Set(() => Staff, ref _staff, value);
@@ -86,7 +86,7 @@ namespace Client.Desktop.ViewModels.Content
         public ObservableCollection<DepartmentEntityViewModel> SortedDepartments =>
             Departments?.Where(x => x.ClientId == SelectedClient?.Id).ToObservableCollection();
 
-        public ObservableCollection<ClientStaffEntityViewModel> SortedStaff => SortStaff();
+        public ObservableCollection<StaffDetailsEntityViewModel> SortedStaff => SortStaff();
 
         public ObservableCollection<ClientLinenEntityViewModel> SortedLinens => SortLinen();
 
@@ -109,7 +109,7 @@ namespace Client.Desktop.ViewModels.Content
             _resolverService = resolver ?? throw new ArgumentNullException(nameof(resolver));
 
             AddStaffCommand = new RelayCommand(AddNewStaff, (() => SelectedDepartment != null));
-            EditStaffCommand = new RelayCommand(EditStaff, (() => SelectedStaff != null));
+            EditStaffCommand = new RelayCommand(EditStaff, (() => SelectedStaffDetails != null));
 
             AddLinenCommand = new RelayCommand(() => LinenWindow(null));
             EditLinenCommand = new RelayCommand(() => LinenWindow(SelectedClientLinen), () => SelectedClientLinen != null);
@@ -178,8 +178,8 @@ namespace Client.Desktop.ViewModels.Content
 
         private async void GetStaffs()
         {
-            var staff = await _laundryService.GetAllAsync<ClientStaffEntity>();
-            var staffs = staff.Select(x => new ClientStaffEntityViewModel(x));
+            var staff = await _laundryService.GetAllAsync<StaffDetailsEntity>();
+            var staffs = staff.Select(x => new StaffDetailsEntityViewModel(x));
             Staff = staffs.ToObservableCollection();
         }
 
@@ -207,7 +207,7 @@ namespace Client.Desktop.ViewModels.Content
                 AddLinenCommand.RaiseCanExecuteChanged();
             }
 
-            if (e.PropertyName == nameof(SelectedStaff))
+            if (e.PropertyName == nameof(SelectedStaffDetails))
             {
                 RaisePropertyChanged(() => SortedLinens);
                 EditStaffCommand.RaiseCanExecuteChanged();
@@ -245,9 +245,9 @@ namespace Client.Desktop.ViewModels.Content
             return linens;
         }
 
-        private ObservableCollection<ClientStaffEntityViewModel> SortStaff()
+        private ObservableCollection<StaffDetailsEntityViewModel> SortStaff()
         {
-            var staffs = new ObservableCollection<ClientStaffEntityViewModel>();
+            var staffs = new ObservableCollection<StaffDetailsEntityViewModel>();
 
             if (SelectedDepartment == null)
             {
@@ -283,7 +283,7 @@ namespace Client.Desktop.ViewModels.Content
 
         private void EditStaff()
         {
-            StaffWindow(SelectedStaff);
+            StaffWindow(SelectedStaffDetails);
         }
 
         private void AddNewStaff()
@@ -291,12 +291,12 @@ namespace Client.Desktop.ViewModels.Content
             StaffWindow(null);
         }
 
-        private void StaffWindow(ClientStaffEntityViewModel staff)
+        private void StaffWindow(StaffDetailsEntityViewModel staffDetails)
         {
             var staffWindow = _resolverService.Resolve<MasterStaffWindowModel>();
 
-            staffWindow.SetSelectedStaff(staff, SelectedDepartment);
-            staffWindow.Staffs = Staff;
+            //staffWindow.SetSelectedStaff(staffDetails, SelectedDepartment);
+            //staffWindow.Staffs = Staff;
 
             if (_dialogService.ShowDialog(staffWindow))
             {
@@ -312,7 +312,6 @@ namespace Client.Desktop.ViewModels.Content
 
             linenWindow.Clients = Clients;
             linenWindow.Departments = Departments;
-            linenWindow.Staffs = Staff;
             linenWindow.MasterLinens = MasterLinens;
             linenWindow.ClientLinens = Linens;
 
