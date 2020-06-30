@@ -11,7 +11,6 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
         private ClientLinenEntity _originalObject; 
         private int _departmentId;
         private int _clientId;
-        private int? _staffId;
         private int _masterLinenId;
         private string _tag;
         private int _statusId;
@@ -19,6 +18,8 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
         private int _packingValue;
         private bool _isValid;
         private string _error;
+
+        public bool IsSelected { get; set; }
 
         public string Error
         {
@@ -54,11 +55,6 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
         {
             get => _masterLinenId;
             set => Set(() => MasterLinenId, ref _masterLinenId, value);
-        }
-        public int? StaffId
-        {
-            get => _staffId;
-            set => Set(() => StaffId, ref _staffId, value);
         }
         public int ClientId
         {
@@ -100,7 +96,6 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             Tag = OriginalObject.RfidTag;
             StatusId = OriginalObject.StatusId;
             MasterLinenId = OriginalObject.MasterLinenId;
-            StaffId = OriginalObject.StaffId;
             PackingValue = OriginalObject.PackingValue;
         }
 
@@ -112,7 +107,6 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             OriginalObject.ClientId = ClientId;
             OriginalObject.RfidTag = Tag;
             OriginalObject.StatusId = StatusId;
-            OriginalObject.StaffId = StaffId;
             OriginalObject.MasterLinenId = MasterLinenId;
             OriginalObject.PackingValue = PackingValue;
         }
@@ -123,13 +117,12 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
                                     !Equals(ClientId, OriginalObject.ClientId) ||
                                     !Equals(Tag, OriginalObject.RfidTag) ||
                                     !Equals(StatusId, OriginalObject.StatusId) ||
-                                    !Equals(StaffId, OriginalObject.StaffId) ||
                                     !Equals(PackingValue, OriginalObject.PackingValue) ||
                                     !Equals(MasterLinenId, OriginalObject.MasterLinenId);
 
         public string this[string columnName] => Validate(columnName);
         public Func<ClientEntityViewModel, string, bool> NameUniqueValidationFunc { get; set; }
-
+        
         private string Validate(string columnName)
         {
             var error = String.Empty;

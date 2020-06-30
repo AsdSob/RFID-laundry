@@ -13,10 +13,16 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
         private string _name;
         private int _id;
         private int _clientId;
-        private int _departmentTypeId;
+        private int? _departmentTypeId;
         private bool _isValid;
         private string _error;
+        private int? _parentId;
 
+        public int? ParentId
+        {
+            get => _parentId;
+            set => Set(ref _parentId, value);
+        }
         public string Error
         {
             get => _error;
@@ -27,7 +33,7 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             get => _isValid;
             set => Set(ref _isValid, value);
         }
-        public int DepartmentTypeId
+        public int? DepartmentTypeId
         {
             get => _departmentTypeId;
             set => Set(() => DepartmentTypeId, ref _departmentTypeId, value);
@@ -75,6 +81,7 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             Name = OriginalObject.Name;
             ClientId = OriginalObject.ClientId;
             DepartmentTypeId = OriginalObject.DepartmentTypeId;
+            ParentId = OriginalObject.ParentId;
         }
 
         public void AcceptChanges()
@@ -84,12 +91,14 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             OriginalObject.Name = Name;
             OriginalObject.ClientId = ClientId;
             OriginalObject.DepartmentTypeId = DepartmentTypeId;
+            OriginalObject.ParentId = ParentId;
         }
 
         public bool HasChanges() => OriginalObject == null ||
                                     OriginalObject.IsNew ||
                                     !Equals(Name, OriginalObject.Name) ||
                                     !Equals(DepartmentTypeId, OriginalObject.DepartmentTypeId) ||
+                                    !Equals(ParentId, OriginalObject.ParentId) ||
                                     !Equals(ClientId, OriginalObject.ClientId);
 
         public Func<ClientEntityViewModel, string, bool> NameUniqueValidationFunc { get; set; }

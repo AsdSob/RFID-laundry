@@ -153,10 +153,6 @@ namespace Storage.Laundry.Migrations
                         .HasColumnName("rfidTag")
                         .HasColumnType("text");
 
-                    b.Property<int?>("StaffId")
-                        .HasColumnName("staffId")
-                        .HasColumnType("integer");
-
                     b.Property<int>("StatusId")
                         .HasColumnName("statusId")
                         .HasColumnType("integer");
@@ -169,46 +165,7 @@ namespace Storage.Laundry.Migrations
 
                     b.HasIndex("MasterLinenId");
 
-                    b.HasIndex("StaffId");
-
                     b.ToTable("clientLinen");
-                });
-
-            modelBuilder.Entity("Storage.Laundry.Models.ClientStaffEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<DateTime>("CreatedDateUtc")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<int>("DepartmentId")
-                        .HasColumnName("departmentId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Email")
-                        .HasColumnName("email")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasColumnName("name")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnName("phoneNumber")
-                        .HasColumnType("text");
-
-                    b.Property<string>("StaffId")
-                        .HasColumnName("staffId")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DepartmentId");
-
-                    b.ToTable("clientStaff");
                 });
 
             modelBuilder.Entity("Storage.Laundry.Models.ConveyorEntity", b =>
@@ -254,7 +211,7 @@ namespace Storage.Laundry.Migrations
                     b.Property<DateTime>("CreatedDateUtc")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<int>("DepartmentTypeId")
+                    b.Property<int?>("DepartmentTypeId")
                         .HasColumnName("departmentTypeId")
                         .HasColumnType("integer");
 
@@ -262,9 +219,15 @@ namespace Storage.Laundry.Migrations
                         .HasColumnName("name")
                         .HasColumnType("text");
 
+                    b.Property<int?>("ParentId")
+                        .HasColumnName("parentId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ClientId");
+
+                    b.HasIndex("ParentId");
 
                     b.ToTable("department");
                 });
@@ -383,6 +346,44 @@ namespace Storage.Laundry.Migrations
                     b.ToTable("rfidReader");
                 });
 
+            modelBuilder.Entity("Storage.Laundry.Models.StaffDetailsEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<DateTime>("CreatedDateUtc")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnName("departmentId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Email")
+                        .HasColumnName("email")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnName("name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnName("phoneNumber")
+                        .HasColumnType("text");
+
+                    b.Property<string>("StaffId")
+                        .HasColumnName("staffId")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DepartmentId")
+                        .IsUnique();
+
+                    b.ToTable("clientStaff");
+                });
+
             modelBuilder.Entity("Storage.Laundry.Models.AccountDetailsEntity", b =>
                 {
                     b.HasOne("Storage.Laundry.Models.AccountEntity", "AccountEntity")
@@ -415,19 +416,6 @@ namespace Storage.Laundry.Migrations
                         .HasForeignKey("MasterLinenId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Storage.Laundry.Models.ClientStaffEntity", "ClientStaffEntity")
-                        .WithMany("ClientLinenEntities")
-                        .HasForeignKey("StaffId");
-                });
-
-            modelBuilder.Entity("Storage.Laundry.Models.ClientStaffEntity", b =>
-                {
-                    b.HasOne("Storage.Laundry.Models.DepartmentEntity", "DepartmentEntity")
-                        .WithMany("ClientStaffEntities")
-                        .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Storage.Laundry.Models.ConveyorEntity", b =>
@@ -444,6 +432,10 @@ namespace Storage.Laundry.Migrations
                         .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Storage.Laundry.Models.DepartmentEntity", "Parent")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentId");
                 });
 
             modelBuilder.Entity("Storage.Laundry.Models.RfidAntennaEntity", b =>
@@ -451,6 +443,15 @@ namespace Storage.Laundry.Migrations
                     b.HasOne("Storage.Laundry.Models.RfidReaderEntity", "RfidReaderEntity")
                         .WithMany("RfidAntennaEntities")
                         .HasForeignKey("RfidReaderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Storage.Laundry.Models.StaffDetailsEntity", b =>
+                {
+                    b.HasOne("Storage.Laundry.Models.DepartmentEntity", "DepartmentEntity")
+                        .WithOne("StaffDetailsEntity")
+                        .HasForeignKey("Storage.Laundry.Models.StaffDetailsEntity", "DepartmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

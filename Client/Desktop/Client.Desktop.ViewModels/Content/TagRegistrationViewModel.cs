@@ -8,7 +8,6 @@ using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Windows;
-using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Content
 {
@@ -17,11 +16,9 @@ namespace Client.Desktop.ViewModels.Content
         private readonly IDialogService _dialogService;
         private readonly ILaundryService _laundryService;
         private readonly IResolver _resolverService;
-        private readonly IMainDispatcher _dispatcher;
 
         private ObservableCollection<ClientEntityViewModel> _clients;
         private ObservableCollection<DepartmentEntityViewModel> _departments;
-        private ObservableCollection<ClientStaffEntityViewModel> _staffs;
         private ObservableCollection<ClientLinenEntityViewModel> _linens;
         private ClientLinenEntityViewModel _selectedClientLinen;
         private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
@@ -86,11 +83,6 @@ namespace Client.Desktop.ViewModels.Content
             get => _linens;
             set => Set(() => Linens, ref _linens, value);
         }
-        public ObservableCollection<ClientStaffEntityViewModel> Staffs
-        {
-            get => _staffs;
-            set => Set(() => Staffs, ref _staffs, value);
-        }
         public ObservableCollection<DepartmentEntityViewModel> Departments
         {
             get => _departments;
@@ -101,6 +93,8 @@ namespace Client.Desktop.ViewModels.Content
             get => _clients;
             set => Set(() => Clients, ref _clients, value);
         }
+
+        public ObservableCollection<DepartmentEntityViewModel> SortedStaffs => SortStaffs();
 
         public RelayCommand NewLinenCommand { get; }
         public RelayCommand EditLinenCommand { get; }
@@ -114,12 +108,11 @@ namespace Client.Desktop.ViewModels.Content
         public RelayCommand ReaderSettingsWindowCommand { get; }
 
 
-        public TagRegistrationViewModel(ILaundryService dataService, IDialogService dialogService, IResolver resolver, IMainDispatcher dispatcher)
+        public TagRegistrationViewModel(ILaundryService dataService, IDialogService dialogService, IResolver resolver)
         {
             _laundryService = dataService ?? throw new ArgumentNullException(nameof(dataService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _resolverService = resolver ?? throw new ArgumentNullException(nameof(resolver));
-            _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
 
 
             NewLinenCommand = new RelayCommand(() => LinenWindow(null));
@@ -165,51 +158,36 @@ namespace Client.Desktop.ViewModels.Content
             {
                 StartStopCommand?.RaiseCanExecuteChanged();
                 SetReader();
-            }
 
+                //TODO: Set SelectedReader base on Software registration account
+            }
         }
 
         private async void Initialize()
         {
-            var client = await _laundryService.GetAllAsync<ClientEntity>();
-            var clients = client.Select(x => new ClientEntityViewModel(x));
-            Clients = clients.ToObservableCollection();
+            Clients = await _laundryService.Clients();
+            Departments = await _laundryService.Departments();
+            MasterLinens = await _laundryService.MasterLinens();
 
-            var department = await _laundryService.GetAllAsync<DepartmentEntity>();
-            var departments = department.Select(x => new DepartmentEntityViewModel(x));
-            Departments = departments.ToObservableCollection();
+            RaisePropertyChanged(()=> SortedStaffs);
 
-            var masterLinen = await _laundryService.GetAllAsync<MasterLinenEntity>();
-            var masterLinens = masterLinen.Select(x => new MasterLinenEntityViewModel(x));
-            MasterLinens = masterLinens.ToObservableCollection();
-
-            GetStaffs();
             GetClientLinens();
             GetRfidReaders();
         }
 
-        private async void GetStaffs()
-        {
-            var staff = await _laundryService.GetAllAsync<ClientStaffEntity>();
-            var staffs = staff.Select(x => new ClientStaffEntityViewModel(x));
-            Staffs = staffs.ToObservableCollection();
-        }
-
         private async void GetClientLinens()
         {
-            var linen = await _laundryService.GetAllAsync<ClientLinenEntity>();
-            var linens = linen.Select(x => new ClientLinenEntityViewModel(x));
-            Linens = linens.ToObservableCollection();
+            Linens = await _laundryService.ClientLinens();
         }
         private async void GetRfidReaders()
         {
-            var reader = await _laundryService.GetAllAsync<RfidReaderEntity>();
-            var readers = reader.Select(x => new RfidReaderEntityViewModel(x));
-            Readers = readers.ToObservableCollection();
+            Readers = await _laundryService.RfidReaders();
+            Antennas = await _laundryService.RfidAntennas();
+        }
 
-            var antenna = await _laundryService.GetAllAsync<RfidAntennaEntity>();
-            var antennas = antenna.Select(x => new RfidAntennaEntityViewModel(x));
-            Antennas = antennas.ToObservableCollection();
+        private ObservableCollection<DepartmentEntityViewModel> SortStaffs()
+        {
+            return Departments.Where(x => x.ParentId != null).ToObservableCollection();
         }
 
         private void TagsCollectionChanged(ConcurrentDictionary<string, int> dataTags)
@@ -242,6 +220,8 @@ namespace Client.Desktop.ViewModels.Content
 
         private void CheckAllTagRegistration()
         {
+            if(Tags == null) return;
+
             foreach (var tag in Tags)
             {
                 SetTagLinenRegistration(tag);
@@ -250,7 +230,7 @@ namespace Client.Desktop.ViewModels.Content
 
         private void SetReader()
         {
-            var antennas = Antennas.Where(x => x.RfidReaderId == SelectedReader.Id).ToList();
+            var antennas = Antennas.Where(x => x.RfidReaderId == SelectedReader?.Id).ToList();
             RfidService.Connection(SelectedReader, antennas);
         }
 
@@ -323,17 +303,8 @@ namespace Client.Desktop.ViewModels.Content
 
             linenWindow.Clients = Clients;
             linenWindow.Departments = Departments;
-            linenWindow.Staffs = Staffs;
             linenWindow.MasterLinens = MasterLinens;
             linenWindow.ClientLinens = Linens;
-
-            if (linen == null)
-            {
-                linen = new ClientLinenEntityViewModel()
-                {
-                    Tag = SelectedTag?.Tag,
-                };
-            }
 
             linenWindow.SetSelectedLinen(linen);
 

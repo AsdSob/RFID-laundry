@@ -110,6 +110,7 @@ namespace Client.Desktop.ViewModels.Windows
 
             _laundryService.AddOrUpdateAsync(SelectedMasterLinen.OriginalObject);
             
+            
             Close();
         }
 

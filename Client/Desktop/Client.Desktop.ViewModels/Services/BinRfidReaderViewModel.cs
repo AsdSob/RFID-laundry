@@ -14,7 +14,7 @@ namespace Client.Desktop.ViewModels.Services
 {
     public class BinRfidReaderViewModel : ViewModelBase
     {
-        private readonly ILaundryService _laundryService;
+        private readonly LaundryService _laundryService;
         private readonly IDialogService _dialogService;
         private readonly IMainDispatcher _dispatcher;
 
@@ -52,7 +52,7 @@ namespace Client.Desktop.ViewModels.Services
             set => Set(() => RfidReaders, ref _rfidReaders, value);
         }
 
-        public BinRfidReaderViewModel(ILaundryService laundryService, IDialogService dialogService, IMainDispatcher dispatcher)
+        public BinRfidReaderViewModel(LaundryService laundryService, IDialogService dialogService, IMainDispatcher dispatcher)
         {
             //TODO: get account and BinLocation entities
             _laundryService = laundryService ?? throw new ArgumentNullException(nameof(laundryService));

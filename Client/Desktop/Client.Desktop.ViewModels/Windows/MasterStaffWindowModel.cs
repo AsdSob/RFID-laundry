@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
-using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Common.Windows;
-using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Windows
 {
@@ -15,19 +12,25 @@ namespace Client.Desktop.ViewModels.Windows
     {
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
-        private readonly IMainDispatcher _dispatcher;
-        private ClientStaffEntityViewModel _selectedClientStaff;
-        private ObservableCollection<ClientStaffEntityViewModel> _staffs;
+        private StaffDetailsEntityViewModel _selectedStaffDetails;
+        private ObservableCollection<DepartmentEntityViewModel> _departments;
+        private DepartmentEntityViewModel _selectedStaff;
 
-        public ObservableCollection<ClientStaffEntityViewModel> Staffs
+        public DepartmentEntityViewModel SelectedStaff
         {
-            get => _staffs;
-            set => Set(ref _staffs, value);
+            get => _selectedStaff;
+            set => Set(ref _selectedStaff, value);
         }
-        public ClientStaffEntityViewModel SelectedClientStaff
+        public ObservableCollection<DepartmentEntityViewModel> Departments
         {
-            get => _selectedClientStaff;
-            set => Set(ref _selectedClientStaff, value);
+            get => _departments;
+            set => Set(ref _departments, value);
+        }
+
+        public StaffDetailsEntityViewModel SelectedStaffDetails
+        {
+            get => _selectedStaffDetails;
+            set => Set(ref _selectedStaffDetails, value);
         }
 
         public Action<bool> CloseAction { get; set; }
@@ -36,11 +39,10 @@ namespace Client.Desktop.ViewModels.Windows
         public RelayCommand DeleteCommand { get; }
         public RelayCommand InitializeCommand { get; }
 
-        public MasterStaffWindowModel(ILaundryService laundryService, IDialogService dialogService, IMainDispatcher dispatcher)
+        public MasterStaffWindowModel(ILaundryService laundryService, IDialogService dialogService)
         {
             _laundryService = laundryService ?? throw new ArgumentNullException(nameof(laundryService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
-            _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
 
             SaveCommand = new RelayCommand(Save);
             CloseCommand = new RelayCommand(Close);
@@ -49,20 +51,37 @@ namespace Client.Desktop.ViewModels.Windows
 
         }
 
-        public void SetSelectedStaff(ClientStaffEntityViewModel staff, DepartmentEntityViewModel department)
+        public void SetSelectedStaff(DepartmentEntityViewModel item, DepartmentEntityViewModel parent)
         {
-            SelectedClientStaff = null;
+            SelectedStaff = null;
 
-            if (staff != null)
+            if (item != null)
             {
-                SelectedClientStaff = staff;
+                SelectedStaff = item;
+
+                if (item.OriginalObject.StaffDetailsEntity == null)
+                {
+                    SelectedStaffDetails = new StaffDetailsEntityViewModel();
+                }
+                else
+                {
+                    SelectedStaffDetails = new StaffDetailsEntityViewModel(item.OriginalObject.StaffDetailsEntity);
+                }
                 return;
             }
 
-            SelectedClientStaff = new ClientStaffEntityViewModel(new ClientStaffEntity()
+            NewItem(parent);
+        }
+
+        private void NewItem(DepartmentEntityViewModel parent)
+        {
+            SelectedStaff = new DepartmentEntityViewModel
             {
-                DepartmentId = department.Id,
-            });
+                ParentId = parent.Id,
+                ClientId = parent.ClientId,
+            };
+
+            SelectedStaffDetails = new StaffDetailsEntityViewModel();
         }
 
         private async void Initialize()
@@ -71,9 +90,9 @@ namespace Client.Desktop.ViewModels.Windows
 
             try
             {
-                var staff = await _laundryService.GetAllAsync<ClientStaffEntity>();
-                var staffs = staff.Select(x => new ClientStaffEntityViewModel(x));
-                Staffs = staffs.ToObservableCollection();
+                //var staff = await _laundryService.GetAllAsync<StaffDetailsEntity>();
+                //var staffs = staff.Select(x => new StaffDetailsEntityViewModel(x));
+                //Staffs = staffs.ToObservableCollection();
 
             }
             catch (Exception e)
@@ -95,25 +114,42 @@ namespace Client.Desktop.ViewModels.Windows
 
         private void Save()
         {
-            if (!SelectedClientStaff.IsValid || !SelectedClientStaff.HasChanges())
+            var canClose = false;
+            
+            if (SelectedStaff.IsValid && SelectedStaff.HasChanges())
             {
-                return;
+                SelectedStaff.AcceptChanges();
+                _laundryService.AddOrUpdateAsync(SelectedStaff.OriginalObject);
+                canClose =true;
             }
 
-            SelectedClientStaff.AcceptChanges();
-            _laundryService.AddOrUpdateAsync(SelectedClientStaff.OriginalObject);
+            if (SelectedStaffDetails.IsValid && SelectedStaffDetails.HasChanges())
+            {
+                SelectedStaffDetails.DepartmentId = SelectedStaff.OriginalObject.Id;
+                SelectedStaffDetails.AcceptChanges();
+                _laundryService.AddOrUpdateAsync(SelectedStaffDetails.OriginalObject);
+                canClose = true;
+            }
 
-            Close();
+            if (canClose)
+            {
+                Close();
+            }
         }
 
         private void Delete()
         {
-            if (!_dialogService.ShowQuestionDialog($"Do you want to DELETE {SelectedClientStaff.Name} ?"))
+            if (!_dialogService.ShowQuestionDialog($"Do you want to DELETE {SelectedStaff.Name} ?"))
                 return;
 
-            if (!SelectedClientStaff.IsNew)
+            if (!SelectedStaff.IsNew)
             {
-                _laundryService.DeleteAsync(SelectedClientStaff.OriginalObject);
+                _laundryService.DeleteAsync(SelectedStaff.OriginalObject);
+            }
+
+            if (!SelectedStaffDetails.IsNew)
+            {
+                _laundryService.DeleteAsync(SelectedStaffDetails.OriginalObject);
             }
 
             Close();
@@ -121,7 +157,7 @@ namespace Client.Desktop.ViewModels.Windows
 
         private void Close()
         {
-            if (SelectedClientStaff.HasChanges())
+            if (SelectedStaff.HasChanges() || SelectedStaffDetails.HasChanges())
             {
                 if (_dialogService.ShowQuestionDialog($"Do you want to close window ? \n \"Changes is NOT saved\""))
                 {

@@ -1,0 +1,128 @@
+﻿<UserControl x:Class="Client.Desktop.Views.Content.UniversalNoteView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:content="clr-namespace:Client.Desktop.ViewModels.Content;assembly=Client.Desktop.ViewModels"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:domain="clr-namespace:Client.Desktop.ViewModels.Common.EntityViewModels;assembly=Client.Desktop.ViewModels.Common"
+             xmlns:converters="clr-namespace:Client.Desktop.Views.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance content:UniversalNoteViewModel}">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverterKey"></BooleanToVisibilityConverter>
+        <converters:DataGridRowColorConvertor x:Key="DataGridRowColorConvertor" />
+    </UserControl.Resources>
+
+    <b:Interaction.Triggers>
+        <b:EventTrigger EventName="Loaded">
+            <b:InvokeCommandAction Command="{Binding InitializeCommand}"/>
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
+
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.5*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+            
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!--Client-->
+            <ComboBox Grid.Row="0" 
+                      ItemsSource="{Binding Clients}" 
+                      SelectedValue="{Binding SelectedClient}" 
+                      materialDesign:HintAssist.Hint="Client" 
+                      DisplayMemberPath="ShortName"
+                      Margin="10"
+                      />
+
+            <!--Departments-->
+            <ComboBox Grid.Row="1" 
+                      ItemsSource="{Binding SortedDepartments}" 
+                      SelectedValue="{Binding SelectedDepartment}" 
+                      materialDesign:HintAssist.Hint="Department" 
+                      DisplayMemberPath="Name"
+                      Margin="10"
+                      />
+
+            <!--Show All Linen-->
+            <CheckBox Grid.Row="2"
+                      Margin="20"
+                      IsChecked="{Binding ShowAllLinen}"
+                      Content="Show All Linen"
+                      FontSize="20"
+            />
+
+            <!--Linen-->
+            <GroupBox Grid.Row="3" Header="Linen">
+                <DataGrid Grid.Row="3"
+                          ItemsSource="{Binding SortedClientLinens}"
+                          SelectionMode="Single"
+                          IsReadOnly="True"
+                          HorizontalAlignment="Stretch"
+                          IsTextSearchEnabled="True"
+                          CanUserAddRows="False"
+                          AutoGenerateColumns="False"
+                          HorizontalContentAlignment="Stretch"
+                          HeadersVisibility="None"
+                >
+                    <DataGrid.Columns>
+
+                        <DataGridTemplateColumn>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="Add" Style="{StaticResource DataGridButton}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <!--Linen-->
+                        <DataGridTextColumn Header="Linen" Binding="{Binding OriginalObject.MasterLinenEntity.Name}"  Width="*"/>
+
+                        <!--Department-->
+                        <materialDesign:DataGridComboBoxColumn
+                            Header="Department"
+                            SelectedValueBinding="{Binding DepartmentId}"
+                            DisplayMemberPath="OriginalObject.Parent.Name"
+                            SelectedValuePath="Id"
+                            ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.Departments}"
+                        />
+
+                        <!--Staff-->
+                        <materialDesign:DataGridComboBoxColumn
+                            Header="Staff"
+                            SelectedValueBinding="{Binding DepartmentId}"
+                            DisplayMemberPath="OriginalObject.StaffDetailsEntity.Name"
+                            SelectedValuePath="Id"
+                            ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.Departments}"
+                        />
+
+                    </DataGrid.Columns>
+                </DataGrid>
+            </GroupBox>
+                
+        </Grid>
+
+        <Grid Grid.Column="1">
+
+        </Grid>
+
+
+
+
+
+    </Grid>
+</UserControl>

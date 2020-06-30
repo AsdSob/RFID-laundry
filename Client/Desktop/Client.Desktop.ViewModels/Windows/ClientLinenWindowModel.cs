@@ -15,21 +15,20 @@ namespace Client.Desktop.ViewModels.Windows
     {
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
-        private readonly IMainDispatcher _dispatcher;
         private ObservableCollection<ClientLinenEntityViewModel> _clientLinens;
         private ClientLinenEntityViewModel _selectedLinen;
         private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
         private ObservableCollection<ClientEntityViewModel> _clients;
         private ObservableCollection<DepartmentEntityViewModel> _departments;
-        private ObservableCollection<ClientStaffEntityViewModel> _staffs;
+        private DepartmentEntityViewModel _selectedDepartment;
 
+        public DepartmentEntityViewModel SelectedDepartment
+        {
+            get => _selectedDepartment;
+            set => Set(ref _selectedDepartment, value);
+        }
         public Action<bool> CloseAction { get; set; }
 
-        public ObservableCollection<ClientStaffEntityViewModel> Staffs
-        {
-            get => _staffs;
-            set => Set(ref _staffs, value);
-        }
         public ObservableCollection<DepartmentEntityViewModel> Departments
         {
             get => _departments;
@@ -57,7 +56,7 @@ namespace Client.Desktop.ViewModels.Windows
         }
 
         public ObservableCollection<DepartmentEntityViewModel> SortedDepartments => SortDepartments();
-        public ObservableCollection<ClientStaffEntityViewModel> SortedStaffs => SortStaffs();
+        public ObservableCollection<DepartmentEntityViewModel> SortedStaffs => SortStaffs();
 
         public RelayCommand SaveCommand { get; }
         public RelayCommand CloseCommand { get; }
@@ -66,11 +65,10 @@ namespace Client.Desktop.ViewModels.Windows
         public RelayCommand InitializeCommand { get; }
 
 
-        public ClientLinenWindowModel(ILaundryService laundryService, IDialogService dialogService, IMainDispatcher dispatcher)
+        public ClientLinenWindowModel(ILaundryService laundryService, IDialogService dialogService)
         {
             _laundryService = laundryService ?? throw new ArgumentNullException(nameof(laundryService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
-            _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
 
             SaveCommand = new RelayCommand(Save);
             CloseCommand = new RelayCommand(Close);
@@ -78,7 +76,7 @@ namespace Client.Desktop.ViewModels.Windows
             DeleteCommand = new RelayCommand(Delete);
             //InitializeCommand = new RelayCommand(Initialize);
 
-            //PropertyChanged += OnPropertyChanged;
+            PropertyChanged += OnPropertyChanged;
         }
 
         public async void Initialize()
@@ -98,10 +96,6 @@ namespace Client.Desktop.ViewModels.Windows
                 var masterLinen = await _laundryService.GetAllAsync<MasterLinenEntity>();
                 var masterLinens = masterLinen.Select(x => new MasterLinenEntityViewModel(x));
                 MasterLinens = masterLinens.ToObservableCollection();
-
-                var staff = await _laundryService.GetAllAsync<ClientStaffEntity>();
-                var staffs = staff.Select(x => new ClientStaffEntityViewModel(x));
-                Staffs = staffs.ToObservableCollection();
 
                 var linen = await _laundryService.GetAllAsync<ClientLinenEntity>();
                 var linens = linen.Select(x => new ClientLinenEntityViewModel(x));
@@ -130,11 +124,6 @@ namespace Client.Desktop.ViewModels.Windows
                 RaisePropertyChanged(() => SortedStaffs);
             }
 
-            if (e.PropertyName == nameof(SelectedLinen.DepartmentId))
-            {
-                RaisePropertyChanged(() => SortedStaffs);
-            }
-
             if (e.PropertyName == nameof(SelectedLinen.MasterLinenId))
             {
                 SelectedLinen.PackingValue = MasterLinens.FirstOrDefault(x => x.Id == SelectedLinen.MasterLinenId).PackingValue;
@@ -143,10 +132,10 @@ namespace Client.Desktop.ViewModels.Windows
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            //if (e.PropertyName == nameof(SelectedDepartment))
-            //{
-            //    RaisePropertyChanged(() => SortedStaffs);
-            //}
+            if (e.PropertyName == nameof(SelectedDepartment))
+            {
+                RaisePropertyChanged(() => SortedStaffs);
+            }
         }
 
         private ObservableCollection<DepartmentEntityViewModel> SortDepartments()
@@ -158,50 +147,45 @@ namespace Client.Desktop.ViewModels.Windows
                 return departments;
             }
 
-            departments = Departments?.Where(x => x.ClientId == SelectedLinen.ClientId).ToObservableCollection();
+            departments = Departments?.Where(x => x.ClientId == SelectedLinen.ClientId && x.ParentId == null).ToObservableCollection();
 
-            if (departments != null && departments.All(x => x.Id != SelectedLinen.DepartmentId))
-            {
-                SelectedLinen.DepartmentId = 0;
-            }
             return departments;
         }
 
-        private ObservableCollection<ClientStaffEntityViewModel> SortStaffs()
+        private ObservableCollection<DepartmentEntityViewModel> SortStaffs()
         {
-            var staffs = new ObservableCollection<ClientStaffEntityViewModel>();
+            var staffs = Departments?.Where(x => x.ParentId == SelectedDepartment?.Id).ToObservableCollection();
 
-            if (SelectedLinen.DepartmentId == 0)
-            {
-                return staffs;
-            }
-            
-            staffs = Staffs?.Where(x => x.DepartmentId == SelectedLinen.DepartmentId).ToObservableCollection();
-
-            if (staffs != null && staffs.All(x => x.Id != SelectedLinen.StaffId))
-            {
-                SelectedLinen.StaffId = null;
-            }
             return staffs;
         }
 
         public void SetSelectedLinen(ClientLinenEntityViewModel linen)
         {
+            if (linen == null)
+            {
+                NewLinen();
+                return;
+            }
+
             SelectedLinen = linen;
+
+            var department = Departments.FirstOrDefault(x => x.Id == linen.DepartmentId);
+
+            if (department.ParentId.HasValue)
+            {
+                SelectedDepartment = Departments.FirstOrDefault(x => x.Id == department.ParentId);
+            }
+            else
+            {
+                SelectedDepartment = department;
+            }
 
             SelectedLinen.PropertyChanged += ItemOnPropertyChanged;
         }
 
         private void NewLinen()
         {
-            var linen = new ClientLinenEntityViewModel()
-            {
-                DepartmentId = SelectedLinen.DepartmentId,
-                ClientId = SelectedLinen.ClientId,
-                StaffId = SelectedLinen.StaffId,
-                Tag = SelectedLinen.Tag,
-                MasterLinenId = 0,
-            };
+            var linen = new ClientLinenEntityViewModel();
 
             SelectedLinen = linen;
 
@@ -210,24 +194,20 @@ namespace Client.Desktop.ViewModels.Windows
 
         private void Save()
         {
-            if (!SelectedLinen.IsValid)
+            if(SelectedLinen.DepartmentId == 0)
             {
-                return;
+                SelectedLinen.DepartmentId = SelectedDepartment.Id;
             }
 
-            if (!SelectedLinen.HasChanges())
+            if (!SelectedLinen.IsValid || !SelectedLinen.HasChanges())
             {
                 return;
             }
 
             SelectedLinen.AcceptChanges();
-
             _laundryService.AddOrUpdateAsync(SelectedLinen.OriginalObject);
 
-            if (_dialogService.ShowQuestionDialog("Saved! \n Do you want to close window ? "))
-            {
-                Close();
-            }
+            Close();
         }
 
         private void Delete()

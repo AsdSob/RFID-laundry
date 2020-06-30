@@ -6,6 +6,7 @@
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:content="clr-namespace:Client.Desktop.ViewModels.Content;assembly=Client.Desktop.ViewModels"
+             xmlns:converters="clr-namespace:Client.Desktop.Views.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance content:TagRegistrationViewModel}">
@@ -65,93 +66,54 @@
 
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Id" Binding="{Binding Id}"  IsReadOnly="True" />
+                        <DataGridTextColumn Header="Linen" Binding="{Binding OriginalObject.MasterLinenEntity.Name}" Width="3*" IsReadOnly="True" />
 
-                        <!--Linen-->
+                        <!--StaffID-->
 
                         <materialDesign:DataGridComboBoxColumn
-                            Header="matDesign"
-                            SelectedValueBinding="{Binding MasterLinenId}"
-                            DisplayMemberPath="Name"
+                            Header="Staff Id"
+                            Width="*"
+                            SelectedValueBinding="{Binding DepartmentId}"
+                            DisplayMemberPath="OriginalObject.StaffDetailsEntity.StaffId"
                             SelectedValuePath="Id"
-                            ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.MasterLinens}"
-                            />
-
-                        <!--<DataGridComboBoxColumn Header="Linen"
-                                                DisplayMemberPath="Name"
-                                                SelectedValuePath="Id"
-                                                Width="*"
-                                                SelectedValueBinding="{Binding MasterLinenId}"
-                                                >
-                            <DataGridComboBoxColumn.ElementStyle>
-                                <Style TargetType="{x:Type ComboBox}">
-                                    <Setter Property="ItemsSource" Value="{Binding Path=DataContext.MasterLinens, ElementName=LinenWindow}" />
-                                </Style>
-                            </DataGridComboBoxColumn.ElementStyle>
-                            <DataGridComboBoxColumn.EditingElementStyle>
-                                <Style TargetType="{x:Type ComboBox}">
-                                    <Setter Property="ItemsSource" Value="{Binding Path=DataContext.MasterLinens, ElementName=LinenWindow}" />
-                                </Style>
-                            </DataGridComboBoxColumn.EditingElementStyle>
-                        </DataGridComboBoxColumn>-->
+                            materialDesign:IsEditable="False"
+                            ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.Departments}"
+                        />
 
                         <!--Staff-->
 
-                        <DataGridComboBoxColumn Header="Staff"
-                                                DisplayMemberPath="Name"
-                                                SelectedValuePath="Id"
-                                                Width="*"
-                                                SelectedValueBinding="{Binding StaffId}">
-                            <DataGridComboBoxColumn.ElementStyle>
-                                <Style TargetType="{x:Type ComboBox}">
-                                    <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Staffs, ElementName=LinenWindow}" />
-                                </Style>
-                            </DataGridComboBoxColumn.ElementStyle>
-                            <DataGridComboBoxColumn.EditingElementStyle>
-                                <Style TargetType="{x:Type ComboBox}">
-                                    <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Staffs, ElementName=LinenWindow}" />
-                                </Style>
-                            </DataGridComboBoxColumn.EditingElementStyle>
-                        </DataGridComboBoxColumn>
-
-                        <!--Client-->
-
-                        <DataGridComboBoxColumn Header="Client"
-                                                DisplayMemberPath="ShortName"
-                                                SelectedValuePath="Id"
-                                                Width="*"
-                                                SelectedValueBinding="{Binding ClientId}">
-                            <DataGridComboBoxColumn.ElementStyle>
-                                <Style TargetType="{x:Type ComboBox}">
-                                    <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Clients, ElementName=LinenWindow}" />
-                                </Style>
-                            </DataGridComboBoxColumn.ElementStyle>
-                            <DataGridComboBoxColumn.EditingElementStyle>
-                                <Style TargetType="{x:Type ComboBox}">
-                                    <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Clients, ElementName=LinenWindow}" />
-                                </Style>
-                            </DataGridComboBoxColumn.EditingElementStyle>
-                        </DataGridComboBoxColumn>
+                        <materialDesign:DataGridComboBoxColumn
+                            Header="Staff"
+                            Width="2*"
+                            SelectedValueBinding="{Binding DepartmentId}"
+                            DisplayMemberPath="OriginalObject.StaffDetailsEntity.Name"
+                            SelectedValuePath="Id"
+                            ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.Departments}"
+                        />
 
                         <!--Department-->
 
-                        <DataGridComboBoxColumn Header="Department"
-                                                DisplayMemberPath="Name"
-                                                SelectedValuePath="Id"
-                                                Width="*"
-                                                SelectedValueBinding="{Binding DepartmentId}">
-                            <DataGridComboBoxColumn.ElementStyle>
-                                <Style TargetType="{x:Type ComboBox}">
-                                    <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Departments, ElementName=LinenWindow}" />
-                                </Style>
-                            </DataGridComboBoxColumn.ElementStyle>
-                            <DataGridComboBoxColumn.EditingElementStyle>
-                                <Style TargetType="{x:Type ComboBox}">
-                                    <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Departments, ElementName=LinenWindow}" />
-                                </Style>
-                            </DataGridComboBoxColumn.EditingElementStyle>
-                        </DataGridComboBoxColumn>
+                        <materialDesign:DataGridComboBoxColumn
+                            Header="Department"
+                            Width="2*"
 
-                        <DataGridTextColumn Header="Tag" Binding="{Binding Tag}" Width="2*" />
+                            SelectedValueBinding="{Binding DepartmentId}"
+                            DisplayMemberPath="Name"
+                            SelectedValuePath="Id"
+                            ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.Departments}"
+                        />
+
+                        <!--Client-->
+                        <materialDesign:DataGridComboBoxColumn
+                            Header="Client"
+                            Width="2*"
+                            SelectedValueBinding="{Binding ClientId}"
+                            DisplayMemberPath="ShortName"
+                            SelectedValuePath="Id"
+                            ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.Clients}"
+                        />
+
+                        <DataGridTextColumn Header="Tag" Binding="{Binding Tag}" Width="3*" />
 
                     </DataGrid.Columns>
                 </DataGrid>
@@ -169,7 +131,6 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <DockPanel Grid.Row="1" Grid.Column="0" LastChildFill="False" Margin="0,20,0,0">
@@ -203,7 +164,10 @@
 
             </DockPanel>
 
-            <GroupBox Grid.Column="0" Grid.Row="2" Header="Tags">
+            <GroupBox Grid.Column="0" 
+                      Grid.Row="2" 
+                      Header="Tags"
+                      >
                 <DataGrid AutoGenerateColumns="False"
                           Height="NaN"
                           ItemsSource="{Binding Tags}"
@@ -211,17 +175,31 @@
                           VerticalScrollBarVisibility="Visible"
                           AllowDrop="True" 
                           EnableRowVirtualization="True" 
-                          IsReadOnly="True" >
+                          IsReadOnly="True" 
+                          x:Name="xaxa"
+                          >
+
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow">
+                            <Setter Property="Background" Value="{Binding colorColumn}"/>
+                        </Style>
+                    </DataGrid.RowStyle>
 
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Antenna" Binding="{Binding Path=Antenna}" Width="Auto" />
                         <DataGridTextColumn Header="Tag" Binding="{Binding Path=Tag}" Width="*" />
-                        <DataGridTextColumn Header="reg" Binding="{Binding Path=IsRegistered}" Width="Auto" />
+
+                        <DataGridTextColumn Header="reg" 
+                                            Binding="{Binding Path=IsRegistered}" 
+                                            Width="Auto" 
+                                            >
+
+                        </DataGridTextColumn>
+
                     </DataGrid.Columns>
 
                 </DataGrid>
             </GroupBox>
-
         </Grid>
     </Grid>
 </UserControl>

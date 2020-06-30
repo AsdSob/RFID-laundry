@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
-using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Windows;
-using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Content
 {
@@ -54,9 +51,7 @@ namespace Client.Desktop.ViewModels.Content
 
             try
             {
-                var master = await _laundryService.GetAllAsync<MasterLinenEntity>();
-                var masters = master.Select(x => new MasterLinenEntityViewModel(x));
-                MasterLinens = masters.ToObservableCollection();
+                MasterLinens = await _laundryService.MasterLinens();
 
             }
             catch (Exception e)
