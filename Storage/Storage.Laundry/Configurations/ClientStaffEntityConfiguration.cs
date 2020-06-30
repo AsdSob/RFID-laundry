@@ -5,21 +5,19 @@ using Storage.Laundry.Models;
 
 namespace Storage.Laundry.Configurations
 {
-    class StaffDetailsEntityConfiguration : EntityTypeConfigurationBase<StaffDetailsEntity>
+    class ClientStaffEntityConfiguration : EntityTypeConfigurationBase<ClientStaffEntity>
     {
-        public override void Configure(EntityTypeBuilder<StaffDetailsEntity> builder)
+        public override void Configure(EntityTypeBuilder<ClientStaffEntity> builder)
         {
             builder.ToTable("clientStaff");
 
+            builder.Property(x => x.Name).HasColumnName("name");
             builder.Property(x => x.DepartmentId).HasColumnName("departmentId");
             builder.Property(x => x.StaffId).HasColumnName("staffId");
             builder.Property(x => x.PhoneNumber).HasColumnName("phoneNumber");
             builder.Property(x => x.Email).HasColumnName("email");
-            builder.Property(x => x.Name).HasColumnName("name");
 
-            builder.HasOne(x => x.DepartmentEntity)
-                .WithOne(x => x.StaffDetailsEntity)
-                .HasForeignKey<StaffDetailsEntity>(x => x.DepartmentId);
+            builder.HasOne(x => x.DepartmentEntity).WithMany(x => x.ClientStaffEntities).HasForeignKey(x=> x.DepartmentId);
 
         }
     }

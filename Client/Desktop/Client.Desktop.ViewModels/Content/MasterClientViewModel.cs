@@ -9,6 +9,7 @@ using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Windows;
+using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Content
 {
@@ -26,7 +27,8 @@ namespace Client.Desktop.ViewModels.Content
         private List<UnitViewModel> _cities;
         private DepartmentEntityViewModel _selectedDepartment;
         private List<UnitViewModel> _departmentTypes;
-        private DepartmentEntityViewModel _selectedStaff;
+        private ObservableCollection<ClientStaffEntityViewModel> _staffs;
+        private ClientStaffEntityViewModel _selectedStaff;
         private bool _showAllStaff;
 
         public bool ShowAllStaff
@@ -34,10 +36,15 @@ namespace Client.Desktop.ViewModels.Content
             get => _showAllStaff;
             set => Set(ref _showAllStaff, value);
         }
-        public DepartmentEntityViewModel SelectedStaff
+        public ClientStaffEntityViewModel SelectedStaff
         {
             get => _selectedStaff;
             set => Set(ref _selectedStaff, value);
+        }
+        public ObservableCollection<ClientStaffEntityViewModel> Staffs
+        {
+            get => _staffs;
+            set => Set(ref _staffs, value);
         }
         public List<UnitViewModel> DepartmentTypes
         {
@@ -71,7 +78,7 @@ namespace Client.Desktop.ViewModels.Content
         }
 
         public ObservableCollection<DepartmentEntityViewModel> SortedDepartments => SortDepartments();
-        public ObservableCollection<DepartmentEntityViewModel> SortedStaffs => SortStaffs();
+        public ObservableCollection<ClientStaffEntityViewModel> SortedStaffs => SortStaffs();
 
         #endregion
 
@@ -117,7 +124,7 @@ namespace Client.Desktop.ViewModels.Content
                 AddDepartmentCommand.RaiseCanExecuteChanged();
                 EditClientCommand.RaiseCanExecuteChanged();
                 RaisePropertyChanged((() => SortedDepartments));
-                SelectedDepartment = SortedDepartments.FirstOrDefault();
+                RaisePropertyChanged((() => SortedStaffs));
             }else
 
             if (e.PropertyName == nameof(SelectedDepartment))
@@ -142,26 +149,38 @@ namespace Client.Desktop.ViewModels.Content
         {
             await GetClients();
             await GetDepartments();
+            await GetStaffs();
         }
 
         private async Task GetClients()
         {
-            Clients = await _laundryService.Clients();
+            var client = await _laundryService.GetAllAsync<ClientEntity>();
+            var clients = client.Select(x => new ClientEntityViewModel(x));
+            Clients = clients.ToObservableCollection();
         }
 
         private async Task GetDepartments()
         {
-            Departments = await _laundryService.Departments();
+            var department = await _laundryService.GetAllAsync<DepartmentEntity>();
+            var departments = department.Select(x => new DepartmentEntityViewModel(x));
+            Departments = departments.ToObservableCollection();
+        }
+
+        private async Task GetStaffs()
+        {
+            var staff = await _laundryService.GetAllAsync<ClientStaffEntity>();
+            var staffs = staff.Select(x => new ClientStaffEntityViewModel(x));
+            Staffs = staffs.ToObservableCollection();
         }
 
         private ObservableCollection<DepartmentEntityViewModel> SortDepartments()
         {
-            return Departments?.Where(x => x.ClientId == SelectedClient?.Id && x.ParentId == null).ToObservableCollection();
+            return Departments?.Where(x => x.ClientId == SelectedClient?.Id).ToObservableCollection();
         }
 
-        private ObservableCollection<DepartmentEntityViewModel> SortStaffs()
+        private ObservableCollection<ClientStaffEntityViewModel> SortStaffs()
         {
-            var staffs = new ObservableCollection<DepartmentEntityViewModel>();
+            var staffs = new ObservableCollection<ClientStaffEntityViewModel>();
 
             if (SelectedDepartment == null || ShowAllStaff)
             {
@@ -170,12 +189,12 @@ namespace Client.Desktop.ViewModels.Content
 
                 foreach (var department in SortedDepartments)
                 {
-                    staffs.AddRange(Departments?.Where(x => x.ParentId == department?.Id));
+                    staffs.AddRange(Staffs?.Where(x => x.DepartmentId == department?.Id));
                 }
             }
             else
             {
-                staffs.AddRange(Departments?.Where(x => x.ParentId == SelectedDepartment?.Id).ToObservableCollection());
+                staffs.AddRange(Staffs?.Where(x => x.DepartmentId == SelectedDepartment?.Id).ToObservableCollection());
             }
 
             return staffs;
@@ -240,17 +259,17 @@ namespace Client.Desktop.ViewModels.Content
             StaffWindow(null);
         }
 
-        private async void StaffWindow(DepartmentEntityViewModel staff)
+        private async void StaffWindow(ClientStaffEntityViewModel staff)
         {
             var staffWindow = _resolverService.Resolve<MasterStaffWindowModel>();
 
-            staffWindow.Departments = Departments;
+            staffWindow.Staffs = Staffs;
             staffWindow.SetSelectedStaff(staff, SelectedDepartment);
 
             if (_dialogService.ShowDialog(staffWindow))
             {
-                Departments.Clear();
-                await GetDepartments();
+                Staffs.Clear();
+                await GetStaffs();
                 RaisePropertyChanged((() => SortedStaffs));
             }
         }

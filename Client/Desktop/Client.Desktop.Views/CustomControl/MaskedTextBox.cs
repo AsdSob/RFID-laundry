@@ -12,7 +12,6 @@ namespace Client.Desktop.Views.CustomControl
         static MaskedTextBox()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(MaskedTextBox), new FrameworkPropertyMetadata(typeof(MaskedTextBox)));
-
         }
 
         public TextBoxMask Mask { get; set; }

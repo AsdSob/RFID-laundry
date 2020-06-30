@@ -7,23 +7,18 @@ using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Common.EntityViewModels
 {
-    public class StaffDetailsEntityViewModel : ViewModelBase,IDataErrorInfo
+    public class ClientStaffEntityViewModel : ViewModelBase,IDataErrorInfo
     {
-        private StaffDetailsEntity _originalObject;
+        private ClientStaffEntity _originalObject;
         private int _id;
         private string _staffId;
         private int _departmentId;
+        private string _name;
         private string _phoneNumber;
         private string _email;
         private bool _isValid;
         private string _error;
-        private string _name;
 
-        public string Name
-        {
-            get => _name;
-            set => Set(ref _name, value);
-        }
         public string Error
         {
             get => _error;
@@ -44,6 +39,11 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             get => _phoneNumber;
             set => Set(() => PhoneNumber, ref _phoneNumber, value);
         }
+        public string Name
+        {
+            get => _name;
+            set => Set(() => Name, ref _name, value);
+        }
         public int DepartmentId
         {
             get => _departmentId;
@@ -59,73 +59,74 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             get => _id;
             set => Set(() => Id, ref _id, value);
         }
-        public StaffDetailsEntity OriginalObject
+        public ClientStaffEntity OriginalObject
         {
             get => _originalObject;
             set => Set(() => OriginalObject, ref _originalObject, value);
         }
 
-        public StaffDetailsEntityViewModel()
+        public ClientStaffEntityViewModel()
         {
-            OriginalObject = new StaffDetailsEntity();
+            OriginalObject = new ClientStaffEntity();
 
             PropertyChanged += OnPropertyChanged;
         }
 
-        public StaffDetailsEntityViewModel(StaffDetailsEntity originalObject) :this()
+        public ClientStaffEntityViewModel(ClientStaffEntity originalObject) :this()
         {
             Update(originalObject);
         }
 
         public bool IsNew => OriginalObject == null || OriginalObject.IsNew;
 
-        public void Update(StaffDetailsEntity originalObject)
+        public void Update(ClientStaffEntity originalObject)
         {
             OriginalObject = originalObject;
             Id = OriginalObject.Id;
+            Name = OriginalObject.Name;
             StaffId = OriginalObject.StaffId;
             DepartmentId = OriginalObject.DepartmentId;
             Email = OriginalObject.Email;
             PhoneNumber = OriginalObject.PhoneNumber;
-            Name = OriginalObject.Name;
         }
 
         public void AcceptChanges()
         {
             if (OriginalObject == null) return;
 
+            OriginalObject.Name = Name;
             OriginalObject.StaffId = StaffId;
             OriginalObject.PhoneNumber = PhoneNumber;
             OriginalObject.Email = Email;
             OriginalObject.DepartmentId = DepartmentId;
-            OriginalObject.Name = Name;
         }
 
         public bool HasChanges() => OriginalObject == null ||
                                     OriginalObject.IsNew ||
-                                    !Equals(StaffId, OriginalObject.StaffId) ||
                                     !Equals(Name, OriginalObject.Name) ||
+                                    !Equals(StaffId, OriginalObject.StaffId) ||
                                     !Equals(PhoneNumber, OriginalObject.PhoneNumber) ||
                                     !Equals(Email, OriginalObject.Email) ||
                                     !Equals(DepartmentId, OriginalObject.DepartmentId);
 
         public string this[string columnName] => Validate(columnName);
-        public Func<StaffDetailsEntityViewModel, string, bool> NameUniqueValidationFunc { get; set; }
+        public Func<ClientStaffEntityViewModel, string, bool> NameUniqueValidationFunc { get; set; }
 
         private string Validate(string columnName)
         {
             var error = String.Empty;
 
-            if (columnName == nameof(Name))
-            {
-                Name.ValidateRequired(ref error);
-                Name.ValidateByNameMaxLength(ref error);
-            }
-            else
             if (columnName == nameof(StaffId))
             {
                 StaffId.ValidateRequired(ref error);
                 StaffId.ValidateByNameMaxLength(ref error);
+            }
+            else
+
+            if (columnName == nameof(Name))
+            {
+                Name.ValidateRequired(ref error);
+                Name.ValidateByNameMaxLength(ref error);
             }
             else
 
@@ -174,7 +175,9 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
                     Name = regex.Replace(Name, " ");
                 }
             }
-            else if (e.PropertyName == nameof(StaffId))
+            else
+
+            if (e.PropertyName == nameof(StaffId))
             {
                 if (!String.IsNullOrEmpty(StaffId))
                 {
@@ -182,7 +185,9 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
                     StaffId = regex.Replace(StaffId, " ");
                 }
             }
-            else if (e.PropertyName == nameof(Email))
+            else
+
+            if (e.PropertyName == nameof(Email))
             {
                 if (!String.IsNullOrEmpty(Email))
                 {

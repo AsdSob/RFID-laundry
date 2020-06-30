@@ -43,12 +43,6 @@
 
         </MenuItem>
 
-        <MenuItem Header="_Note">
-
-            <MenuItem Header="_Multi Notes" Command="{Binding UniversalNoteCommand}"
-                      Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverterKey}}"/>
-        </MenuItem>
-
         <MenuItem Header="_Linen Bin">
 
             <MenuItem Header="_Bin Load" Command="{Binding BinSoilCollectionCommand}" 

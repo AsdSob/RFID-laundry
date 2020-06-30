@@ -52,7 +52,6 @@ namespace Client.Desktop.Laundry.ViewModels
             builder.RegisterType<AuthManageViewModel>();
             builder.RegisterType<TagRegistrationViewModel>().SingleInstance();
             builder.RegisterType<BinClientViewModel>().SingleInstance();
-            builder.RegisterType<UniversalNoteViewModel>().SingleInstance();
 
 
             builder.RegisterType<BinRfidReaderViewModel>().SingleInstance();

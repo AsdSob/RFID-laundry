@@ -8,7 +8,7 @@
                     xmlns:windows="clr-namespace:Client.Desktop.ViewModels.Windows;assembly=Client.Desktop.ViewModels"
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                     mc:Ignorable="d"
-                    Title="Staff"
+                    Title="Master Linen"
                     Height="450"
                     Width="500"
                     WindowStartupLocation="CenterOwner"
@@ -49,13 +49,13 @@
                  Grid.Column="0"
                  Grid.ColumnSpan="2"
                  Style="{StaticResource OutLinedTextBox}"
-                 Text="{Binding SelectedStaffDetails.Name, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
+                 Text="{Binding SelectedClientStaff.Name, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
                  HorizontalScrollBarVisibility="Auto" 
                  VerticalScrollBarVisibility="Auto"
                  TextWrapping="Wrap"
                  MaxLength="99"
                  materialDesign:HintAssist.Hint="Staff Name"
-                 Margin="10,20,10,0"
+                 Margin="10,30,10,0"
         />
 
         <!-- StaffId -->
@@ -63,7 +63,7 @@
        <TextBox Grid.Row="2"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
-                Text="{Binding SelectedStaffDetails.StaffId, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                Text="{Binding SelectedClientStaff.StaffId, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                 MaxLength="14"
                 MaxWidth="200"
                 MinWidth="200"
@@ -80,7 +80,7 @@
                 FontSize="15"
                 MaxLength="14"
                 materialDesign:HintAssist.Hint="Phone Number"
-                Text="{Binding SelectedStaffDetails.PhoneNumber, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" TextWrapping="Wrap"
+                Text="{Binding SelectedClientStaff.PhoneNumber, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" TextWrapping="Wrap"
                 />
 
    <!-- Email -->
@@ -89,7 +89,7 @@
                 Grid.Column="1"
                 FontSize="15"
                 materialDesign:HintAssist.Hint="Email Address"
-                Text="{Binding SelectedStaffDetails.Email, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" TextWrapping="Wrap"
+                Text="{Binding SelectedClientStaff.Email, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" TextWrapping="Wrap"
                 />
         
     </Grid>

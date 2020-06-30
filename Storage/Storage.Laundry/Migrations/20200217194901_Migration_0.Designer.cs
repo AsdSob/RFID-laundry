@@ -113,7 +113,7 @@ namespace Storage.Laundry.Migrations
                     b.ToTable("clientLinen");
                 });
 
-            modelBuilder.Entity("Storage.Laundry.Models.StaffDetailsEntity", b =>
+            modelBuilder.Entity("Storage.Laundry.Models.ClientStaffEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -349,12 +349,12 @@ namespace Storage.Laundry.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Storage.Laundry.Models.StaffDetailsEntity", "StaffDetailsEntity")
+                    b.HasOne("Storage.Laundry.Models.ClientStaffEntity", "ClientStaffEntity")
                         .WithMany("ClientLinenEntities")
                         .HasForeignKey("StaffId");
                 });
 
-            modelBuilder.Entity("Storage.Laundry.Models.StaffDetailsEntity", b =>
+            modelBuilder.Entity("Storage.Laundry.Models.ClientStaffEntity", b =>
                 {
                     b.HasOne("Storage.Laundry.Models.DepartmentEntity", "DepartmentEntity")
                         .WithMany("ClientStaffEntities")

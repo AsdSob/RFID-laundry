@@ -35,10 +35,6 @@
 
     <DataTemplate DataType="{x:Type content:BinClientViewModel}">
         <contentView:BinSoilCollectionView/>
-    </DataTemplate>    
-    
-    <DataTemplate DataType="{x:Type content:UniversalNoteViewModel}">
-        <contentView:UniversalNoteView/>
     </DataTemplate>
 
 <!-- Windows -->

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Storage.Core.Abstract;
@@ -14,9 +13,7 @@ namespace Client.Desktop.ViewModels.Services
         protected BaseService(IDbContextFactory contextFactory)
         {
             _contextFactory = contextFactory;
-
         }
-
         public async Task<ICollection<T>> GetAllAsync<T>() where T : class, IEntity<int>
         {
             using (var context = await _contextFactory.CreateAsync())
@@ -58,27 +55,6 @@ namespace Client.Desktop.ViewModels.Services
                 else
                 {
                     context.Update(entity);
-                }
-
-                context.SaveChanges();
-            }
-        }
-        
-        public async Task AddOrUpdateAsync<T>(ICollection<T> entity) where T : class, IEntity<int>
-        {
-            using (var context = await _contextFactory.CreateAsync())
-            {
-                var newEntities = entity.Where(x => x.Id == 0);
-                var updateEntities = entity.Where(x => x.Id != 0);
-
-                if (newEntities.Any())
-                {
-                    context.AttachRange(newEntities);
-                }
-
-                if (updateEntities.Any())
-                {
-                    context.UpdateRange(updateEntities);
                 }
 
                 context.SaveChanges();

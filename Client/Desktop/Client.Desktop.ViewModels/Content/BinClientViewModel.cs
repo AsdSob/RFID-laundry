@@ -8,6 +8,7 @@ using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Services;
+using Client.Desktop.ViewModels.Windows;
 using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Content
@@ -15,12 +16,13 @@ namespace Client.Desktop.ViewModels.Content
     public class BinClientViewModel : ViewModelBase
     {
         private readonly IDialogService _dialogService;
-        private readonly LaundryService _laundryService;
+        private readonly ILaundryService _laundryService;
         private readonly IResolver _resolverService;
         private readonly IMainDispatcher _dispatcher;
 
         private ObservableCollection<ClientEntityViewModel> _clients;
         private ObservableCollection<DepartmentEntityViewModel> _departments;
+        private ObservableCollection<ClientStaffEntityViewModel> _staffs;
         private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
         private ObservableCollection<ClientLinenEntityViewModel> _linens;
         public ObservableCollection<ClientLinenEntityViewModel> Linens
@@ -32,6 +34,11 @@ namespace Client.Desktop.ViewModels.Content
         {
             get => _masterLinens;
             set => Set(() => MasterLinens, ref _masterLinens, value);
+        }
+        public ObservableCollection<ClientStaffEntityViewModel> Staffs
+        {
+            get => _staffs;
+            set => Set(() => Staffs, ref _staffs, value);
         }
         public ObservableCollection<DepartmentEntityViewModel> Departments
         {
@@ -46,7 +53,7 @@ namespace Client.Desktop.ViewModels.Content
         public BinRfidReaderViewModel RfidReader { get; set; }
 
 
-        public ObservableCollection<StaffDetailsEntityViewModel> StaffsLoaded => GetLoadedStaffs();
+        public ObservableCollection<ClientStaffEntityViewModel> StaffsLoaded => GetLoadedStaffs();
         public ObservableCollection<ClientLinenEntityViewModel> LinensLoaded => GetLoadedLinens();
 
         public DataViewModel DataViewModel { get; set; }
@@ -54,7 +61,7 @@ namespace Client.Desktop.ViewModels.Content
         public RelayCommand InitializeCommand { get; }
 
 
-        public BinClientViewModel(LaundryService dataService, IDialogService dialogService, IResolver resolver, IMainDispatcher dispatcher)
+        public BinClientViewModel(ILaundryService dataService, IDialogService dialogService, IResolver resolver, IMainDispatcher dispatcher)
         {
             _laundryService = dataService ?? throw new ArgumentNullException(nameof(dataService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
@@ -77,6 +84,7 @@ namespace Client.Desktop.ViewModels.Content
         {
             GetClients();
             GetDepartments();
+            GetClientStaffs();
             GetMasterLinens();
             GetLinens();
         }
@@ -99,6 +107,13 @@ namespace Client.Desktop.ViewModels.Content
             var masterLinen = await _laundryService.GetAllAsync<MasterLinenEntity>();
             var masterLinens = masterLinen.Select(x => new MasterLinenEntityViewModel(x));
             MasterLinens = masterLinens.ToObservableCollection();
+        }
+
+        public async void GetClientStaffs()
+        {
+            var staff = await _laundryService.GetAllAsync<ClientStaffEntity>();
+            var staffs = staff.Select(x => new ClientStaffEntityViewModel(x));
+            Staffs = staffs.ToObservableCollection();
         }
 
         public async void GetLinens()
@@ -128,9 +143,13 @@ namespace Client.Desktop.ViewModels.Content
             }
         }
 
-        private ObservableCollection<StaffDetailsEntityViewModel> GetLoadedStaffs()
+        private ObservableCollection<ClientStaffEntityViewModel> GetLoadedStaffs()
         {
-            var items = new ObservableCollection<StaffDetailsEntityViewModel>();
+            var items = new ObservableCollection<ClientStaffEntityViewModel>();
+
+            if (Staffs == null) return items;
+
+            items.AddRange(Staffs);
 
             return items;
         }        
@@ -139,6 +158,9 @@ namespace Client.Desktop.ViewModels.Content
         {
             var items = new ObservableCollection<ClientLinenEntityViewModel>();
 
+            if (Staffs == null) return items;
+
+            items.AddRange(Linens);
 
             return items;
         }

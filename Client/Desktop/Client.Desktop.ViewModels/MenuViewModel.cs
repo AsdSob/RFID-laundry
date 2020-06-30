@@ -27,7 +27,6 @@ namespace Client.Desktop.ViewModels
         public ICommand MasterLinenCommand { get; }
         public ICommand AuthManageCommand { get; }
         public ICommand TagRegistrationCommand { get; }
-        public ICommand UniversalNoteCommand { get; }
 
         public ICommand BinSoilCollectionCommand { get; }
 
@@ -45,9 +44,8 @@ namespace Client.Desktop.ViewModels
             TagRegistrationCommand = new RelayCommand(() => Select(typeof(TagRegistrationViewModel)), TagRegistrationCommandCanExecute);
 
             BinSoilCollectionCommand = new RelayCommand(() => Select(typeof(BinClientViewModel)), BinSoilCollectionCommandCanExecute);
-            UniversalNoteCommand = new RelayCommand(() => Select(typeof(UniversalNoteViewModel)), UniversalNoteCommandCanExecute);
 
-            _selectedItem = typeof(UniversalNoteViewModel);
+            _selectedItem = typeof(TagRegistrationViewModel);
         }
 
         private bool AuthManageCommandCanExecute()
@@ -62,11 +60,6 @@ namespace Client.Desktop.ViewModels
         }
 
         private bool BinSoilCollectionCommandCanExecute()
-        {
-            return _authorizationService.CurrentPrincipal?.IsInRole(Roles.Administrator) == true;
-        }        
-        
-        private bool UniversalNoteCommandCanExecute()
         {
             return _authorizationService.CurrentPrincipal?.IsInRole(Roles.Administrator) == true;
         }

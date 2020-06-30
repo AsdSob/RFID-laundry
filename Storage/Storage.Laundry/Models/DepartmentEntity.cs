@@ -7,15 +7,11 @@ namespace Storage.Laundry.Models
     {
         public string Name { get; set; }
         public int ClientId { get; set; }
-        public int? DepartmentTypeId { get; set; }
-        public int? ParentId { get; set; }
-
-        public virtual DepartmentEntity Parent { get; set; }
-        public virtual ICollection<DepartmentEntity> Children { get; set; }
+        public int DepartmentTypeId { get; set; }
 
         public virtual ClientEntity ClientEntity { get; set; }
         public virtual ICollection<ClientLinenEntity> ClientLinenEntities { get; set; }
-        public virtual StaffDetailsEntity StaffDetailsEntity { get; set; }
+        public virtual ICollection<ClientStaffEntity> ClientStaffEntities { get; set; }
 
     }
 }

@@ -18,16 +18,6 @@
         <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="10" />
     </Style>
 
-    <!-- Data Grid Button-->
-    <Style x:Key="DataGridButton" 
-           BasedOn="{StaticResource MaterialDesignRaisedAccentButton}"
-           TargetType="{x:Type Button}">
-
-        <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="5" />
-        <Setter Property="Margin" Value="1,0" />
-
-    </Style>
-
 
     <!--TextBox-->
     <Style BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}"
@@ -56,12 +46,6 @@
            TargetType="{x:Type TextBox}">
             <Setter Property="Margin" Value="10"/>
             <Setter Property="FontSize" Value="20"/>
-            <Setter Property="materialDesign:TextFieldAssist.IncludeSpellingSuggestions" Value="True"/>
-            <Setter Property="materialDesign:ValidationAssist.UsePopup" Value="True"/>
-            <Setter Property="materialDesign:ValidationAssist.OnlyShowOnFocus" Value="True"/>
-            <Setter Property="materialDesign:ValidationAssist.Background" Value="Transparent"/>
-
-
     </Style>
 
 
@@ -94,25 +78,6 @@
 
     </Style>
 
-    <!--ComboBoxFor List-->
-    <Style x:Key="ComboBoxListView"
-           BasedOn="{StaticResource MaterialDesignComboBox}"
-           TargetType="{x:Type ComboBox}">
-        <Setter Property="FontSize" Value="12"/>
-
-    </Style>    
-    
-    <!--Toggle Button-->
-    <Style BasedOn="{StaticResource MaterialDesignActionLightToggleButton}"
-           TargetType="{x:Type ToggleButton}">
-    </Style>
-
-    <Style x:Key="MaterialDesignActionLightToggleButton" TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource MaterialDesignActionToggleButton}">
-        <Setter Property="Background" Value="{DynamicResource PrimaryHueLightBrush}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueLightBrush}"/>
-        <Setter Property="Foreground" Value="{DynamicResource PrimaryHueLightForegroundBrush}"/>
-    </Style>
-
     <!--Password Box-->
     <Style BasedOn="{StaticResource MaterialDesignFloatingHintPasswordBox}"
            TargetType="{x:Type PasswordBox}">
@@ -134,5 +99,6 @@
         <Setter Property="Margin" Value="10"/>
 
     </Style>
+
 
 </ResourceDictionary>
