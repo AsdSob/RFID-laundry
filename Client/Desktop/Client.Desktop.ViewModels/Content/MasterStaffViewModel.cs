@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -7,6 +6,7 @@ using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
+using Client.Desktop.ViewModels.Services;
 using Client.Desktop.ViewModels.Windows;
 using Storage.Laundry.Models;
 
@@ -27,16 +27,19 @@ namespace Client.Desktop.ViewModels.Content
         private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
         private ObservableCollection<ClientLinenEntityViewModel> _linens;
         private ClientLinenEntityViewModel _selectedClientLinen;
+        private RfidTagViewModel _selectedTag;
+        private RfidServiceTest _reader;
 
-        private string _addShowButton;
-
-        public string AddShowButton
+        public RfidTagViewModel SelectedTag
         {
-            get => _addShowButton;
-            set => Set(ref _addShowButton, value);
+            get => _selectedTag;
+            set => Set(() => SelectedTag, ref _selectedTag, value);
         }
-        public RfidReaderWindowModel RfidReaderWindow { get; set; }
-
+        public RfidServiceTest Reader
+        {
+            get => _reader;
+            set => Set(ref _reader, value);
+        }
         public ClientLinenEntityViewModel SelectedClientLinen
         {
             get => _selectedClientLinen;
@@ -102,11 +105,12 @@ namespace Client.Desktop.ViewModels.Content
         public RelayCommand InitializeCommand { get; }
         
 
-        public MasterStaffViewModel(ILaundryService dataService, IDialogService dialogService, IResolver resolver, IMainDispatcher dispatcher)
+        public MasterStaffViewModel(RfidServiceTest rfidReader, ILaundryService dataService, IDialogService dialogService, IResolver resolver, IMainDispatcher dispatcher)
         {
             _laundryService = dataService ?? throw new ArgumentNullException(nameof(dataService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
-            _resolverService = resolver ?? throw new ArgumentNullException(nameof(resolver));
+            _resolverService = resolver ?? throw new ArgumentNullException(nameof(resolver)); 
+            Reader = rfidReader ?? throw new ArgumentNullException(nameof(rfidReader));
 
             AddStaffCommand = new RelayCommand(AddNewStaff, (() => SelectedDepartment != null));
             EditStaffCommand = new RelayCommand(EditStaff, (() => SelectedStaffDetails != null));
@@ -116,31 +120,12 @@ namespace Client.Desktop.ViewModels.Content
 
             InitializeCommand = new RelayCommand(Initialize);
 
-            RfidReaderCommand = new RelayCommand(RfidReader);
+            RfidReaderCommand = new RelayCommand(RfidReaderSettings);
             AddShowLinenByTagCommand = new RelayCommand(AddShowLinenByTag, () => SelectedTag != null);
             DeleteTagCommand = new RelayCommand(DeleteTag, () => SelectedTag != null || SelectedClientLinen != null);
 
-            RfidReaderWindow = _resolverService.Resolve<RfidReaderWindowModel>();
-
-            AddShowButton = "Add";
-            //RfidReaderWindow.Tags.CollectionChanged += TagsCollectionChanged;
-
-
+            Reader.SetLinens(Linens);
         }
-
-        //private void TagsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        //{
-        //    if (e.Action == NotifyCollectionChangedAction.Add)
-        //    {
-        //        foreach (var tag in RfidReaderWindow.Tags)
-        //        {
-        //            if (Linens.Any(x => x.Tag == tag.Tag))
-        //            {
-        //                tag.IsRegistered = true;
-        //            }
-        //        }
-        //    }
-        //}
 
         private async void Initialize()
         {
@@ -223,7 +208,6 @@ namespace Client.Desktop.ViewModels.Content
             {
                 AddShowLinenByTagCommand.RaiseCanExecuteChanged();
                 DeleteTagCommand.RaiseCanExecuteChanged();
-                AddShowButtonName();
             }
         }
 
@@ -328,32 +312,18 @@ namespace Client.Desktop.ViewModels.Content
             if (_dialogService.ShowDialog(linenWindow))
             {
                 GetClientLinens();
-                CheckTags();
+                Reader.SetLinens(Linens);
             }
         }
 
-
-        private void RfidReader()
+        private void RfidReaderSettings()
         {
-            //RfidReaderWindow.ReaderService.StopRead();
+            var window = _resolverService.Resolve<ClientLinenWindowModel>();
 
-            var showDialog = _dialogService.ShowDialog(RfidReaderWindow);
+            var showDialog = _dialogService.ShowDialog(window);
         }
 
-        private void AddShowButtonName()
-        {
-            if (SelectedTag == null) return;
 
-            AddShowButton = SelectedTag.IsRegistered ? "Show" : "Add";
-        }
-
-        private void CheckTags()
-        {
-            //foreach (var tag in RfidReaderWindow.Tags)
-            //{
-            //    tag.IsRegistered = Linens.Any(x => Equals(x.Tag, tag.Tag));
-            //}
-        }
 
         private void AddShowLinenByTag()
         {
@@ -366,7 +336,6 @@ namespace Client.Desktop.ViewModels.Content
             else
             {
                 UseTag();
-                CheckTags();
             }
         }
 
@@ -385,7 +354,6 @@ namespace Client.Desktop.ViewModels.Content
 
             linen.Tag = null;
             linen.AcceptChanges();
-            CheckTags();
 
             _laundryService.AddOrUpdateAsync(linen.OriginalObject);
         }
@@ -400,109 +368,6 @@ namespace Client.Desktop.ViewModels.Content
 
             _laundryService.AddOrUpdateAsync(SelectedClientLinen.OriginalObject);
         }
-
-
-        #region RFID Part
-
-        private RfidTagViewModel _selectedTag;
-        private ObservableCollection<RfidTagViewModel> _tags;
-        private ObservableCollection<RfidReaderEntityViewModel> _readers;
-        private ObservableCollection<RfidAntennaEntityViewModel> _antennas;
-        private RfidReaderEntityViewModel _selectedReader;
-        private string _startStopString;
-        public RfidServiceTest RfidService { get; set; }
-
-        public string StartStopString
-        {
-            get => _startStopString;
-            set => Set(ref _startStopString, value);
-        }
-        public RfidReaderEntityViewModel SelectedReader
-        {
-            get => _selectedReader;
-            set => Set(ref _selectedReader, value);
-        }
-        public ObservableCollection<RfidAntennaEntityViewModel> Antennas
-        {
-            get => _antennas;
-            set => Set(ref _antennas, value);
-        }
-        public ObservableCollection<RfidReaderEntityViewModel> Readers
-        {
-            get => _readers;
-            set => Set(ref _readers, value);
-        }
-        public ObservableCollection<RfidTagViewModel> Tags
-        {
-            get => _tags;
-            set => Set(ref _tags, value);
-        }
-        public RfidTagViewModel SelectedTag
-        {
-            get => _selectedTag;
-            set => Set(() => SelectedTag, ref _selectedTag, value);
-        }
-        private async void GetRfidReaders()
-        {
-            var reader = await _laundryService.GetAllAsync<RfidReaderEntity>();
-            var readers = reader.Select(x => new RfidReaderEntityViewModel(x));
-            Readers = readers.ToObservableCollection();
-
-            var antenna = await _laundryService.GetAllAsync<RfidAntennaEntity>();
-            var antennas = antenna.Select(x => new RfidAntennaEntityViewModel(x));
-            Antennas = antennas.ToObservableCollection();
-        }
-
-        private void TagsCollectionChanged(ConcurrentDictionary<string, int> dataTags)
-        {
-            SetTagViewModels(dataTags);
-        }
-
-        private void SetTagViewModels(ConcurrentDictionary<string, int> dataTags)
-        {
-            Tags = new ObservableCollection<RfidTagViewModel>();
-
-            foreach (var data in dataTags)
-            {
-                var tag = new RfidTagViewModel()
-                {
-                    Tag = data.Key,
-                    Antenna = data.Value,
-                };
-
-                SetTagLinenRegistration(tag);
-
-                Tags.Add(tag);
-            }
-        }
-
-        private void SetTagLinenRegistration(RfidTagViewModel tag)
-        {
-            tag.IsRegistered = Linens.Any(x => Equals(x.Tag, tag.Tag));
-        }
-
-        private void CheckAllTagRegistration()
-        {
-            foreach (var tag in Tags)
-            {
-                SetTagLinenRegistration(tag);
-            }
-        }
-
-        private void SetReader()
-        {
-            var antennas = Antennas.Where(x => x.RfidReaderId == SelectedReader.Id).ToList();
-            RfidService.Connection(SelectedReader, antennas);
-        }
-
-        private void StartStopRead()
-        {
-            if (SelectedReader == null) return;
-
-            RfidService.StartStopRead();
-            StartStopString = RfidService.GetStartStopString();
-        }
-        #endregion
 
 
     }

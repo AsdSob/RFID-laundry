@@ -6,7 +6,6 @@
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:content="clr-namespace:Client.Desktop.ViewModels.Content;assembly=Client.Desktop.ViewModels"
-             xmlns:converters="clr-namespace:Client.Desktop.Views.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance content:TagRegistrationViewModel}">
@@ -123,7 +122,9 @@
 
         </Grid>
 
-        <Grid Grid.Row="1" Grid.Column="2" Margin="10,0">
+        <ContentPresenter Grid.Row="1" Grid.Column="2" Margin="10,0" Content="{Binding Reader}" />
+        <!--<Grid Grid.Row="1" Grid.Column="2" Margin="10,0">
+            
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
@@ -134,31 +135,31 @@
             </Grid.RowDefinitions>
 
             <DockPanel Grid.Row="1" Grid.Column="0" LastChildFill="False" Margin="0,20,0,0">
-                <Button Content="{Binding AddShowButton}" Command="{Binding AddShowLinenByTagCommand}"/>
+                <Button Content="{Binding Reader.AddShowContent}" Command="{Binding AddShowLinenByTagCommand}"/>
                 <Button Content="Remove" Command="{Binding DeleteTagCommand}"/>
             </DockPanel>
 
-            <!-- RFID\Reader Commands -->
+            --><!-- RFID\Reader Commands --><!--
             <DockPanel Grid.Row="0"
                         Grid.Column="0"
                        >
 
                 <Button DockPanel.Dock="Right"
                         Content="Setting"
-                        Command="{Binding ReaderSettingsWindowCommand}"
+                        Command="{Binding Reader.RfidReaderWindowCommand}"
 
                 />
 
-                <!-- Start/Stop-->
+                --><!-- Start/Stop--><!--
                 <Button DockPanel.Dock="Right"
-                        Content="{Binding StartStopString}"
-                        Command="{Binding StartStopCommand}"
+                        Content="{Binding Reader.StartStopContent}"
+                        Command="{Binding Reader.StartStopCommand}"
 
                 />                
                 
                 <ComboBox DockPanel.Dock="Left" 
-                          ItemsSource="{Binding Readers}" 
-                          SelectedValue="{Binding SelectedReader}" 
+                          ItemsSource="{Binding Reader.Readers}" 
+                          SelectedValue="{Binding Reader.SelectedReader}" 
                           VerticalContentAlignment="Center"
                           DisplayMemberPath="Name"/>
 
@@ -170,20 +171,14 @@
                       >
                 <DataGrid AutoGenerateColumns="False"
                           Height="NaN"
-                          ItemsSource="{Binding Tags}"
-                          SelectedItem="{Binding SelectedTag, UpdateSourceTrigger=PropertyChanged}"
+                          ItemsSource="{Binding Reader.Tags}"
+                          SelectedItem="{Binding Reader.SelectedTag, UpdateSourceTrigger=PropertyChanged}"
                           VerticalScrollBarVisibility="Visible"
                           AllowDrop="True" 
                           EnableRowVirtualization="True" 
                           IsReadOnly="True" 
                           x:Name="xaxa"
                           >
-
-                    <DataGrid.RowStyle>
-                        <Style TargetType="DataGridRow">
-                            <Setter Property="Background" Value="{Binding colorColumn}"/>
-                        </Style>
-                    </DataGrid.RowStyle>
 
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Antenna" Binding="{Binding Path=Antenna}" Width="Auto" />
@@ -200,6 +195,6 @@
 
                 </DataGrid>
             </GroupBox>
-        </Grid>
+        </Grid>-->
     </Grid>
 </UserControl>

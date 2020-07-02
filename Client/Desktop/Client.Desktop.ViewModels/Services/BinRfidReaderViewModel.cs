@@ -23,7 +23,6 @@ namespace Client.Desktop.ViewModels.Services
         private ObservableCollection<RfidReaderEntityViewModel> _rfidReaders;
         private RfidReaderEntityViewModel _selectedRfidReader;
         private ObservableCollection<RfidAntennaEntityViewModel> _rfidAntennas;
-        private RfidService _readerService;
         private ObservableCollection<RfidTagViewModel> _tags;
 
         public ObservableCollection<RfidTagViewModel> Tags
@@ -31,11 +30,7 @@ namespace Client.Desktop.ViewModels.Services
             get => _tags;
             set => Set(() => Tags, ref _tags, value);
         }
-        public RfidService ReaderService
-        {
-            get => _readerService;
-            set => Set(() => ReaderService, ref _readerService, value);
-        }
+
         public ObservableCollection<RfidAntennaEntityViewModel> RfidAntennas
         {
             get => _rfidAntennas;
@@ -58,7 +53,6 @@ namespace Client.Desktop.ViewModels.Services
             _laundryService = laundryService ?? throw new ArgumentNullException(nameof(laundryService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
-            //ReaderService = new RfidService();
 
             Tags = new ObservableCollection<RfidTagViewModel>();
 

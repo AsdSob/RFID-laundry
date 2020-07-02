@@ -8,7 +8,7 @@ using Impinj.OctaneSdk;
 
 namespace Client.Desktop.ViewModels.Common.Services
 {
-    public class RfidService : ViewModelBase
+    public class RfidBaseService : ViewModelBase
     {
         public ImpinjReader Reader = new ImpinjReader();
         private Settings settings;

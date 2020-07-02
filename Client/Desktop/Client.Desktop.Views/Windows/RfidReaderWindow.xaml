@@ -114,13 +114,13 @@
                        VerticalContentAlignment="Center" 
                        Margin = "5" 
                        Padding="20,2" 
-                       Content="{Binding ConnectionStatus}" 
+                       Content="{Binding Reader.ConnectionStatus}" 
                        FontWeight="ExtraBold" 
                        AllowDrop="True" />
 
                 <Button DockPanel.Dock="Right" 
-                        Content="{Binding StartStopString}" 
-                        Command="{Binding StartStopReadCommand}"/>
+                        Content="{Binding Reader.StartStopContent}" 
+                        Command="{Binding Reader.StartStopCommand}"/>
 
             </DockPanel>
 
@@ -128,7 +128,7 @@
 
                 <DataGrid AutoGenerateColumns="False"
                           Height="NaN"
-                          ItemsSource="{Binding Tags}"
+                          ItemsSource="{Binding Reader.Tags}"
                           VerticalScrollBarVisibility="Visible"
                           AllowDrop="True" 
                           HorizontalAlignment="Stretch"

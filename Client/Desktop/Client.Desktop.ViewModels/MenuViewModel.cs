@@ -5,6 +5,7 @@ using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Content;
 using Client.Desktop.ViewModels.Content.Administration;
+using RfidService = Client.Desktop.ViewModels.Services.RfidService;
 
 namespace Client.Desktop.ViewModels
 {
@@ -12,7 +13,13 @@ namespace Client.Desktop.ViewModels
     {
         private readonly IAuthorizationService _authorizationService;
         private Type _selectedItem;
+        private RfidService _rfidService;
 
+        public RfidService RfidService
+        {
+            get => _rfidService;
+            set => Set(ref _rfidService, value);
+        }
         public Type SelectedItem
         {
             get => _selectedItem;
@@ -31,9 +38,10 @@ namespace Client.Desktop.ViewModels
 
         public ICommand BinSoilCollectionCommand { get; }
 
-        public MenuViewModel(IAuthorizationService authorizationService)
+        public MenuViewModel(IAuthorizationService authorizationService, RfidService rfidService)
         {
             _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
+            RfidService = rfidService ?? throw new ArgumentNullException(nameof(rfidService));
             
             NewCommand = new RelayCommand(() => Select(typeof(DataViewModel)));
             ExitCommand = new RelayCommand(() => Select(typeof(ExitViewModel)));
@@ -48,6 +56,8 @@ namespace Client.Desktop.ViewModels
             UniversalNoteCommand = new RelayCommand(() => Select(typeof(UniversalNoteViewModel)), UniversalNoteCommandCanExecute);
 
             _selectedItem = typeof(UniversalNoteViewModel);
+
+
         }
 
         private bool AuthManageCommandCanExecute()

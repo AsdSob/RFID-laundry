@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -8,7 +7,7 @@ using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Common.Windows;
-using Storage.Laundry.Models;
+using Client.Desktop.ViewModels.Services;
 
 namespace Client.Desktop.ViewModels.Windows
 {
@@ -20,33 +19,16 @@ namespace Client.Desktop.ViewModels.Windows
         private readonly IResolver _resolverService;
 
         public Action<bool> CloseAction { get; set; }
-        private RfidTagViewModel _selectedTag;
         private ObservableCollection<RfidTagViewModel> _tags;
-        private string _startStopString;
         private ObservableCollection<RfidReaderEntityViewModel> _rfidReaders;
         private RfidReaderEntityViewModel _selectedRfidReader;
         private ObservableCollection<RfidAntennaEntityViewModel> _rfidAntennas;
-        private string _connectionStatus;
+        private RfidServiceTest _reader;
 
-        public string ConnectionStatus
+        public RfidServiceTest Reader
         {
-            get => _connectionStatus;
-            set => Set(ref _connectionStatus, value);
-        }
-        public string StartStopString
-        {
-            get => _startStopString;
-            set => Set(ref _startStopString, value);
-        }
-        public ObservableCollection<RfidTagViewModel> Tags
-        {
-            get => _tags;
-            set => Set(ref _tags, value);
-        }
-        public RfidTagViewModel SelectedTag
-        {
-            get => _selectedTag;
-            set => Set(() => SelectedTag, ref _selectedTag, value);
+            get => _reader;
+            set => Set(ref _reader, value);
         }
         public ObservableCollection<RfidAntennaEntityViewModel> RfidAntennas
         {
@@ -73,47 +55,36 @@ namespace Client.Desktop.ViewModels.Windows
         public RelayCommand AddReaderCommand { get; }
         public RelayCommand CloseCommand { get; }
         public RelayCommand InitializeCommand { get; }
-        public RelayCommand StartStopReadCommand { get; }
 
         public RelayCommand CheckConnectionCommand { get; }
 
-        public RfidReaderWindowModel(ILaundryService laundryService, IDialogService dialogService, IMainDispatcher dispatcher,IResolver resolver)
+        public RfidReaderWindowModel(RfidServiceTest reader, ILaundryService laundryService, IDialogService dialogService, IMainDispatcher dispatcher,IResolver resolver)
         {
             _laundryService = laundryService ?? throw new ArgumentNullException(nameof(laundryService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
             _resolverService = resolver ?? throw new ArgumentNullException(nameof(resolver));
+            Reader = reader ?? throw new ArgumentNullException(nameof(reader));
 
             SaveCommand = new RelayCommand(Save);
             AddReaderCommand = new RelayCommand(AddReader);
             CloseCommand = new RelayCommand(Close);
             DeleteReaderCommand = new RelayCommand(DeleteReader, () => SelectedRfidReader != null);
 
-            StartStopReadCommand = new RelayCommand(StartStopRead, () => SelectedRfidReader != null);
-            CheckConnectionCommand = new RelayCommand(CheckConnection, () => SelectedRfidReader != null);
+            CheckConnectionCommand = new RelayCommand(Reader.UpdateConnectionStatus, () => SelectedRfidReader != null);
 
             InitializeCommand = new RelayCommand(Initialize);
-            RfidService = _resolverService.Resolve<RfidServiceTest>();
-            StartStopString = RfidService.GetStartStopString();
 
-            RfidService.SortedDataEvent += TagsCollectionChanged;
             PropertyChanged += OnPropertyChanged;
-
         }
 
         private async void Initialize()
         {
             _dialogService.ShowBusy();
-
             try
             {
-                var reader = await _laundryService.GetAllAsync<RfidReaderEntity>();
-                var readers = reader.Select(x => new RfidReaderEntityViewModel(x));
-                RfidReaders = readers.ToObservableCollection();
-
-                var antenna = await _laundryService.GetAllAsync<RfidAntennaEntity>();
-                var antennas = antenna.Select(x => new RfidAntennaEntityViewModel(x));
-                RfidAntennas = antennas.ToObservableCollection();
+                RfidReaders = await _laundryService.RfidReaders();
+                RfidAntennas = await _laundryService.RfidAntennas();
             }
             catch (Exception e)
             {
@@ -123,7 +94,6 @@ namespace Client.Desktop.ViewModels.Windows
             {
                 _dialogService.HideBusy();
             }
-
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -134,44 +104,8 @@ namespace Client.Desktop.ViewModels.Windows
                 DeleteReaderCommand.RaiseCanExecuteChanged();
                 CheckConnectionCommand.RaiseCanExecuteChanged();
 
-                StartStopReadCommand?.RaiseCanExecuteChanged();
-                SetReader();
+                Reader.SelectedReader = SelectedRfidReader;
             }
-        }
-
-        private void TagsCollectionChanged(ConcurrentDictionary<string, int> dataTags)
-        {
-            SetTagViewModels(dataTags);
-        }
-
-        private void SetTagViewModels(ConcurrentDictionary<string, int> dataTags)
-        {
-            Tags = new ObservableCollection<RfidTagViewModel>();
-
-            foreach (var data in dataTags)
-            {
-                var tag = new RfidTagViewModel()
-                {
-                    Tag = data.Key,
-                    Antenna = data.Value,
-                };
-
-                Tags.Add(tag);
-            }
-        }
-
-        private void SetReader()
-        {
-            var antennas = RfidAntennas.Where(x => x.RfidReaderId == SelectedRfidReader.Id).ToList();
-            RfidService.Connection(SelectedRfidReader, antennas);
-        }
-
-        private void StartStopRead()
-        {
-            if (SelectedRfidReader == null) return;
-
-            RfidService.StartStopRead();
-            StartStopString = RfidService.GetStartStopString();
         }
 
         private ObservableCollection<RfidAntennaEntityViewModel> GetReaderAntennas()
@@ -209,12 +143,6 @@ namespace Client.Desktop.ViewModels.Windows
             }
             return antennas;
         }
-
-        private void CheckConnection()
-        {
-            ConnectionStatus = RfidService.CheckConnection();
-        }
-
 
         private void Close()
         {
@@ -291,9 +219,9 @@ namespace Client.Desktop.ViewModels.Windows
             if(!_dialogService.ShowQuestionDialog($"Do you want to DELETE {reader.Name} ?")) return;
 
             _laundryService.DeleteAsync(reader.OriginalObject);
-            _laundryService.DeleteAsync(antennas.Select(x=> x.OriginalObject));
+            _laundryService.DeleteAsync(antennas?.Select(x=> x.OriginalObject));
 
-            antennas.ForEach(x=> RfidAntennas.Remove(x));
+            antennas?.ForEach(x=> RfidAntennas.Remove(x));
             RfidReaders.Remove(reader);
 
             SelectedRfidReader = RfidReaders.FirstOrDefault();

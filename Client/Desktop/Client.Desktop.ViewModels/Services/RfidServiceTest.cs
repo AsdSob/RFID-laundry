@@ -1,42 +1,26 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
-using Client.Desktop.ViewModels.Common.ViewModels;
-using Impinj.OctaneSdk;
+using Client.Desktop.ViewModels.Common.Services;
 
-namespace Client.Desktop.ViewModels.Common.Services
+namespace Client.Desktop.ViewModels.Services
 {
-    public class RfidServiceTest : ViewModelBase
+    public class RfidServiceTest : RfidService
     {
         public TestImpinj Reader = new TestImpinj();
-        private Settings settings;
 
-        public ConcurrentDictionary<string, int> _data = new ConcurrentDictionary<string, int>();
-
-        private string _connectionStatus;
-        private bool _isReading;
-
-        public bool IsReading
+        public RfidServiceTest(ILaundryService laundryService, IResolver resolver, IDialogService dialog) 
+            : base(laundryService, resolver, dialog)
         {
-            get => _isReading;
-            set => Set(ref _isReading, value);
-        }
-        public string ConnectionStatus
-        {
-            get => _connectionStatus;
-            set => Set(() => ConnectionStatus, ref _connectionStatus, value);
+            
         }
 
-        
-        public void Connect(RfidReaderEntityViewModel reader, List<RfidAntennaEntityViewModel> antennas)
+        public override void Connect()
         {
-            if (reader == null || !antennas.Any()) return;
+            if (SelectedReader == null) return;
 
-            Connection(reader, antennas);
+            Connection(SelectedReader, SortedAntennas);
         }
 
         public bool Connection(RfidReaderEntityViewModel newReader, List<RfidAntennaEntityViewModel> antennas)
@@ -44,7 +28,8 @@ namespace Client.Desktop.ViewModels.Common.Services
             IsReading = false;
             return true;
         }
-        public void StartStopRead()
+
+        public override void StartStopRead()
         {
             if (!IsReading)
             {
@@ -56,7 +41,7 @@ namespace Client.Desktop.ViewModels.Common.Services
             }
         }
 
-        public void StartRead()
+        public override void StartRead()
         {
             Reader.UserEvent += DisplayTag;
             Reader.Start();
@@ -64,35 +49,12 @@ namespace Client.Desktop.ViewModels.Common.Services
             IsReading = true;
         }
 
-        public void StopRead()
+        public override void StopRead()
         {
             Reader.UserEvent -= DisplayTag;
 
             IsReading = false;
         }
-
-        public string GetStartStopString()
-        {
-            if (IsReading)
-            {
-                return "Stop";
-            }
-            else
-            {
-                return "Start";
-            }
-        }
-
-        public string CheckConnection()
-        {
-            if (Reader == null ) return "Error";
-
-            return "Connected";
-        }
-
-
-        public delegate void SortedData(ConcurrentDictionary<string, int> data);
-        public event SortedData SortedDataEvent;
 
         private void DisplayTag(List<Tuple<string, int>> tags)
         {
@@ -103,7 +65,7 @@ namespace Client.Desktop.ViewModels.Common.Services
                 AddData(tag.Item1, tag.Item2);
             }
 
-            SortedDataEvent?.Invoke(_data);
+            SetTagViewModels();
         }
 
         private void AddData(string epc, int antenna)
@@ -117,7 +79,6 @@ namespace Client.Desktop.ViewModels.Common.Services
                 _data.TryUpdate(epc, antenna, val);
             }
         }
-
     }
 
     public class TestImpinj

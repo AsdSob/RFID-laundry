@@ -56,8 +56,9 @@ namespace Client.Desktop.Laundry.ViewModels
 
 
             builder.RegisterType<BinRfidReaderViewModel>().SingleInstance();
-            builder.RegisterType<RfidService>().SingleInstance();
             builder.RegisterType<RfidServiceTest>().SingleInstance();
+            builder.RegisterType<RfidService>().SingleInstance();
+
         }
 
         private void RegisterModules(ContainerBuilder builder)

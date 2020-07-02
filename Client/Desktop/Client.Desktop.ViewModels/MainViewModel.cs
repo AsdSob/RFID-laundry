@@ -1,8 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Threading;
 using System.Windows.Input;
-using Client.Desktop.ViewModels.Common.Identity;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Content;

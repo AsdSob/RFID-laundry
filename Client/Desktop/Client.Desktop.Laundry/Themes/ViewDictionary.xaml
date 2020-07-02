@@ -7,10 +7,15 @@
                     xmlns:views="clr-namespace:Client.Desktop.Laundry.Views"
                     xmlns:contentView="clr-namespace:Client.Desktop.Views.Content;assembly=Client.Desktop.Views"
                     xmlns:windows1="clr-namespace:Client.Desktop.Views.Windows;assembly=Client.Desktop.Views"
-                    xmlns:views1="clr-namespace:Client.Desktop.Views;assembly=Client.Desktop.Views">
+                    xmlns:views1="clr-namespace:Client.Desktop.Views;assembly=Client.Desktop.Views"
+                    xmlns:services="clr-namespace:Client.Desktop.ViewModels.Services;assembly=Client.Desktop.ViewModels">
 
     <DataTemplate DataType="{x:Type viewModels:MenuViewModel}">
         <views:MenuView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type services:RfidServiceTest}">
+        <contentView:RfidBaseContentView/>
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type content:MasterClientViewModel}">
