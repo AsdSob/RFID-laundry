@@ -382,9 +382,9 @@ namespace Client.Desktop.ViewModels.Services
             }
             else
             {
-                if (Equals(SelectedLinen.Tag, SelectedTag.Tag))
+                if (!String.IsNullOrWhiteSpace(SelectedLinen.Tag))
                 {
-                    if (!_dialogService.ShowWarnigDialog(
+                    if (!_dialogService.ShowQuestionDialog(
                         $"{SelectedLinen.OriginalObject.MasterLinenEntity.Name} already has Tag \"{SelectedLinen.Tag}\" \n Do you want to replace Tag?")
                     ) return;
                 }
