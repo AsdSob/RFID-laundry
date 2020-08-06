@@ -64,39 +64,24 @@
                         <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*" />
                         <DataGridTextColumn Header="Short Name" Binding="{Binding ShortName}" Width="*" />
 
-                        <DataGridComboBoxColumn Header="City"
-                                                DisplayMemberPath="Name"
-                                                SelectedValuePath="Id"
-                                                Width="0.5*"
-                                                SelectedValueBinding="{Binding CityId}">
-                            <DataGridComboBoxColumn.ElementStyle>
-                                <Style TargetType="{x:Type ComboBox}">
-                                    <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Cities, ElementName=StaffWindow}" />
-                                </Style>
-                            </DataGridComboBoxColumn.ElementStyle>
-                            <DataGridComboBoxColumn.EditingElementStyle>
-                                <Style TargetType="{x:Type ComboBox}">
-                                    <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Cities, ElementName=StaffWindow}" />
-                                </Style>
-                            </DataGridComboBoxColumn.EditingElementStyle>
-                        </DataGridComboBoxColumn>
+                        <materialDesign:DataGridComboBoxColumn
+                            Header="City"
+                            Width="0.5*"
+                            ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.Cities}"
+                            SelectedValueBinding="{Binding CityId}"
+                            DisplayMemberPath="Name"
+                            SelectedValuePath="Id"
+                        />
 
-                        <DataGridComboBoxColumn Header="Parent"
-                                                DisplayMemberPath="ShortName"
-                                                SelectedValuePath="Id"
-                                                MinWidth="150"
-                                                SelectedValueBinding="{Binding ParentId}">
-                            <DataGridComboBoxColumn.ElementStyle>
-                                <Style TargetType="{x:Type ComboBox}">
-                                    <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Clients, ElementName=StaffWindow}" />
-                                </Style>
-                            </DataGridComboBoxColumn.ElementStyle>
-                            <DataGridComboBoxColumn.EditingElementStyle>
-                                <Style TargetType="{x:Type ComboBox}">
-                                    <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Clients, ElementName=StaffWindow}" />
-                                </Style>
-                            </DataGridComboBoxColumn.EditingElementStyle>
-                        </DataGridComboBoxColumn>
+
+                        <materialDesign:DataGridComboBoxColumn
+                            Header="Parent"
+                            Width="150"
+                            ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.Clients}"
+                            SelectedValueBinding="{Binding ParentId}"
+                            DisplayMemberPath="ShortName"
+                            SelectedValuePath="Id"
+                        />
 
                         <!--<DataGridTextColumn Header="Address" Binding="{Binding Address}" Width="*" FontSize="10"/>-->
 

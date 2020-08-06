@@ -377,8 +377,8 @@ namespace Client.Desktop.ViewModels.Services
             {
                 var linen = Linens.FirstOrDefault(x => x.Tag == SelectedTag.Tag);
                 if (linen == null) return;
+
                 _dialogService.ShowInfoDialog("Linen Window");
-                //LinenWindow(linen);
             }
             else
             {

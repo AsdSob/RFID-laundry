@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
@@ -16,17 +16,10 @@ namespace Client.Desktop.ViewModels.Windows
     {
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
-        private readonly IMainDispatcher _dispatcher;
         private ObservableCollection<DepartmentEntityViewModel> _departments;
         private List<UnitViewModel> _departmentTypes;
         private DepartmentEntityViewModel _selectedDepartment;
-        private ClientEntityViewModel _selectedClient;
 
-        public ClientEntityViewModel SelectedClient
-        {
-            get => _selectedClient;
-            set => Set(ref _selectedClient, value);
-        }
         public DepartmentEntityViewModel SelectedDepartment
         {
             get => _selectedDepartment;
@@ -50,11 +43,10 @@ namespace Client.Desktop.ViewModels.Windows
         public RelayCommand DeleteCommand { get; }
         public RelayCommand InitializeCommand { get; }
 
-        public MasterDepartmentWindowModel(ILaundryService laundryService, IDialogService dialogService, IMainDispatcher dispatcher)
+        public MasterDepartmentWindowModel(ILaundryService laundryService, IDialogService dialogService)
         {
             _laundryService = laundryService ?? throw new ArgumentNullException(nameof(laundryService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
-            _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
 
             SaveCommand = new RelayCommand(Save);
             CloseCommand = new RelayCommand(Close);
@@ -64,11 +56,14 @@ namespace Client.Desktop.ViewModels.Windows
             DepartmentTypes = EnumExtensions.GetValues<DepartmentTypeEnum>();
         }
 
-        public void SetSelectedDepartment(DepartmentEntityViewModel department, ClientEntityViewModel selectedClient)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="department"></param>
+        /// <param name="clientId">Set Selected Client Id even for new department</param>
+        public async void SetItem(DepartmentEntityViewModel department, int clientId)
         {
-            SelectedDepartment = null;
-            SelectedClient = selectedClient;
-
+            await Initialize();
             if (department != null)
             {
                 SelectedDepartment = department;
@@ -77,21 +72,19 @@ namespace Client.Desktop.ViewModels.Windows
 
             SelectedDepartment = new DepartmentEntityViewModel(new DepartmentEntity()
             {
-                ClientId = selectedClient.Id,
+                ClientId = clientId,
                 DepartmentTypeId = 1,
             });
         }
 
-        private async void Initialize()
+        //TODO: GetOnly Departments of Passing client
+        public async Task Initialize()
         {
             _dialogService.ShowBusy();
 
             try
             {
-                var department = await _laundryService.GetAllAsync<DepartmentEntity>();
-                var departments = department.Select(x=> new DepartmentEntityViewModel(x));
-                Departments = departments.ToObservableCollection();
-
+                Departments = await _laundryService.Departments();
             }
             catch (Exception e)
             {
@@ -100,16 +93,6 @@ namespace Client.Desktop.ViewModels.Windows
             finally
             {
                 _dialogService.HideBusy();
-            }
-
-            PropertyChanged += OnPropertyChanged;
-        }
-
-        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(SelectedDepartment))
-            {
-                SaveCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -122,7 +105,6 @@ namespace Client.Desktop.ViewModels.Windows
 
             SelectedDepartment.AcceptChanges();
             _laundryService.AddOrUpdateAsync(SelectedDepartment.OriginalObject);
-
             Close();
         }
 
@@ -149,9 +131,7 @@ namespace Client.Desktop.ViewModels.Windows
                     return;
                 }
             }
-
             CloseAction?.Invoke(true);
-
         }
 
 

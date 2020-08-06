@@ -52,7 +52,7 @@
 
 
         <!-- busy indicator -->
-        <!--<dx:WaitIndicator x:Name="BusyIndicator"
+        <!--<Busy x:Name="BusyIndicator"
                           Content="Loading..."
                           Grid.Row="0"
                           Grid.Column="0"

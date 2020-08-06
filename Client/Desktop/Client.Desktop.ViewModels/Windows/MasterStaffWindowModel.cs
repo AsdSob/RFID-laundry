@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
+using System.Threading.Tasks;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
@@ -26,7 +26,6 @@ namespace Client.Desktop.ViewModels.Windows
             get => _departments;
             set => Set(ref _departments, value);
         }
-
         public StaffDetailsEntityViewModel SelectedStaffDetails
         {
             get => _selectedStaffDetails;
@@ -48,12 +47,16 @@ namespace Client.Desktop.ViewModels.Windows
             CloseCommand = new RelayCommand(Close);
             DeleteCommand = new RelayCommand(Delete);
             //InitializeCommand = new RelayCommand(Initialize);
-
         }
 
-        public void SetSelectedStaff(DepartmentEntityViewModel item, DepartmentEntityViewModel parent)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="item">Selected Staff</param>
+        /// <param name="parent"> Selected Department</param>
+        public async void SetItem(DepartmentEntityViewModel item, DepartmentEntityViewModel parent)
         {
-            SelectedStaff = null;
+            await Initialize();
 
             if (item != null)
             {
@@ -70,11 +73,6 @@ namespace Client.Desktop.ViewModels.Windows
                 return;
             }
 
-            NewItem(parent);
-        }
-
-        private void NewItem(DepartmentEntityViewModel parent)
-        {
             SelectedStaff = new DepartmentEntityViewModel
             {
                 ParentId = parent.Id,
@@ -84,15 +82,13 @@ namespace Client.Desktop.ViewModels.Windows
             SelectedStaffDetails = new StaffDetailsEntityViewModel();
         }
 
-        private async void Initialize()
+        private async Task Initialize()
         {
             _dialogService.ShowBusy();
 
             try
             {
-                //var staff = await _laundryService.GetAllAsync<StaffDetailsEntity>();
-                //var staffs = staff.Select(x => new StaffDetailsEntityViewModel(x));
-                //Staffs = staffs.ToObservableCollection();
+                Departments = await _laundryService.Departments();
 
             }
             catch (Exception e)
@@ -103,13 +99,6 @@ namespace Client.Desktop.ViewModels.Windows
             {
                 _dialogService.HideBusy();
             }
-
-            PropertyChanged += OnPropertyChanged;
-        }
-
-        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-
         }
 
         private void Save()
@@ -165,7 +154,6 @@ namespace Client.Desktop.ViewModels.Windows
                     return;
                 }
             }
-
             CloseAction?.Invoke(true);
         }
 

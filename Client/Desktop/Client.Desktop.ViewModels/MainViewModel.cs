@@ -17,11 +17,17 @@ namespace Client.Desktop.ViewModels
         private object _content;
         private MenuViewModel _menuViewModel;
         private bool _menuIsVisible;
+        private bool _isBusy;
 
         public Action CloseAction { get; set; }
 
         public ICommand InitilizeCommand { get; }
 
+        public bool IsBusy
+        {
+            get => _isBusy;
+            set => Set(ref _isBusy, value);
+        }
         public object Content
         {
             get => _content;

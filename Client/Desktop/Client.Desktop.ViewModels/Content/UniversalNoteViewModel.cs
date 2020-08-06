@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Windows.Documents;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
@@ -25,18 +23,24 @@ namespace Client.Desktop.ViewModels.Content
         private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
         private ObservableCollection<ClientLinenEntityViewModel> _clientLinens;
         private bool _showAllLinen;
-        private ObservableCollection<RfidReaderEntityViewModel> _readers;
-        private ObservableCollection<RfidAntennaEntityViewModel> _antennas;
+        private ObservableCollection<DeliveryNoteEntityViewModel> _deliveryNotes;
+        private DeliveryNoteEntityViewModel _selectedDeliveryNote;
+        private ObservableCollection<DeliveryNoteRowEntityViewModel> _deliveryNoteRows;
 
-        public ObservableCollection<RfidAntennaEntityViewModel> Antennas
+        public ObservableCollection<DeliveryNoteRowEntityViewModel> DeliveryNoteRows
         {
-            get => _antennas;
-            set => Set(ref _antennas, value);
+            get => _deliveryNoteRows;
+            set => Set(ref _deliveryNoteRows, value);
         }
-        public ObservableCollection<RfidReaderEntityViewModel> Readers
+        public DeliveryNoteEntityViewModel SelectedDeliveryNote
         {
-            get => _readers;
-            set => Set(ref _readers, value);
+            get => _selectedDeliveryNote;
+            set => Set(ref _selectedDeliveryNote, value);
+        }
+        public ObservableCollection<DeliveryNoteEntityViewModel> DeliveryNotes
+        {
+            get => _deliveryNotes;
+            set => Set(ref _deliveryNotes, value);
         }
         public bool ShowAllLinen
         {
@@ -79,10 +83,13 @@ namespace Client.Desktop.ViewModels.Content
 
         public ObservableCollection<DepartmentEntityViewModel> SortedDepartments => Departments
             ?.Where(x => x.ClientId == SelectedClient?.Id && x.ParentId == null).ToObservableCollection();
-        public ObservableCollection<ClientLinenEntityViewModel> SortedClientLinens => SortClientLinens();
 
+        public ObservableCollection<DeliveryNoteEntityViewModel> SortedNoteHeaders => SortNoteHeaders();
+        public ObservableCollection<DeliveryNoteRowEntityViewModel> SortedNoteRows => SortNoteRows();
 
         public RelayCommand InitializeCommand { get; }
+        public RelayCommand NewNoteCommand { get; }
+        public RelayCommand EditNoteCommand { get; }
 
         public UniversalNoteViewModel(ILaundryService dataService, IDialogService dialogService, IResolver resolver, IMainDispatcher dispatcher)
         {
@@ -92,6 +99,8 @@ namespace Client.Desktop.ViewModels.Content
             _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
 
             InitializeCommand = new RelayCommand(Initialize);
+            //NewNoteCommand = new RelayCommand(DeliveryNoteWindow(null), ()=> SelectedDepartment != null);
+            //EditNoteCommand = new RelayCommand(DeliveryNoteWindow(SelectedDeliveryNote), ()=> SelectedDeliveryNote != null);
 
             PropertyChanged += OnPropertyChanged;
         }
@@ -105,13 +114,15 @@ namespace Client.Desktop.ViewModels.Content
             
             if (e.PropertyName == nameof(SelectedDepartment))
             {
-                RaisePropertyChanged(() => SortedClientLinens);
+                RaisePropertyChanged(() => SortedNoteHeaders);
+                NewNoteCommand.RaiseCanExecuteChanged();
             }
             else
 
-            if (e.PropertyName == nameof(ShowAllLinen))
+            if (e.PropertyName == nameof(SelectedDeliveryNote))
             {
-                RaisePropertyChanged(() => SortedClientLinens);
+                RaisePropertyChanged(() => SortedNoteRows);
+                EditNoteCommand.RaiseCanExecuteChanged();
             }
 
         }
@@ -123,37 +134,52 @@ namespace Client.Desktop.ViewModels.Content
             MasterLinens = await _laundryService.MasterLinens();
 
             GetClientLinens();
-            GetRfidReaders();
         }
 
         private async void GetClientLinens()
         {
             ClientLinens = await _laundryService.ClientLinens();
         }
-        private async void GetRfidReaders()
+
+        private ObservableCollection<DeliveryNoteEntityViewModel> SortNoteHeaders()
         {
-            Readers = await _laundryService.RfidReaders();
-            Antennas = await _laundryService.RfidAntennas();
-        }
+            var notes = new ObservableCollection<DeliveryNoteEntityViewModel>();
+            if (SelectedDepartment == null) return notes;
 
-        private ObservableCollection<ClientLinenEntityViewModel> SortClientLinens()
-        {
-            var linens = new ObservableCollection<ClientLinenEntityViewModel>();
+            notes.AddRange(DeliveryNotes.Where(x=> x.DepartmentId == SelectedDepartment.Id));
 
-            if (SortedStaffs == null || SelectedDepartment == null) return linens;
-
-
-
-            var staffs = ShowAllLinen
-                ? SortedStaffs
-                : SortedStaffs.Where(x => x.ParentId == SelectedDepartment?.Id).ToObservableCollection();
-
+            var staffs = Departments.Where(x => x.ParentId == SelectedDepartment.Id);
             foreach (var staff in staffs)
             {
-                linens.AddRange(ClientLinens?.Where(x=> x.DepartmentId == staff.Id));
+                notes.AddRange(DeliveryNotes.Where(x => x.DepartmentId == staff.Id));
             }
 
-            return linens;
+            return notes;
+        }
+
+        private ObservableCollection<DeliveryNoteRowEntityViewModel> SortNoteRows()
+        {
+            var rows = new ObservableCollection<DeliveryNoteRowEntityViewModel>();
+            if (SelectedDeliveryNote == null) return rows;
+
+            rows = DeliveryNoteRows.Where(x => x.DeliveryNoteId == SelectedDeliveryNote.Id).ToObservableCollection();
+
+            return rows;
+        }
+
+        private void DeliveryNoteWindow(DeliveryNoteEntityViewModel item)
+        {
+            //var window = _resolverService.Resolve<DeliveryNoteWindowModel>();
+
+            //window.Clients = Clients;
+            //window.Departments = Departments;
+
+            //window.SetSelectedLinen(item);
+
+            //if (_dialogService.ShowDialog(window))
+            //{
+
+            //}
         }
 
 

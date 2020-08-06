@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
+using Client.Desktop.ViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.Windows;
@@ -17,6 +19,16 @@ namespace Client.Desktop.Views.Services
             window.DataContext = windowDialogViewModel;
 
             return window.ShowDialog() == true;
+        }
+
+        private readonly IResolver _resolver;
+        private readonly IMainDispatcher _dispatcher;
+
+        public DialogService(IResolver resolverService, IMainDispatcher dispatcher)
+        {
+            _resolver = resolverService ?? throw new ArgumentNullException(nameof(resolverService));
+            _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
+
         }
 
         public bool ShowQuestionDialog(string message)
@@ -63,6 +75,10 @@ namespace Client.Desktop.Views.Services
 
         private void SetIsBusy(bool isBusy)
         {
+            var viewModel = _resolver.Resolve<MainViewModel>();
+
+            _dispatcher.RunInMainThread(() => viewModel.IsBusy = isBusy);
+
             //Helper.RunInMainThread(() => viewModel.IsBusy = isBusy);
         }
 

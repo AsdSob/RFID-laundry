@@ -11,6 +11,7 @@ namespace Storage.Laundry.Models
         public string RfidTag { get; set; }
         public int StatusId { get; set; }
         public int PackingValue { get; set; }
+        public int? StaffId { get; set; }
 
         public virtual ICollection<ConveyorEntity> ConveyorEntities { get; set; }
         public virtual MasterLinenEntity MasterLinenEntity { get; set; }

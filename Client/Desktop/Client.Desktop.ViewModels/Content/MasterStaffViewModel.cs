@@ -294,20 +294,16 @@ namespace Client.Desktop.ViewModels.Content
         {
             var linenWindow = _resolverService.Resolve<ClientLinenWindowModel>();
 
-            linenWindow.Clients = Clients;
-            linenWindow.Departments = Departments;
-            linenWindow.MasterLinens = MasterLinens;
             linenWindow.ClientLinens = Linens;
 
             if (linen == null)
             {
                 linen = new ClientLinenEntityViewModel()
                 {
-                    Tag = SelectedTag?.Tag,
                 };
             }
 
-            linenWindow.SetSelectedLinen(linen);
+            linenWindow.SetItem(linen);
 
             if (_dialogService.ShowDialog(linenWindow))
             {

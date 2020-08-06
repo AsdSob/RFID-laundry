@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
@@ -24,7 +25,25 @@ namespace Client.Desktop.ViewModels.Content
         private ObservableCollection<MasterLinenEntityViewModel> _masterLinens;
         private RfidTagViewModel _selectedTag;
         private RfidServiceTest _reader;
+        private ClientEntityViewModel _selectedClient;
+        private DepartmentEntityViewModel _selectedDepartment;
+        private DepartmentEntityViewModel _selectedStaff;
 
+        public DepartmentEntityViewModel SelectedStaff
+        {
+            get => _selectedStaff;
+            set => Set(ref _selectedStaff, value);
+        }
+        public DepartmentEntityViewModel SelectedDepartment
+        {
+            get => _selectedDepartment;
+            set => Set(ref _selectedDepartment, value);
+        }
+        public ClientEntityViewModel SelectedClient
+        {
+            get => _selectedClient;
+            set => Set(ref _selectedClient, value);
+        }
         public RfidServiceTest Reader
         {
             get => _reader;
@@ -62,6 +81,8 @@ namespace Client.Desktop.ViewModels.Content
         }
 
         public ObservableCollection<DepartmentEntityViewModel> SortedStaffs => SortStaffs();
+        public ObservableCollection<DepartmentEntityViewModel> SortedDepartments => SortDepartments();
+        public ObservableCollection<ClientLinenEntityViewModel> SortedLinens => SortLinens();
 
         public RelayCommand NewLinenCommand { get; }
         public RelayCommand EditLinenCommand { get; }
@@ -89,6 +110,25 @@ namespace Client.Desktop.ViewModels.Content
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            if (e.PropertyName == nameof(SelectedClient))
+            {
+                RaisePropertyChanged(()=> SortedDepartments);
+                RaisePropertyChanged(() => SortedLinens);
+            }
+            else             
+            
+            if (e.PropertyName == nameof(SelectedDepartment))
+            {
+                RaisePropertyChanged(()=> SortedStaffs);
+                RaisePropertyChanged(() => SortedLinens);
+            }
+            else            
+            
+            if (e.PropertyName == nameof(SelectedStaff))
+            {
+                RaisePropertyChanged(()=> SortedLinens);
+            }else 
+
             if (e.PropertyName == nameof(SelectedClientLinen))
             {
                 DeleteLinenCommand?.RaiseCanExecuteChanged();
@@ -103,32 +143,87 @@ namespace Client.Desktop.ViewModels.Content
             Departments = await _laundryService.Departments();
             MasterLinens = await _laundryService.MasterLinens();
 
-            RaisePropertyChanged(()=> SortedStaffs);
+            await GetClientLinens();
 
-            GetClientLinens();
+            RaisePropertyChanged(() => SortedLinens);
         }
 
-        private async void GetClientLinens()
+        private async Task GetClientLinens()
         {
             Linens = await _laundryService.ClientLinens();
             Reader.SetLinens(Linens);
         }
 
+        private ObservableCollection<DepartmentEntityViewModel> SortDepartments()
+        {
+            var departments = new ObservableCollection<DepartmentEntityViewModel>();
+
+            if (SelectedClient != null)
+            {
+                departments = Departments.Where(x => x.ParentId == null && x.ClientId == SelectedClient.Id).ToObservableCollection();
+            }
+
+            SelectedDepartment = departments.FirstOrDefault();
+            return departments;
+        }
+
         private ObservableCollection<DepartmentEntityViewModel> SortStaffs()
         {
-            return Departments.Where(x => x.ParentId != null).ToObservableCollection();
-        }
+            var staffs = new ObservableCollection<DepartmentEntityViewModel>();
+
+            if (SelectedClient == null)
+            {
+               staffs = Departments?.Where(x => x.ParentId != null).ToObservableCollection();
+            }
+            else
+            {
+                if (SelectedDepartment == null)
+                {
+                    staffs = Departments?.Where(x => x.ParentId != null && x.ClientId == SelectedClient?.Id)
+                        .ToObservableCollection();
+                }
+                else
+                {
+                    staffs = Departments?.Where(x => x.ParentId != null && x.ParentId == SelectedDepartment?.Id).ToObservableCollection();
+                }
+            }
+
+            SelectedStaff = staffs?.FirstOrDefault();
+            return staffs;
+        }          
+        
+        private ObservableCollection<ClientLinenEntityViewModel> SortLinens()
+        {
+            ObservableCollection<ClientLinenEntityViewModel> linens;
+
+            if (SelectedClient == null)
+            {
+                linens = Linens;
+            }
+            else
+            {
+                if (SelectedDepartment == null)
+                {
+                    linens = Linens.Where(x => x.ClientId == SelectedClient.Id).ToObservableCollection();
+                }
+                else
+                {
+                    linens = SelectedStaff == null
+                        ? Linens.Where(x => x.DepartmentId == SelectedDepartment.Id).ToObservableCollection()
+                        : Linens.Where(x => x.StaffId == SelectedStaff.Id).ToObservableCollection();
+                }
+            }
+            return linens;
+        }        
+
 
         private void LinenWindow(ClientLinenEntityViewModel linen)
         {
             var linenWindow = _resolverService.Resolve<ClientLinenWindowModel>();
 
-            linenWindow.Clients = Clients;
-            linenWindow.Departments = Departments;
-            linenWindow.MasterLinens = MasterLinens;
             linenWindow.ClientLinens = Linens;
 
-            linenWindow.SetSelectedLinen(linen);
+            linenWindow.SetItem(linen);
 
             if (_dialogService.ShowDialog(linenWindow))
             {

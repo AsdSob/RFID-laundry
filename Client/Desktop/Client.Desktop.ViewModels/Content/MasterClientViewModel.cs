@@ -194,9 +194,8 @@ namespace Client.Desktop.ViewModels.Content
         private async void ClientWindow(ClientEntityViewModel client)
         {
             var clientWindow = _resolverService.Resolve<MasterClientWindowModel>();
-            clientWindow.Clients = Clients;
 
-            clientWindow.SetSelectedClient(client);
+            clientWindow.SetItem(client);
 
             if (_dialogService.ShowDialog(clientWindow))
             {
@@ -219,8 +218,7 @@ namespace Client.Desktop.ViewModels.Content
         {
             var departmentWindow = _resolverService.Resolve<MasterDepartmentWindowModel>();
 
-            departmentWindow.Departments = Departments;
-            departmentWindow.SetSelectedDepartment(department, SelectedClient);
+            departmentWindow.SetItem(department, SelectedClient.Id);
 
             if (_dialogService.ShowDialog(departmentWindow))
             {
@@ -244,8 +242,7 @@ namespace Client.Desktop.ViewModels.Content
         {
             var staffWindow = _resolverService.Resolve<MasterStaffWindowModel>();
 
-            staffWindow.Departments = Departments;
-            staffWindow.SetSelectedStaff(staff, SelectedDepartment);
+            staffWindow.SetItem(staff, SelectedDepartment);
 
             if (_dialogService.ShowDialog(staffWindow))
             {

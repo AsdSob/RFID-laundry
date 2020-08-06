@@ -54,7 +54,7 @@
                   SelectedValue="{Binding SelectedLinen.ClientId, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   materialDesign:HintAssist.Hint="Client"
                   SelectedValuePath="Id"
-                  DisplayMemberPath="Name"
+                  DisplayMemberPath="ShortName"
                   Margin="10,20,20,0"
                   FontSize="20"
                   Height="45"
@@ -63,21 +63,22 @@
         <!-- Department -->
         <ComboBox Grid.Row="1"
                   Grid.Column="1"
-                  ItemsSource="{Binding SortedDepartments}"
-                  SelectedItem="{Binding SelectedDepartment, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  DisplayMemberPath="Name"
+                  ItemsSource="{Binding SortedDepartments}" 
+                  SelectedValue="{Binding SelectedLinen.DepartmentId, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   materialDesign:HintAssist.Hint="Department"
-                  Margin="0,20,20,0"
+                  SelectedValuePath="Id"
+                  DisplayMemberPath="Name"
+                  Margin="10,20,20,0"
                   FontSize="20"
                   Height="45"
         />
-
+        
         <!-- Staff -->
         <ComboBox Grid.Row="2"
                   Grid.Column="0"
                   Grid.ColumnSpan="2"
                   ItemsSource="{Binding SortedStaffs}"
-                  SelectedValue="{Binding SelectedLinen.DepartmentId, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  SelectedValue="{Binding SelectedLinen.StaffId, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   materialDesign:TextFieldAssist.HasClearButton="True"
                   materialDesign:HintAssist.Hint="Staff"
                   SelectedValuePath="Id"

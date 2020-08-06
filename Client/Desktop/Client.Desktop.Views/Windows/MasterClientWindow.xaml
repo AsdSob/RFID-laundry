@@ -89,11 +89,11 @@
 
             <!-- Parent Id -->
 
-            <ComboBox ItemsSource="{Binding SortedParentClients, UpdateSourceTrigger=PropertyChanged}" SelectedValue="{Binding SelectedClient.ParentId}"
+            <ComboBox ItemsSource="{Binding ParentClients, UpdateSourceTrigger=PropertyChanged}" 
+                      SelectedValue="{Binding SelectedClient.ParentId, UpdateSourceTrigger=PropertyChanged}"
                       DockPanel.Dock="Left"
                       DisplayMemberPath="ShortName"
                       SelectedValuePath="Id"
-                      IsEditable="False"
                       Grid.Column="0"
                       materialDesign:HintAssist.Hint="Parent"
                       materialDesign:TextFieldAssist.HasClearButton="True"

@@ -61,7 +61,7 @@
                           AllowDrop="True" 
                           EnableRowVirtualization="True" 
                           IsReadOnly="True" 
-                          x:Name="xaxa"
+                          RowStyle="{StaticResource DecorationDataGridRowStyle}"
                           >
 
                     <DataGrid.Columns>

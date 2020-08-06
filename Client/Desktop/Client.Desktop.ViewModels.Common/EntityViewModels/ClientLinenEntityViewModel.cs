@@ -18,9 +18,15 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
         private int _packingValue;
         private bool _isValid;
         private string _error;
+        private int? _staffId;
 
         public bool IsSelected { get; set; }
 
+        public int? StaffId
+        {
+            get => _staffId;
+            set => Set(ref _staffId, value);
+        }
         public string Error
         {
             get => _error;
@@ -97,6 +103,7 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             StatusId = OriginalObject.StatusId;
             MasterLinenId = OriginalObject.MasterLinenId;
             PackingValue = OriginalObject.PackingValue;
+            StaffId = OriginalObject.StaffId;
         }
 
         public void AcceptChanges()
@@ -109,6 +116,7 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
             OriginalObject.StatusId = StatusId;
             OriginalObject.MasterLinenId = MasterLinenId;
             OriginalObject.PackingValue = PackingValue;
+            OriginalObject.StaffId = StaffId;
         }
 
         public bool HasChanges() => OriginalObject == null ||
@@ -118,6 +126,7 @@ namespace Client.Desktop.ViewModels.Common.EntityViewModels
                                     !Equals(Tag, OriginalObject.RfidTag) ||
                                     !Equals(StatusId, OriginalObject.StatusId) ||
                                     !Equals(PackingValue, OriginalObject.PackingValue) ||
+                                    !Equals(StaffId, OriginalObject.StaffId) ||
                                     !Equals(MasterLinenId, OriginalObject.MasterLinenId);
 
         public string this[string columnName] => Validate(columnName);

@@ -37,21 +37,52 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>                                                        
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <!-- Linen Commands -->
-            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+            <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
                 <Button Content="New" Command="{Binding NewLinenCommand}"/>
                 <Button Content="Edit" Command="{Binding EditLinenCommand}"/>
                 <Button Content="Delete" Command="{Binding DeleteLinenCommand}"/>
             </StackPanel>
 
+            <!-- Filter fields -->
+            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+
+                <ComboBox ItemsSource="{Binding Clients}" 
+                          SelectedValue="{Binding SelectedClient}" 
+                          DisplayMemberPath="Name"
+                          materialDesign:HintAssist.Hint="Client"
+                          materialDesign:TextFieldAssist.HasClearButton="True"
+                          />                
+                
+                <ComboBox ItemsSource="{Binding SortedDepartments}" 
+                          SelectedValue="{Binding SelectedDepartment}" 
+                          DisplayMemberPath="Name"
+                          materialDesign:HintAssist.Hint="Department"
+                          materialDesign:TextFieldAssist.HasClearButton="True"
+                          />
+
+                <ComboBox ItemsSource="{Binding SortedStaffs}" 
+                          SelectedValue="{Binding SelectedStaff}" 
+                          DisplayMemberPath="Name"
+                          materialDesign:HintAssist.Hint="Staff"
+                          materialDesign:TextFieldAssist.HasClearButton="True"/>
+
+                <TextBox Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
+                         materialDesign:HintAssist.Hint="Search"
+                         FontSize="20"
+                />
+
+            </StackPanel>
+
             <!-- Linens -->
-            <GroupBox Grid.Row="1" Grid.Column="0" Header="Linen">
+            <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Header="Linen">
 
                 <DataGrid Height="Auto"
-                          ItemsSource="{Binding Linens}"
+                          ItemsSource="{Binding SortedLinens}"
                           SelectedItem="{Binding SelectedClientLinen}"
                           SelectionMode="Single"
                           IsReadOnly="True"
@@ -60,7 +91,6 @@
                           CanUserAddRows="False"
                           AutoGenerateColumns="False"
                           HorizontalContentAlignment="Stretch"
-                          
                           >
 
                     <DataGrid.Columns>
@@ -72,7 +102,7 @@
                         <materialDesign:DataGridComboBoxColumn
                             Header="Staff Id"
                             Width="*"
-                            SelectedValueBinding="{Binding DepartmentId}"
+                            SelectedValueBinding="{Binding StaffId}"
                             DisplayMemberPath="OriginalObject.StaffDetailsEntity.StaffId"
                             SelectedValuePath="Id"
                             materialDesign:IsEditable="False"
@@ -84,7 +114,7 @@
                         <materialDesign:DataGridComboBoxColumn
                             Header="Staff"
                             Width="2*"
-                            SelectedValueBinding="{Binding DepartmentId}"
+                            SelectedValueBinding="{Binding StaffId}"
                             DisplayMemberPath="OriginalObject.StaffDetailsEntity.Name"
                             SelectedValuePath="Id"
                             ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.Departments}"
@@ -123,78 +153,6 @@
         </Grid>
 
         <ContentPresenter Grid.Row="1" Grid.Column="2" Margin="10,0" Content="{Binding Reader}" />
-        <!--<Grid Grid.Row="1" Grid.Column="2" Margin="10,0">
-            
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-
-            <DockPanel Grid.Row="1" Grid.Column="0" LastChildFill="False" Margin="0,20,0,0">
-                <Button Content="{Binding Reader.AddShowContent}" Command="{Binding AddShowLinenByTagCommand}"/>
-                <Button Content="Remove" Command="{Binding DeleteTagCommand}"/>
-            </DockPanel>
-
-            --><!-- RFID\Reader Commands --><!--
-            <DockPanel Grid.Row="0"
-                        Grid.Column="0"
-                       >
-
-                <Button DockPanel.Dock="Right"
-                        Content="Setting"
-                        Command="{Binding Reader.RfidReaderWindowCommand}"
-
-                />
-
-                --><!-- Start/Stop--><!--
-                <Button DockPanel.Dock="Right"
-                        Content="{Binding Reader.StartStopContent}"
-                        Command="{Binding Reader.StartStopCommand}"
-
-                />                
-                
-                <ComboBox DockPanel.Dock="Left" 
-                          ItemsSource="{Binding Reader.Readers}" 
-                          SelectedValue="{Binding Reader.SelectedReader}" 
-                          VerticalContentAlignment="Center"
-                          DisplayMemberPath="Name"/>
-
-            </DockPanel>
-
-            <GroupBox Grid.Column="0" 
-                      Grid.Row="2" 
-                      Header="Tags"
-                      >
-                <DataGrid AutoGenerateColumns="False"
-                          Height="NaN"
-                          ItemsSource="{Binding Reader.Tags}"
-                          SelectedItem="{Binding Reader.SelectedTag, UpdateSourceTrigger=PropertyChanged}"
-                          VerticalScrollBarVisibility="Visible"
-                          AllowDrop="True" 
-                          EnableRowVirtualization="True" 
-                          IsReadOnly="True" 
-                          x:Name="xaxa"
-                          >
-
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Antenna" Binding="{Binding Path=Antenna}" Width="Auto" />
-                        <DataGridTextColumn Header="Tag" Binding="{Binding Path=Tag}" Width="*" />
-
-                        <DataGridTextColumn Header="reg" 
-                                            Binding="{Binding Path=IsRegistered}" 
-                                            Width="Auto" 
-                                            >
-
-                        </DataGridTextColumn>
-
-                    </DataGrid.Columns>
-
-                </DataGrid>
-            </GroupBox>
-        </Grid>-->
+             
     </Grid>
 </UserControl>

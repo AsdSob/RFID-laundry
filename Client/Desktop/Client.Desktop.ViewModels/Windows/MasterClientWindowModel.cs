@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Client.Desktop.ViewModels.Common.EntityViewModels;
 using Client.Desktop.ViewModels.Common.Extensions;
 using Client.Desktop.ViewModels.Common.Services;
 using Client.Desktop.ViewModels.Common.ViewModels;
 using Client.Desktop.ViewModels.Common.Windows;
-using Storage.Laundry.Models;
 
 namespace Client.Desktop.ViewModels.Windows
 {
@@ -16,11 +15,16 @@ namespace Client.Desktop.ViewModels.Windows
     {
         private readonly ILaundryService _laundryService;
         private readonly IDialogService _dialogService;
-        private readonly IMainDispatcher _dispatcher;
         private ObservableCollection<ClientEntityViewModel> _clients;
         private ClientEntityViewModel _selectedClient;
         private List<UnitViewModel> _cities;
+        private ObservableCollection<ClientEntityViewModel> _parentClients;
 
+        public ObservableCollection<ClientEntityViewModel> ParentClients
+        {
+            get => _parentClients;
+            set => Set(ref _parentClients, value);
+        }
         public List<UnitViewModel> Cities
         {
             get => _cities;
@@ -37,13 +41,6 @@ namespace Client.Desktop.ViewModels.Windows
             set => Set(ref _clients, value);
         }
 
-        public List<ClientEntityViewModel> SortedParentClients => SortParentClients();
-
-        private List<ClientEntityViewModel> SortParentClients()
-        {
-            return Clients?.Where(x => (x.ParentId == 0 || x.ParentId == null) && x.Id != SelectedClient?.Id).ToList();
-        }
-
         public RelayCommand SaveCommand { get; }
         public RelayCommand CloseCommand { get; }
         public RelayCommand NewCommand { get; }
@@ -53,52 +50,52 @@ namespace Client.Desktop.ViewModels.Windows
         public Action<bool> CloseAction { get; set; }
 
 
-        public MasterClientWindowModel(ILaundryService laundryService, IDialogService dialogService, IMainDispatcher dispatcher)
+        public MasterClientWindowModel(ILaundryService laundryService, IDialogService dialogService)
         {
             _laundryService = laundryService ?? throw new ArgumentNullException(nameof(laundryService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
-            _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
 
             SaveCommand = new RelayCommand(Save);
             CloseCommand = new RelayCommand(CloseWindow);
             DeleteCommand = new RelayCommand(Delete);
-            NewCommand = new RelayCommand(NewItem);
+            NewCommand = new RelayCommand(New);
             //InitializeCommand = new RelayCommand(Initialize);
 
             Cities = EnumExtensions.GetValues<CitiesEnum>();
         }
 
-        public void SetSelectedClient(ClientEntityViewModel client)
+        public async void SetItem(ClientEntityViewModel item)
         {
-            SelectedClient = null;
+            await Initialize();
 
-            if (client != null)
+            ParentClients = Clients
+                ?.Where(x => (x.ParentId == 0 || x.ParentId == null) && x.Id != item?.Id)
+                .ToObservableCollection();
+
+            if (item != null)
             {
-                SelectedClient = client;
+                SelectedClient = item;
                 return;
             }
-
-            NewItem();
+            New();
         }
 
-        public void NewItem()
+        public void New()
         {
             SelectedClient = new ClientEntityViewModel()
             {
                 CityId = 1,
-                Active = true
+                Active = true,
             };
         }
 
-        private async void Initialize()
+        public async Task Initialize()
         {
             _dialogService.ShowBusy();
 
             try
             {
-                var client = await _laundryService.GetAllAsync<ClientEntity>();
-                var clients = client.Select(x => new ClientEntityViewModel(x));
-                Clients = clients.ToObservableCollection();
+                Clients = await _laundryService.Clients();
 
             }
             catch (Exception e)
@@ -109,14 +106,6 @@ namespace Client.Desktop.ViewModels.Windows
             {
                 _dialogService.HideBusy();
             }
-
-            PropertyChanged += OnPropertyChanged;
-            RaisePropertyChanged((() => SortedParentClients));
-        }
-
-        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-
         }
 
         private void Save()
@@ -130,10 +119,7 @@ namespace Client.Desktop.ViewModels.Windows
 
             _laundryService.AddOrUpdateAsync(SelectedClient.OriginalObject);
 
-            if (_dialogService.ShowQuestionDialog("Saved! \n Do you want to close window ? "))
-            {
-                CloseWindow();
-            }
+            CloseWindow();
         }
 
         private void Delete()

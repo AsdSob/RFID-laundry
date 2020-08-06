@@ -14,7 +14,7 @@
 
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverterKey"></BooleanToVisibilityConverter>
-        <converters:DataGridRowColorConvertor x:Key="DataGridRowColorConvertor" />
+        <converters:DecorationBrushConverter x:Key="DataGridRowColorConvertor" />
     </UserControl.Resources>
 
     <b:Interaction.Triggers>
@@ -66,10 +66,20 @@
                       FontSize="20"
             />
 
-            <!--Linen-->
-            <GroupBox Grid.Row="3" Header="Linen">
-                <DataGrid Grid.Row="3"
-                          ItemsSource="{Binding SortedClientLinens}"
+            <!--Note Headers-->
+            <Grid Grid.Row="3">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                    <Button Content="New" Command="{Binding NewNoteCommand}"/>
+                    <Button Content="Edit" Command="{Binding EditNoteCommand}"/>
+                </StackPanel>
+
+                <GroupBox Grid.Row="1" Header="Notes">
+                <DataGrid ItemsSource="{Binding SortedNoteHeaders}"
                           SelectionMode="Single"
                           IsReadOnly="True"
                           HorizontalAlignment="Stretch"
@@ -90,22 +100,13 @@
                         </DataGridTemplateColumn>
 
                         <!--Linen-->
-                        <DataGridTextColumn Header="Linen" Binding="{Binding OriginalObject.MasterLinenEntity.Name}"  Width="*"/>
+                        <DataGridTextColumn Header="Linen" Binding="{Binding Name}"  Width="*"/>
 
                         <!--Department-->
                         <materialDesign:DataGridComboBoxColumn
-                            Header="Department"
-                            SelectedValueBinding="{Binding DepartmentId}"
-                            DisplayMemberPath="OriginalObject.Parent.Name"
-                            SelectedValuePath="Id"
-                            ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.Departments}"
-                        />
-
-                        <!--Staff-->
-                        <materialDesign:DataGridComboBoxColumn
                             Header="Staff"
                             SelectedValueBinding="{Binding DepartmentId}"
-                            DisplayMemberPath="OriginalObject.StaffDetailsEntity.Name"
+                            DisplayMemberPath="OriginalObject.Name"
                             SelectedValuePath="Id"
                             ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.Departments}"
                         />
@@ -113,7 +114,9 @@
                     </DataGrid.Columns>
                 </DataGrid>
             </GroupBox>
-                
+            </Grid>
+
+    <!-- NoteRows -->
         </Grid>
 
         <Grid Grid.Column="1">
